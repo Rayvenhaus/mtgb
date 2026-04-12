@@ -416,3 +416,11 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+# MTGB specific - never commit these
+appsettings.local.json
+secrets.json
+**/OAuthSecrets.cs
+**/client_secrets.json
+src/MTGB/Config/OAuthConfig.cs

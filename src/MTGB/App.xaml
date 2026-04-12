@@ -1,0 +1,60 @@
+<Application x:Class="MTGB.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <!-- ── Colours ──────────────────────────────────── -->
+            <Color x:Key="MtgbPrimaryColor">#2D7DD2</Color>
+            <Color x:Key="MtgbSuccessColor">#3BB273</Color>
+            <Color x:Key="MtgbWarningColor">#F18F01</Color>
+            <Color x:Key="MtgbErrorColor">#E84855</Color>
+            <Color x:Key="MtgbOfflineColor">#888780</Color>
+
+            <SolidColorBrush x:Key="MtgbPrimary"
+                             Color="{StaticResource MtgbPrimaryColor}"/>
+            <SolidColorBrush x:Key="MtgbSuccess"
+                             Color="{StaticResource MtgbSuccessColor}"/>
+            <SolidColorBrush x:Key="MtgbWarning"
+                             Color="{StaticResource MtgbWarningColor}"/>
+            <SolidColorBrush x:Key="MtgbError"
+                             Color="{StaticResource MtgbErrorColor}"/>
+            <SolidColorBrush x:Key="MtgbOffline"
+                             Color="{StaticResource MtgbOfflineColor}"/>
+
+            <!-- ── Base styles ──────────────────────────────── -->
+            <Style TargetType="Window">
+                <Setter Property="FontFamily"
+                        Value="Segoe UI"/>
+                <Setter Property="FontSize"
+                        Value="13"/>
+                <Setter Property="Background"
+                        Value="#FAFAFA"/>
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily"
+                        Value="Segoe UI"/>
+                <Setter Property="FontSize"
+                        Value="13"/>
+                <Setter Property="Foreground"
+                        Value="#1E1E1E"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="FontFamily"
+                        Value="Segoe UI"/>
+                <Setter Property="FontSize"
+                        Value="13"/>
+                <Setter Property="Padding"
+                        Value="16 6"/>
+                <Setter Property="BorderThickness"
+                        Value="1"/>
+                <Setter Property="Cursor"
+                        Value="Hand"/>
+            </Style>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
