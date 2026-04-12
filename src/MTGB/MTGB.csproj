@@ -54,15 +54,18 @@
   <ItemGroup>
     <Resource Include="Assets\**\*" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="App.xaml.cs" />
-  </ItemGroup>
 
   <!-- Config files -->
   <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>
