@@ -1,8 +1,8 @@
-<Window x:Class="MTGB.UI.SettingsWindow"
+<Window x:Class="MTGB.UI.HistoryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MTGB — Settings"
-        Width="700" Height="500"
+        Title="MTGB — History"
+        Width="600" Height="500"
         WindowStartupLocation="CenterScreen">
     <Grid/>
 </Window>

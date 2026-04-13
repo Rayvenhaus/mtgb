@@ -5,7 +5,9 @@ using Microsoft.Extensions.Logging;
 using MTGB.Config;
 using MTGB.Core.Security;
 using MTGB.Services;
+using MTGB.UI;
 using System.Windows;
+using System.IO;
 
 namespace MTGB;
 
@@ -116,6 +118,12 @@ internal class Program
 
                 // ── WPF App ───────────────────────────────────────
                 services.AddSingleton<App>();
+
+                // ── UI ────────────────────────────────────────────────────────
+                services.AddTransient<FlyoutWindow>();
+                services.AddTransient<SettingsWindow>();
+                services.AddTransient<HistoryWindow>();
+                services.AddSingleton<TrayIcon>();
             })
             .Build();
 }
