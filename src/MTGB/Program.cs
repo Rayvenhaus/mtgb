@@ -6,43 +6,32 @@ using MTGB.Config;
 using MTGB.Core.Security;
 using MTGB.Services;
 using MTGB.UI;
-using System.Windows;
 using System.IO;
+using System.Windows;
 
 namespace MTGB;
 
-/// <summary>
-/// MTGB — The Monitor That Goes Bing.
-/// Never leave a print behind.
-/// 
-/// Entry point and dependency injection wiring.
-/// All services are registered here and composed via 
-/// the .NET 8 Generic Host.
-/// </summary>
 internal class Program
 {
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
-        // WPF requires STA thread — [STAThread] above handles this.
-        // The Generic Host runs async services on background threads.
-
         var host = CreateHost(args);
+
+        // Build the WPF app first on the STA thread
+        var app = new App();
+        app.SetServiceProvider(host.Services);
+
+        // Start background services without blocking the STA thread
+        Task.Run(async () => await host.StartAsync());
 
         try
         {
-            await host.StartAsync();
-
-            // Boot the WPF application on the STA thread.
-            // This blocks until the app exits.
-            var app = host.Services.GetRequiredService<App>();
             app.InitializeComponent();
             app.Run();
         }
         catch (Exception ex)
         {
-            // Last-resort catch — something went catastrophically wrong
-            // before the UI was even up.
             MessageBox.Show(
                 $"MTGB failed to start.\n\n{ex.Message}\n\n" +
                 $"Please check the logs in %APPDATA%\\MTGB\\logs\\",
@@ -52,7 +41,7 @@ internal class Program
         }
         finally
         {
-            await host.StopAsync();
+            host.StopAsync().GetAwaiter().GetResult();
             host.Dispose();
         }
     }
@@ -78,21 +67,22 @@ internal class Program
                 logging.AddConsole();
                 logging.AddDebug();
                 logging.AddFile(Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    Environment.GetFolderPath(
+                        Environment.SpecialFolder.ApplicationData),
                     "MTGB", "logs", "mtgb-.log"));
             })
             .ConfigureServices((context, services) =>
             {
-                // ── Configuration ─────────────────────────────────
+                // ── Configuration ─────────────────────────────
                 services.Configure<AppSettings>(
                     context.Configuration);
 
-                // ── Security ──────────────────────────────────────
+                // ── Security ──────────────────────────────────
                 services.AddSingleton<ICredentialManager,
                     WindowsCredentialManager>();
                 services.AddSingleton<WebhookSecretManager>();
 
-                // ── HTTP client ───────────────────────────────────
+                // ── HTTP client ───────────────────────────────
                 services.AddHttpClient<ISimplyPrintApiClient,
                     SimplyPrintApiClient>((provider, client) =>
                     {
@@ -103,23 +93,20 @@ internal class Program
                             "User-Agent", "MTGB/0.1.0");
                     });
 
-                // ── Auth ──────────────────────────────────────────
+                // ── Auth ──────────────────────────────────────
                 services.AddSingleton<IAuthService, AuthService>();
 
-                // ── Core services ─────────────────────────────────
+                // ── Core services ─────────────────────────────
                 services.AddSingleton<IStateDiffEngine,
                     StateDiffEngine>();
                 services.AddSingleton<INotificationManager,
                     NotificationManager>();
 
-                // ── Background workers ────────────────────────────
+                // ── Background workers ────────────────────────
                 services.AddHostedService<PollingWorker>();
                 services.AddHostedService<WebhookWorker>();
 
-                // ── WPF App ───────────────────────────────────────
-                services.AddSingleton<App>();
-
-                // ── UI ────────────────────────────────────────────────────────
+                // ── UI ────────────────────────────────────────
                 services.AddTransient<FlyoutWindow>();
                 services.AddTransient<SettingsWindow>();
                 services.AddTransient<HistoryWindow>();

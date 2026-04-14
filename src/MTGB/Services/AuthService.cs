@@ -351,7 +351,7 @@ internal class LocalCallbackBrowser : IBrowser
             return new BrowserResult
             {
                 ResultType = BrowserResultType.Timeout,
-                ErrorMessage = "Login timed out. Please try again."
+                Error = "Login timed out. Please try again."
             };
         }
         catch (Exception ex)
@@ -360,7 +360,7 @@ internal class LocalCallbackBrowser : IBrowser
             return new BrowserResult
             {
                 ResultType = BrowserResultType.UnknownError,
-                ErrorMessage = ex.Message
+                Error = ex.Message
             };
         }
         finally
