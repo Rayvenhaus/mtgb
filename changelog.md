@@ -14,13 +14,65 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Everything. It did not previously exist.
 
 ---
+## [0.2.0] — Unreleased
+### The one where it gets a face.
+
+### Added
+#### User interface
+- `FlyoutWindow.xaml` — Art Deco dark brass flyout panel, slides up 
+  from taskbar on left-click with cubic ease animation and fade
+- `TrayContextMenu.xaml` — fully custom dark brass context menu with 
+  ControlTemplate overrides to bypass WPF visual tree isolation
+- `TrayIcon.cs` — full tray icon implementation with left-click flyout, 
+  right-click minimal menu, icon state loop, toast action routing and 
+  contextual flavour text pools
+- `App.xaml` — complete MTGB dark theme foundation covering all WPF 
+  control types, Art Deco palette as global resources, SystemColors 
+  overrides for consistent dark rendering regardless of Windows theme
+- `app.manifest` — Windows 10/11 compatibility and Per Monitor V2 
+  DPI awareness for crisp rendering on high-DPI displays
+- `THE_TRUTH.md` — the canonical origin story of MTGB, written in 
+  the tradition of Monty Python and Sir Terry Pratchett. Filed once. 
+  Filed again. Filed a third time because the second filing was filed 
+  under the wrong filing.
+- `CHANGELOG.md` — because apparently we needed one of these
+- Versioning policy established — PATCH/MINOR/MAJOR/pre-release
+
+#### Branding
+- Multi-resolution icon generated from Art Deco 1930s brass and 
+  mahogany wood panel design — MTGB_16/32/48/256.png combined into 
+  mtgb.ico via ImageMagick
+- Full Leonardo.ai prompt documented for future icon variations
+
+### Fixed
+- `NETSDK1135` — TFM updated to `net8.0-windows10.0.19041.0`
+- `CS7036` — App constructor removed, SetServiceProvider pattern adopted
+- STA thread violation — WPF instantiated before host, background 
+  services via Task.Run
+- Flyout positioning — ContentRendered event guarantees ActualHeight 
+  available before positioning above taskbar
+- Flyout only opening once — IsLoaded check with animation replay 
+  on subsequent Show() calls
+- WPF transparency chrome — WS_EX_TOOLWINDOW applied on SourceInitialized
+- Duplicate PositionAboveTaskbar method removed
+- prefersDarkMode removed from manifest — not a valid Windows element
+- XDG0046 — SystemColors keys moved to root ResourceDictionary
+- XDG0012 — ToolTipBrushKey removed, tooltip theming via Style instead
+
+### Known issues
+- Right-click context menu ✅ Fixed
+- Settings window — placeholder, credentials cannot be configured yet
+- History window — placeholder
+- First run setup suppressed pending Settings window completion
+- OAuth2 pending SimplyPrint approval
+
+---
 
 ## [0.1.0] — 14/04/2026
 
 ### The one where it goes Bing for the first time.
 
 ### Added
-
 #### Foundation
 - Full project scaffold — solution, csproj, folder structure
 - MIT licence — the community may do as they wish, within reason
@@ -153,25 +205,5 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - OAuth2 flow requires SimplyPrint approval before it can be tested
 
 ---
-
-## Origin story
-
-> *"Look guys, I'm building a Windows 10/11 notification app for 
-> SimplyPrint. It monitors your prints. It goes Bing. Never leave a 
-> print behind again. But No ONE expects a Notification App, quietly 
-> waiting, to suddenly pop up and notify you, in the middle of your 
-> latest doom scrolling, or whatever it is you're doing alone, in front 
-> of the computer late at night, and I'm not judging, of the fact that 
-> the latest 8 hour print went from perfection to Spag bol (Minus the 
-> bol) in 2.3 nano seconds flat. It's called MTGB. That's all you need 
-> to know for now. Drop a reaction if you'd use it. Or tell me to take 
-> it to the Ministry of Silly Apps. Either way."*
-
-*Inspired by Monty Python's "The Machine That Goes Ping". No NHS budget 
-was harmed in the making of this app, although the Redundant Department 
-of Redundancy was notified, twice, in triplicate.*
-
----
-
-[Unreleased]: https://github.com/YOUR_USERNAME/mtgb/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/YOUR_USERNAME/mtgb/releases/tag/v0.1.0
+[Unreleased]: https://github.com/rayvenhaus/mtgb/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/rayvenhaus/mtgb/releases/tag/v0.1.0
