@@ -1,0 +1,118 @@
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ContextMenu x:Key="TrayMenu"
+                 Background="#141417"
+                 BorderBrush="#59C9930E"
+                 BorderThickness="1"
+                 Padding="0 4"
+                 HasDropShadow="True">
+
+        <ContextMenu.Style>
+            <Style TargetType="ContextMenu">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border Background="#141417"
+                                    BorderBrush="#59C9930E"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="0 4"
+                                    MinWidth="220">
+                                <StackPanel 
+                                    IsItemsHost="True"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ContextMenu.Style>
+
+        <ContextMenu.Resources>
+            <Style TargetType="MenuItem">
+                <Setter Property="Background" Value="#141417"/>
+                <Setter Property="Foreground" Value="#F0EDE8"/>
+                <Setter Property="FontFamily" 
+                        Value="Segoe UI Variable, Segoe UI"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="16 9"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    Padding="{TemplateBinding Padding}"
+                                    BorderThickness="0">
+                                <TextBlock 
+                                    Text="{TemplateBinding Header}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    FontWeight="{TemplateBinding FontWeight}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" 
+                                         Value="True">
+                                    <Setter TargetName="Bd"
+                                            Property="Background"
+                                            Value="#22222A"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Separator">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Separator">
+                            <Border Height="1"
+                                    Background="#38C9930E"
+                                    Margin="10 3"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ContextMenu.Resources>
+
+        <!-- Header -->
+        <MenuItem Header="M · T · G · B"
+                  IsEnabled="False"
+                  Foreground="#F0C840"
+                  FontFamily="Georgia"
+                  FontSize="12"
+                  FontWeight="Bold"
+                  Padding="16 12"/>
+
+        <Separator/>
+
+        <MenuItem x:Name="MenuOpenDashboard"
+                  Header="Open SimplyPrint dashboard ↗"
+                  Foreground="#F0EDE8"/>
+
+        <MenuItem x:Name="MenuHistory"
+                  Header="Notification history"
+                  Foreground="#F0EDE8"/>
+
+        <Separator/>
+
+        <MenuItem x:Name="MenuSettings"
+                  Header="Settings"
+                  Foreground="#C9930E"/>
+
+        <MenuItem x:Name="MenuMute"
+                  Header="Mute all notifications"
+                  Foreground="#F0EDE8"/>
+
+        <Separator/>
+
+        <MenuItem x:Name="MenuExit"
+                  Header="Exit MTGB"
+                  Foreground="#E84855"/>
+
+    </ContextMenu>
+
+</ResourceDictionary>

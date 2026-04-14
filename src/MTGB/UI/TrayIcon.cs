@@ -277,48 +277,40 @@ public class TrayIcon : IDisposable
 
     private ContextMenu BuildContextMenu()
     {
-        var menu = new ContextMenu
-        {
-            Background = new SolidColorBrush(
-                Color.FromRgb(0x14, 0x14, 0x17)),
-            BorderBrush = new SolidColorBrush(
-                Color.FromArgb(0x59, 0xC9, 0x93, 0x0E)),
-            BorderThickness = new Thickness(1)
-        };
+        var menu = Application.Current.Resources["TrayMenu"]
+            as ContextMenu
+            ?? new ContextMenu();
 
-        menu.Items.Add(BuildMenuItem(
-            "M · T · G · B",
-            null,
-            isHeader: true));
+        // Wire up click handlers by name
+        WireMenuItemClick(menu, "MenuOpenDashboard",
+            () => OpenSimplyPrintDashboard());
 
-        menu.Items.Add(new Separator());
+        WireMenuItemClick(menu, "MenuHistory",
+            () => OpenHistory());
 
-        menu.Items.Add(BuildMenuItem(
-            "Open dashboard",
-            () => OpenSimplyPrintDashboard()));
+        WireMenuItemClick(menu, "MenuSettings",
+            () => OpenSettings());
 
-        menu.Items.Add(BuildMenuItem(
-            "Notification history",
-            () => OpenHistory()));
+        WireMenuItemClick(menu, "MenuMute",
+            () => ToggleMute());
 
-        menu.Items.Add(new Separator());
-
-        menu.Items.Add(BuildMenuItem(
-            "Settings",
-            () => OpenSettings()));
-
-        menu.Items.Add(BuildMenuItem(
-            "Mute all notifications",
-            () => ToggleMute()));
-
-        menu.Items.Add(new Separator());
-
-        menu.Items.Add(BuildMenuItem(
-            "Exit MTGB",
-            () => ExitApplication(),
-            isDanger: true));
+        WireMenuItemClick(menu, "MenuExit",
+            () => ExitApplication());
 
         return menu;
+    }
+
+    private static void WireMenuItemClick(
+        ContextMenu menu,
+        string itemName,
+        Action action)
+    {
+        var item = menu.Items
+            .OfType<MenuItem>()
+            .FirstOrDefault(i => i.Name == itemName);
+
+        if (item is not null)
+            item.Click += (_, _) => action();
     }
 
     private MenuItem BuildMenuItem(
