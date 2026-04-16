@@ -8,9 +8,9 @@
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
     <Version>0.2.14</Version>
-    <Authors>Stev3en Sheeley</Authors>
+    <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing — Never leave a print behind.</Description>
-    <Copyright>Copyright © 2026 MTGB Contributors</Copyright>
+    <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -19,6 +19,8 @@
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 	<StartupObject>MTGB.Program</StartupObject>
 	<Title>The Machine That Goes Bing</Title>
+	<PackageIcon>MTGB_256.png</PackageIcon>
+	<RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <!-- NuGet Packages -->
@@ -80,6 +82,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="UI\MTGB_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\MTGB_256.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
