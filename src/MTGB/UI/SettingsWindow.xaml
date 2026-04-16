@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MTGB — Settings"
-        Width="740" Height="620"
-        MinWidth="740" MinHeight="620"
+        Width="740" Height="680"
+        MinWidth="740" MinHeight="680"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BgRaisedBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
@@ -12,7 +12,6 @@
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
         Icon="/UI/MTGB_32.png"
-        SizeToContent="Height"
         Topmost="True">
 
     <Window.Resources>
@@ -29,6 +28,8 @@
                     Value="8"/>
             <Setter Property="Margin"
                     Value="0 0 0 10"/>
+            <Setter Property="ClipToBounds"
+                    Value="True"/>
         </Style>
 
         <!-- ── Setting row style ─────────────────────────────── -->
@@ -400,9 +401,11 @@
                                       Margin="12 0 0 0"/>
                         </Border>
 
-                        <!-- Tab content -->
+                        <!-- Tab content — ClipToBounds prevents
+                             scroll bleed-through on rounded cards -->
                         <Border Grid.Row="1"
-                                Background="{StaticResource BgRaisedBrush}">
+                                Background="{StaticResource BgRaisedBrush}"
+                                ClipToBounds="True">
                             <ContentPresenter
                                 ContentSource="SelectedContent"/>
                         </Border>
@@ -475,7 +478,7 @@
             <!-- ══════════════════════════════════════════════ -->
             <TabItem Header="Account">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              Padding="24 20 24 80">
+                              Padding="24 20">
                     <StackPanel>
 
                         <TextBlock Text="Account"
@@ -587,11 +590,14 @@
 
                         <!-- Connection status -->
                         <Border x:Name="ConnectionStatusPanel"
-                                Style="{StaticResource SectionCard}"
+                                Background="{StaticResource BgCardBrush}"
+                                BorderBrush="#38C9930E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Margin="0 0 0 0"
                                 Visibility="Collapsed">
-                            <Border Style="{StaticResource SettingRow}"
-                                    BorderThickness="0"
-                                    Padding="14 12">
+                            <Border Padding="14 12"
+                                    BorderThickness="0">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -614,8 +620,9 @@
                         </Border>
 
                         <!-- Connect / Disconnect buttons -->
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0 4 0 0">
+                        <StackPanel x:Name="ConnectButtonPanel"
+                                    Orientation="Horizontal"
+                                    Margin="0 10 0 0" Height="32">
                             <Button x:Name="ConnectButton"
                                     Content="Connect to SimplyPrint"
                                     Style="{StaticResource BrassButton}"
@@ -646,10 +653,8 @@
                             Text="Your farm. All of it. Even the ones misbehaving."
                             Style="{StaticResource SectionSubTitle}"/>
 
-                        <!-- Printer list -->
                         <Border Style="{StaticResource SectionCard}">
                             <StackPanel x:Name="PrinterListPanel">
-                                <!-- Populated dynamically -->
                                 <Border Style="{StaticResource SettingRow}"
                                         BorderThickness="0"
                                         Padding="14 20">
@@ -688,7 +693,6 @@
                             Text="Choose your Bings. All of them, some of them, or none. We don't judge."
                             Style="{StaticResource SectionSubTitle}"/>
 
-                        <!-- Global controls -->
                         <Border Style="{StaticResource SectionCard}">
                             <StackPanel>
 
@@ -791,7 +795,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Event pick list — Print jobs -->
                         <TextBlock Text="Print jobs"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -944,7 +947,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Event pick list — Printer -->
                         <TextBlock Text="Printer"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1005,7 +1007,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Event pick list — Progress -->
                         <TextBlock Text="Progress milestones"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1089,7 +1090,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Event pick list — Filament & Temp -->
                         <TextBlock Text="Filament and temperature"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1173,7 +1173,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Event pick list — Queue -->
                         <TextBlock Text="Print queue"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1517,7 +1516,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Danger zone -->
                         <TextBlock Text="Danger zone"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1566,7 +1564,6 @@
                               Padding="24 20">
                     <StackPanel>
 
-                        <!-- Logo and title -->
                         <StackPanel HorizontalAlignment="Center"
                                     Margin="0 10 0 20">
                             <Border Width="56" Height="56"
@@ -1599,7 +1596,6 @@
                                        Margin="0 4 0 0"/>
                         </StackPanel>
 
-                        <!-- Origin quote -->
                         <Border Background="{StaticResource BgCardBrush}"
                                 BorderBrush="{StaticResource BrassDimBrush}"
                                 BorderThickness="2 0 0 0"
@@ -1616,7 +1612,6 @@
                                 LineHeight="20"/>
                         </Border>
 
-                        <!-- Links -->
                         <Border Style="{StaticResource SectionCard}">
                             <StackPanel>
                                 <Border Style="{StaticResource SettingRow}">
@@ -1667,7 +1662,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- NHS line -->
                         <TextBlock
                             Text="Inspired by Monty Python's &quot;The Machine That Goes Ping&quot;. No NHS budget was harmed in the making of this app, although the Redundant Department of Redundancy was notified, twice, in triplicate."
                             FontFamily="Courier New"
