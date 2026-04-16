@@ -1716,8 +1716,10 @@
                             Style="{StaticResource BrassButton}"
                             Margin="0 0 8 0"
                             Click="OnSaveClick"/>
-                    <Button Content="Cancel"
+                    <Button x:Name="CancelButton"
+                            Content="Cancel"
                             Style="{StaticResource GhostButton}"
+                            IsEnabled="False"
                             Click="OnCloseClick"/>
                 </StackPanel>
             </Grid>

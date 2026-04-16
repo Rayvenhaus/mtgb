@@ -7,7 +7,7 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.2.14</Version>
+    <Version>0.2.15</Version>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing — Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
@@ -21,6 +21,8 @@
 	<Title>The Machine That Goes Bing</Title>
 	<PackageIcon>MTGB_256.png</PackageIcon>
 	<RepositoryType>git</RepositoryType>
+	<RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
+	<PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
   </PropertyGroup>
 
   <!-- NuGet Packages -->

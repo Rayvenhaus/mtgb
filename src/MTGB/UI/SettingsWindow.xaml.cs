@@ -51,6 +51,7 @@ public partial class SettingsWindow : Window
         InitializeComponent();
 
         Loaded += OnLoaded;
+        Closing += OnWindowClosing;
     }
 
     // ── Startup ───────────────────────────────────────────────────
@@ -160,6 +161,8 @@ public partial class SettingsWindow : Window
 
         _isLoading = false;
         _isDirty = false;
+        if (CancelButton is not null)
+            CancelButton.IsEnabled = false;
         UpdateFooterStatus();
     }
 
@@ -867,10 +870,12 @@ public partial class SettingsWindow : Window
         {
             var result = MessageBox.Show(
                 "You have unsaved changes.\n\n" +
-                "Save before closing?",
-                "MTGB — Unsaved changes",
+                "Save your changes before closing, " +
+                "or Cancel to discard them.\n\n" +
+                "The Ministry strongly recommends saving.",
+                "MTGB — Unsaved Changes",
                 MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question);
+                MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Cancel) return;
             if (result == MessageBoxResult.Yes)
@@ -884,7 +889,6 @@ public partial class SettingsWindow : Window
     {
         try
         {
-            // Persist settings to appsettings.json
             var json = System.Text.Json.JsonSerializer
                 .Serialize(_settings.Value,
                 new System.Text.Json.JsonSerializerOptions
@@ -899,6 +903,9 @@ public partial class SettingsWindow : Window
             System.IO.File.WriteAllText(path, json);
 
             _isDirty = false;
+            if (CancelButton is not null)
+                CancelButton.IsEnabled = false;
+
             SetFooterStatus("Settings saved.");
 
             _logger.LogInformation(
@@ -906,8 +913,7 @@ public partial class SettingsWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                "Failed to save settings.");
+            _logger.LogError(ex, "Failed to save settings.");
             SetFooterStatus(
                 "Failed to save settings.",
                 isError: true);
@@ -949,17 +955,51 @@ public partial class SettingsWindow : Window
 
     private void MarkDirty()
     {
-        if (_isLoading || FooterStatusText is null) return;
+        if (FooterStatusText is null) return;
 
         _isDirty = true;
         FooterStatusText.Text =
             "Unsaved changes — click Save to apply.";
         FooterStatusText.Foreground = new SolidColorBrush(
             Color.FromRgb(0xF1, 0x8F, 0x01));
+
+        if (CancelButton is not null)
+            CancelButton.IsEnabled = true;
     }
 
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(
     IntPtr hwnd, int attr,
     ref int attrValue, int attrSize);
+
+    private void OnWindowClosing(
+    object? sender,
+    System.ComponentModel.CancelEventArgs e)
+    {
+        if (!_isDirty) return;
+
+        var result = MessageBox.Show(
+            "You have unsaved changes.\n\n" +
+            "Save your changes before closing, " +
+            "or Cancel to discard them.\n\n" +
+            "The Ministry strongly recommends saving.",
+            "MTGB — Unsaved Changes",
+            MessageBoxButton.YesNoCancel,
+            MessageBoxImage.Warning);
+
+        if (result == MessageBoxResult.Cancel)
+        {
+            // Abort the close
+            e.Cancel = true;
+            return;
+        }
+
+        if (result == MessageBoxResult.Yes)
+            SaveSettings();
+
+        // Hide instead of close so the window
+        // can be reopened without recreating it
+        e.Cancel = true;
+        Hide();
+    }
 }
