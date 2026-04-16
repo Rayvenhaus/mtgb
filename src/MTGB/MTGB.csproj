@@ -53,7 +53,7 @@
 
   <!-- Resources -->
   <ItemGroup>
-    <Resource Include="Assets\**\*"/>
+    <Resource Include="Assets\**\*" />
     <Content Include="Assets\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -64,6 +64,9 @@
     <None Remove="NewFolder\**" />
     <Page Remove="NewFolder\**" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="UI\MTGB_32.png" />
+  </ItemGroup>
 
   <!-- Config files -->
   <ItemGroup>
@@ -73,6 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\MTGB_32.png" />
   </ItemGroup>
 
 </Project>

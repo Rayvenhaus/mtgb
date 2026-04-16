@@ -44,6 +44,11 @@ public class TrayIcon : IDisposable
     private static readonly string IconAlert =
         "Assets/mtgb.ico";
 
+    // Cache of flavour text per printer — keyed by printerId
+    // Value is (state when picked, flavour text)
+    private readonly Dictionary<int, (string state, string text)>
+        _flavourCache = new();
+
     // ── Flavour text pools ────────────────────────────────────────
     // These mirror the NotificationManager pools —
     // same voice, same energy, in the tray hover tooltips
@@ -451,7 +456,25 @@ public class TrayIcon : IDisposable
     /// Returns contextual flavour text for a printer's current state.
     /// Used by FlyoutWindow for hover tooltips on printer cards.
     /// </summary>
-    public static string GetFlavourText(PrinterSnapshot snapshot)
+    public string GetFlavourText(PrinterSnapshot snapshot)
+    {
+        // Check cache — if state hasn't changed, return cached text
+        if (_flavourCache.TryGetValue(
+            snapshot.PrinterId, out var cached) &&
+            cached.state == snapshot.State &&
+            snapshot.Online == (cached.state != "offline"))
+        {
+            return cached.text;
+        }
+
+        // State changed or not cached — pick a new one
+        var text = PickFlavourText(snapshot);
+        _flavourCache[snapshot.PrinterId] =
+            (snapshot.Online ? snapshot.State : "offline", text);
+        return text;
+    }
+
+    private static string PickFlavourText(PrinterSnapshot snapshot)
     {
         if (!snapshot.Online)
             return Pick(OfflineFlavour);

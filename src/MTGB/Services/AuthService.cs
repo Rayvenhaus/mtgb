@@ -116,7 +116,8 @@ public class AuthService : IAuthService
         // Store temporarily to test
         _credentials.Save(CredentialKey.ApiKey, apiKey);
 
-        var valid = await _apiClient.TestConnectionAsync(ct);
+        var valid = await _apiClient
+            .TestConnectionAsync(organisationId, ct);
 
         if (!valid)
         {

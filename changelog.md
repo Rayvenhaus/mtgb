@@ -17,6 +17,37 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.2.0] — Unreleased
 ### The one where it gets a face.
 
+### Settings window
+- Full tabbed settings UI — Account, Printers, Notifications,
+  Quiet hours, Advanced and About
+- API key and OAuth2 authentication with connection test
+- Per-printer enable/disable toggles
+- Full event pick list with Pythonesque flavour descriptions
+- Quiet hours configuration with allow-critical override
+- Polling interval, webhook toggle, startup with Windows
+- Danger zone — clear notification history
+- About tab with origin quote, GitHub link and NHS line
+- Save/Cancel footer with unsaved changes detection
+- Dark title bar via DwmSetWindowAttribute on window load
+
+### First successful SimplyPrint connection
+- Real printer data flowing into flyout panel
+- URL construction fixed — absolute URLs bypass HttpClient
+  base address ambiguity
+- Org ID passed directly to TestConnectionAsync bypassing
+  IOptions snapshot which was still 0 at test time
+
+### Flyout
+- Hover flavour text cached per printer per state — only
+  re-picked when printer state changes, never cycles
+
+### Fixed
+- Settings window content clipping — Disconnect button and
+  footer visible, ScrollViewer moved to TabControl level
+- WPF media bar on SettingsWindow — DwmSetWindowAttribute
+  per-window in OnLoaded, not globally in App.OnStartup
+- CS0414 warning on _isLoading suppressed via #pragma
+
 ### Added
 #### User interface
 - `FlyoutWindow.xaml` — Art Deco dark brass flyout panel, slides up 

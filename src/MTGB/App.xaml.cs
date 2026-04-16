@@ -35,11 +35,6 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Force dark title bar on all MTGB windows
-        // regardless of Windows theme setting
-        foreach (Window window in Windows)
-            ForceDarkTitleBar(window);
-
         _logger?.LogInformation(
             "MTGB {Version} starting up. It goes Bing.",
             GetType().Assembly.GetName().Version);
@@ -116,22 +111,4 @@ public partial class App : Application
             e.SetObserved();
         };
     }
-
-    private static void ForceDarkTitleBar(Window window)
-    {
-        var hwnd = new System.Windows.Interop
-            .WindowInteropHelper(window).Handle;
-        if (hwnd == IntPtr.Zero) return;
-
-        int darkMode = 1;
-        DwmSetWindowAttribute(hwnd, 20,
-            ref darkMode, sizeof(int));
-    }
-
-    [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(
-        IntPtr hwnd,
-        int attr,
-        ref int attrValue,
-        int attrSize);
 }

@@ -19,6 +19,7 @@ namespace MTGB.UI;
 public partial class FlyoutWindow : Window
 {
     private readonly IOptions<AppSettings> _settings;
+    private readonly TrayIcon _trayIcon;
 
     // Injected via constructor — resolved from DI
     private Action? _onHistoryClick;
@@ -27,9 +28,12 @@ public partial class FlyoutWindow : Window
     private Action? _onExitClick;
     private Action<bool>? _onMuteToggle;
 
-    public FlyoutWindow(IOptions<AppSettings> settings)
+    public FlyoutWindow(
+        IOptions<AppSettings> settings,
+        TrayIcon trayIcon)
     {
         _settings = settings;
+        _trayIcon = trayIcon;
         InitializeComponent();
 
         // Fix for WPF transparency chrome issue
@@ -45,10 +49,7 @@ public partial class FlyoutWindow : Window
                 NativeMethods.WS_EX_TOOLWINDOW);
         };
 
-        // Close flyout when it loses focus
         Deactivated += (_, _) => SlideDown();
-
-        // Sync mute toggle to current settings on load
         Loaded += (_, _) => SyncMuteToggle();
     }
 
@@ -144,7 +145,7 @@ public partial class FlyoutWindow : Window
     private Border BuildPrinterCard(PrinterSnapshot snapshot)
     {
         var (statusColor, stateLabel) = GetStatusInfo(snapshot);
-        var flavourText = TrayIcon.GetFlavourText(snapshot);
+        var flavourText = _trayIcon.GetFlavourText(snapshot);
 
         // Card border
         var card = new Border

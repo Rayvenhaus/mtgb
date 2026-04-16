@@ -2,9 +2,1732 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MTGB — Settings"
-        Width="700" Height="500"
+        Width="740" Height="620"
+        MinWidth="740" MinHeight="620"
         WindowStartupLocation="CenterScreen"
-        ShowInTaskbar="False"
-        Visibility="Hidden">
-    <Grid/>
+        Background="{StaticResource BgRaisedBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        BorderBrush="{StaticResource BrassBrush}"
+        BorderThickness="1"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize"
+        Icon="/UI/MTGB_32.png"
+        SizeToContent="Height"
+        Topmost="True">
+
+    <Window.Resources>
+
+        <!-- ── Section card style ────────────────────────────── -->
+        <Style x:Key="SectionCard" TargetType="Border">
+            <Setter Property="Background"
+                    Value="{StaticResource BgCardBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="#38C9930E"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="CornerRadius"
+                    Value="8"/>
+            <Setter Property="Margin"
+                    Value="0 0 0 10"/>
+        </Style>
+
+        <!-- ── Setting row style ─────────────────────────────── -->
+        <Style x:Key="SettingRow" TargetType="Border">
+            <Setter Property="Padding"
+                    Value="14 11"/>
+            <Setter Property="BorderBrush"
+                    Value="#20C9930E"/>
+            <Setter Property="BorderThickness"
+                    Value="0 0 0 1"/>
+        </Style>
+
+        <!-- ── Setting label style ───────────────────────────── -->
+        <Style x:Key="SettingLabel" TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextPrimaryBrush}"/>
+        </Style>
+
+        <!-- ── Setting sublabel style ────────────────────────── -->
+        <Style x:Key="SettingSubLabel" TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Courier New"/>
+            <Setter Property="FontSize"
+                    Value="10"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextDimBrush}"/>
+            <Setter Property="FontStyle"
+                    Value="Italic"/>
+            <Setter Property="Margin"
+                    Value="0 3 0 0"/>
+        </Style>
+
+        <!-- ── Section title style ───────────────────────────── -->
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Georgia"/>
+            <Setter Property="FontSize"
+                    Value="15"/>
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource GoldTextBrush}"/>
+            <Setter Property="Margin"
+                    Value="0 0 0 4"/>
+        </Style>
+
+        <!-- ── Section subtitle style ────────────────────────── -->
+        <Style x:Key="SectionSubTitle" TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Courier New"/>
+            <Setter Property="FontSize"
+                    Value="10"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextDimBrush}"/>
+            <Setter Property="FontStyle"
+                    Value="Italic"/>
+            <Setter Property="Margin"
+                    Value="0 0 0 14"/>
+        </Style>
+
+        <!-- ── Brass input style ─────────────────────────────── -->
+        <Style x:Key="BrassInput" TargetType="TextBox">
+            <Setter Property="Background"
+                    Value="{StaticResource BgDeepBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="#59C9930E"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="Padding"
+                    Value="10 7"/>
+            <Setter Property="CaretBrush"
+                    Value="{StaticResource BrassBrush}"/>
+            <Setter Property="SelectionBrush"
+                    Value="{StaticResource BrassBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush"
+                            Value="{StaticResource BrassBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ── Brass password box style ─────────────────────── -->
+        <Style x:Key="BrassPassword" TargetType="PasswordBox">
+            <Setter Property="Background"
+                    Value="{StaticResource BgDeepBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="#59C9930E"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="Padding"
+                    Value="10 7"/>
+            <Setter Property="CaretBrush"
+                    Value="{StaticResource BrassBrush}"/>
+        </Style>
+
+        <!-- ── Brass button style ────────────────────────────── -->
+        <Style x:Key="BrassButton" TargetType="Button">
+            <Setter Property="Background"
+                    Value="{StaticResource BrassBrush}"/>
+            <Setter Property="Foreground"
+                    Value="#1A0A00"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+            <Setter Property="Padding"
+                    Value="20 8"/>
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#E8B820"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#8B6508"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Ghost button style ────────────────────────────── -->
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Background"
+                    Value="{StaticResource BgCardBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="Padding"
+                    Value="16 8"/>
+            <Setter Property="BorderBrush"
+                    Value="#38C9930E"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource BgHoverBrush}"/>
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource GoldTextBrush}"/>
+                                <Setter Property="BorderBrush"
+                                        Value="{StaticResource BrassBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource BgDeepBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Toggle button style ───────────────────────────── -->
+        <Style x:Key="MtgbToggle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Border x:Name="Track"
+                                    Width="40" Height="22"
+                                    CornerRadius="11"
+                                    Background="#5A5248"/>
+                            <Ellipse x:Name="Thumb"
+                                     Width="18" Height="18"
+                                     Fill="White"
+                                     HorizontalAlignment="Left"
+                                     Margin="2 0 0 0">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform
+                                        x:Name="ThumbTranslate"
+                                        X="0"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="Track"
+                                        Property="Background"
+                                        Value="{StaticResource BrassBrush}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ThumbTranslate"
+                                                Storyboard.TargetProperty="X"
+                                                To="18"
+                                                Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ThumbTranslate"
+                                                Storyboard.TargetProperty="X"
+                                                To="0"
+                                                Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Status badge styles ───────────────────────────── -->
+        <Style x:Key="BadgeBrass" TargetType="Border">
+            <Setter Property="Background" Value="#20C9930E"/>
+            <Setter Property="BorderBrush" Value="#59C9930E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8 3"/>
+        </Style>
+
+        <Style x:Key="BadgeGreen" TargetType="Border">
+            <Setter Property="Background" Value="#203BB273"/>
+            <Setter Property="BorderBrush" Value="#593BB273"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8 3"/>
+        </Style>
+
+        <Style x:Key="BadgeRed" TargetType="Border">
+            <Setter Property="Background" Value="#20E84855"/>
+            <Setter Property="BorderBrush" Value="#59E84855"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8 3"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Title bar ─────────────────────────────────────── -->
+        <Border Grid.Row="0"
+                Background="{StaticResource BgDeepBrush}"
+                BorderBrush="#38C9930E"
+                BorderThickness="0 0 0 1"
+                Padding="20 14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Ellipse x:Name="HeaderBingDot"
+                             Width="10" Height="10"
+                             Fill="{StaticResource MtgbSuccess}"
+                             Margin="0 0 10 0"
+                             VerticalAlignment="Center"/>
+                    <StackPanel>
+                        <TextBlock Text="M · T · G · B"
+                                   FontFamily="Georgia"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource GoldTextBrush}"/>
+                        <TextBlock Text="SETTINGS"
+                                   FontFamily="Courier New"
+                                   FontSize="9"
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   Margin="0 2 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="✕"
+                        Style="{StaticResource GhostButton}"
+                        Width="32" Height="32"
+                        Padding="0"
+                        FontSize="14"
+                        Click="OnCloseClick"/>
+            </Grid>
+        </Border>
+
+        <!-- ── Tab control ───────────────────────────────────── -->
+        <TabControl Grid.Row="1"
+                    x:Name="MainTabs"
+                    Background="{StaticResource BgRaisedBrush}"
+                    BorderThickness="0">
+
+            <TabControl.Template>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Tab strip -->
+                        <Border Grid.Row="0"
+                                Background="{StaticResource BgDeepBrush}"
+                                BorderBrush="#38C9930E"
+                                BorderThickness="0 0 0 1">
+                            <TabPanel IsItemsHost="True"
+                                      Margin="12 0 0 0"/>
+                        </Border>
+
+                        <!-- Tab content -->
+                        <Border Grid.Row="1"
+                                Background="{StaticResource BgRaisedBrush}">
+                            <ContentPresenter
+                                ContentSource="SelectedContent"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </TabControl.Template>
+
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="FontFamily"
+                            Value="Segoe UI Variable, Segoe UI"/>
+                    <Setter Property="FontSize"
+                            Value="12"/>
+                    <Setter Property="Padding"
+                            Value="14 10"/>
+                    <Setter Property="Foreground"
+                            Value="{StaticResource TextSecondaryBrush}"/>
+                    <Setter Property="Background"
+                            Value="Transparent"/>
+                    <Setter Property="BorderThickness"
+                            Value="0"/>
+                    <Setter Property="Cursor"
+                            Value="Hand"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="TabBorder"
+                                        Background="Transparent"
+                                        BorderThickness="0 0 0 2"
+                                        BorderBrush="Transparent"
+                                        Padding="{TemplateBinding Padding}">
+                                    <TextBlock
+                                        x:Name="TabText"
+                                        Text="{TemplateBinding Header}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        FontFamily="{TemplateBinding FontFamily}"
+                                        FontSize="{TemplateBinding FontSize}"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected"
+                                             Value="True">
+                                        <Setter TargetName="TabBorder"
+                                                Property="BorderBrush"
+                                                Value="{StaticResource BrassBrush}"/>
+                                        <Setter TargetName="TabText"
+                                                Property="Foreground"
+                                                Value="{StaticResource GoldTextBrush}"/>
+                                        <Setter TargetName="TabBorder"
+                                                Property="Background"
+                                                Value="#10C9930E"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True">
+                                        <Setter TargetName="TabText"
+                                                Property="Foreground"
+                                                Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter TargetName="TabBorder"
+                                                Property="Background"
+                                                Value="#08C9930E"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.ItemContainerStyle>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 1: ACCOUNT                                  -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Account">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20 24 80">
+                    <StackPanel>
+
+                        <TextBlock Text="Account"
+                                   Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                            Text="Connect MTGB to SimplyPrint. It won't bite. Probably."
+                            Style="{StaticResource SectionSubTitle}"/>
+
+                        <!-- Auth mode selector -->
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock
+                                                Text="Authentication mode"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="API key is simpler. OAuth2 is fancier."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center"
+                                                    Margin="12 0 0 0">
+                                            <RadioButton x:Name="RadioApiKey"
+                                                         Content="API Key"
+                                                         Foreground="{StaticResource TextPrimaryBrush}"
+                                                         FontFamily="Segoe UI Variable, Segoe UI"
+                                                         FontSize="12"
+                                                         Margin="0 0 16 0"
+                                                         IsChecked="True"
+                                                         Checked="OnAuthModeChanged"/>
+                                            <RadioButton x:Name="RadioOAuth"
+                                                         Content="OAuth2"
+                                                         Foreground="{StaticResource TextPrimaryBrush}"
+                                                         FontFamily="Segoe UI Variable, Segoe UI"
+                                                         FontSize="12"
+                                                         Checked="OnAuthModeChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- API Key panel -->
+                        <Border x:Name="ApiKeyPanel"
+                                Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="Organisation ID"
+                                            Style="{StaticResource SettingLabel}"/>
+                                        <TextBlock
+                                            Text="Found in your SimplyPrint API base URL — simplyprint.io/api/{id}/"
+                                            Style="{StaticResource SettingSubLabel}"/>
+                                        <TextBox x:Name="OrgIdInput"
+                                                 Style="{StaticResource BrassInput}"
+                                                 Margin="0 8 0 0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="API Key"
+                                            Style="{StaticResource SettingLabel}"/>
+                                        <TextBlock
+                                            Text="Stored securely via Double-Secret Validation™. Never written to disk."
+                                            Style="{StaticResource SettingSubLabel}"/>
+                                        <PasswordBox x:Name="ApiKeyInput"
+                                                     Style="{StaticResource BrassPassword}"
+                                                     Margin="0 8 0 0"/>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- OAuth2 panel -->
+                        <Border x:Name="OAuthPanel"
+                                Style="{StaticResource SectionCard}"
+                                Visibility="Collapsed">
+                            <Border Style="{StaticResource SettingRow}"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock
+                                        Text="SimplyPrint OAuth2"
+                                        Style="{StaticResource SettingLabel}"/>
+                                    <TextBlock
+                                        Text="Opens your browser. You log in. We get a token. Nobody sees your password."
+                                        Style="{StaticResource SettingSubLabel}"/>
+                                    <Button x:Name="OAuthLoginButton"
+                                            Content="Login with SimplyPrint ↗"
+                                            Style="{StaticResource GhostButton}"
+                                            HorizontalAlignment="Left"
+                                            Margin="0 10 0 0"
+                                            Click="OnOAuthLoginClick"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+
+                        <!-- Connection status -->
+                        <Border x:Name="ConnectionStatusPanel"
+                                Style="{StaticResource SectionCard}"
+                                Visibility="Collapsed">
+                            <Border Style="{StaticResource SettingRow}"
+                                    BorderThickness="0"
+                                    Padding="14 12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse x:Name="ConnectionDot"
+                                             Width="8" Height="8"
+                                             Fill="{StaticResource MtgbSuccess}"
+                                             VerticalAlignment="Center"
+                                             Margin="0 0 10 0"/>
+                                    <TextBlock x:Name="ConnectionStatusText"
+                                               Grid.Column="1"
+                                               Text="Connected"
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12"
+                                               Foreground="{StaticResource MtgbSuccess}"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+
+                        <!-- Connect / Disconnect buttons -->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0 4 0 0">
+                            <Button x:Name="ConnectButton"
+                                    Content="Connect to SimplyPrint"
+                                    Style="{StaticResource BrassButton}"
+                                    Margin="0 0 10 0"
+                                    Click="OnConnectClick"/>
+                            <Button x:Name="DisconnectButton"
+                                    Content="Disconnect"
+                                    Style="{StaticResource GhostButton}"
+                                    Visibility="Collapsed"
+                                    Click="OnDisconnectClick"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 2: PRINTERS                                 -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Printers">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20">
+                    <StackPanel>
+
+                        <TextBlock Text="Printers"
+                                   Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                            Text="Your farm. All of it. Even the ones misbehaving."
+                            Style="{StaticResource SectionSubTitle}"/>
+
+                        <!-- Printer list -->
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel x:Name="PrinterListPanel">
+                                <!-- Populated dynamically -->
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0"
+                                        Padding="14 20">
+                                    <TextBlock
+                                        x:Name="NoPrintersText"
+                                        Text="No printers found. Connect your account first."
+                                        FontFamily="Courier New"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextDimBrush}"
+                                        FontStyle="Italic"
+                                        HorizontalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Content="Refresh printer list"
+                                Style="{StaticResource GhostButton}"
+                                HorizontalAlignment="Left"
+                                Click="OnRefreshPrintersClick"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 3: NOTIFICATIONS                            -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Notifications">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20">
+                    <StackPanel>
+
+                        <TextBlock Text="Notifications"
+                                   Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                            Text="Choose your Bings. All of them, some of them, or none. We don't judge."
+                            Style="{StaticResource SectionSubTitle}"/>
+
+                        <!-- Global controls -->
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Global mute"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Blessed silence. Overrides everything."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="GlobalMuteToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            Click="OnGlobalMuteChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Action buttons on toasts"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Pause and Cancel from the notification itself."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="ActionButtonsToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True"
+                                            Click="OnActionButtonsChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Notification grouping"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Batch events within a 5 second window."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="GroupingToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True"
+                                            Click="OnGroupingChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Sound"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="It goes Bing. Audibly."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="SoundToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True"
+                                            Click="OnSoundChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Event pick list — Print jobs -->
+                        <TextBlock Text="Print jobs"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="{StaticResource BrassDimBrush}"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print started"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="It has begun. Try not to watch it too closely."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobStarted"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="job.started"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print finished"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="And there was much rejoicing."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobFinished"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="job.finished"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print failed"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Spaghetti may be involved."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobFailed"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="job.failed"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print paused"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Taking five. The print, not you. Although, same."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobPaused"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="job.paused"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print cancelled"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="The Redundant Department has been notified."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobCancelled"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="job.cancelled"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print resumed"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="And so it continues."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventJobResumed"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="job.resumed"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Event pick list — Printer -->
+                        <TextBlock Text="Printer"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="{StaticResource BrassDimBrush}"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Printer offline"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="It has gone to a better place. Possibly the shed."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventPrinterOffline"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="printer.offline"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Printer back online"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="It has returned. No explanation given."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventPrinterOnline"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="printer.online"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Event pick list — Progress -->
+                        <TextBlock Text="Progress milestones"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="{StaticResource BrassDimBrush}"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print at 25%"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="One quarter done. Three quarters of the anxiety remains."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventProgress25"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="progress.25"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print at 50%"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Halfway. Either going brilliantly or you haven't looked yet."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventProgress50"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="progress.50"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Print at 75%"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Nearly there. Do not jinx it. Step away from the printer."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventProgress75"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="progress.75"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Event pick list — Filament & Temp -->
+                        <TextBlock Text="Filament and temperature"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="{StaticResource BrassDimBrush}"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Low filament"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="The spool giveth and the spool taketh away."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventFilamentLow"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="True"
+                                                      Tag="filament.low"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Nozzle temp dropped"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="The nozzle has gone cold. Much like our confidence."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventNozzleTemp"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="temp.nozzle.low"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Bed temp dropped"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Bed temperature dropping. Tuck it in. Put the kettle on."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventBedTemp"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="temp.bed.low"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Event pick list — Queue -->
+                        <TextBlock Text="Print queue"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="{StaticResource BrassDimBrush}"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Item added to queue"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Someone has added to the pile."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventQueueAdded"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="queue.added"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Queue emptied"
+                                                       Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="The queue is empty. The Ministry is at peace."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton x:Name="EventQueueEmptied"
+                                                      Grid.Column="1"
+                                                      Style="{StaticResource MtgbToggle}"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="False"
+                                                      Tag="queue.emptied"
+                                                      Click="OnEventToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 4: QUIET HOURS                              -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Quiet hours">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20">
+                    <StackPanel>
+
+                        <TextBlock Text="Quiet hours"
+                                   Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                            Text="For whatever it is you're doing alone, in front of the computer, late at night. We're not judging."
+                            Style="{StaticResource SectionSubTitle}"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Enable quiet hours"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="No Bings during the specified window."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="QuietHoursToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            Click="OnQuietHoursToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="QuietHoursTimePanel"
+                                        Style="{StaticResource SettingRow}"
+                                        IsEnabled="False"
+                                        Opacity="0.5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Start time"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="When the Ministry closes for the evening."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="QuietStartInput"
+                                                 Grid.Column="1"
+                                                 Style="{StaticResource BrassInput}"
+                                                 Text="22:00"
+                                                 Width="80"
+                                                 TextAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 TextChanged="OnQuietHoursChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="QuietHoursEndPanel"
+                                        Style="{StaticResource SettingRow}"
+                                        IsEnabled="False"
+                                        Opacity="0.5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="End time"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="When the Ministry reopens, reluctantly."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="QuietEndInput"
+                                                 Grid.Column="1"
+                                                 Style="{StaticResource BrassInput}"
+                                                 Text="08:00"
+                                                 Width="80"
+                                                 TextAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 TextChanged="OnQuietHoursChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Allow critical alerts"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Printer offline and failures still Bing. Even at 3am."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="AllowCriticalToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True"
+                                            Click="OnAllowCriticalChanged"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 5: ADVANCED                                 -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Advanced">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20">
+                    <StackPanel>
+
+                        <TextBlock Text="Advanced"
+                                   Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                            Text="Here be dragons. And polling intervals. Mostly polling intervals."
+                            Style="{StaticResource SectionSubTitle}"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Polling interval (seconds)"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="How often MTGB checks in. Minimum 10s. Be a good API citizen."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="PollingIntervalInput"
+                                                 Grid.Column="1"
+                                                 Style="{StaticResource BrassInput}"
+                                                 Text="30"
+                                                 Width="60"
+                                                 TextAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 TextChanged="OnPollingIntervalChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Webhook receiver"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Real-time events via local HTTP listener. Requires public URL or LAN."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="WebhookToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            Click="OnWebhookToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="WebhookPortPanel"
+                                        Style="{StaticResource SettingRow}"
+                                        IsEnabled="False"
+                                        Opacity="0.5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Webhook port"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Local port for incoming SimplyPrint webhook POSTs."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="WebhookPortInput"
+                                                 Grid.Column="1"
+                                                 Style="{StaticResource BrassInput}"
+                                                 Text="7878"
+                                                 Width="70"
+                                                 TextAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 TextChanged="OnWebhookPortChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Start with Windows"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Boot MTGB on login. Recommended. The Ministry approves."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                            x:Name="StartupToggle"
+                                            Grid.Column="1"
+                                            Style="{StaticResource MtgbToggle}"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True"
+                                            Click="OnStartupToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Language"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="Interface language. More coming via community translations."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ComboBox x:Name="LanguageSelector"
+                                                  Grid.Column="1"
+                                                  Width="120"
+                                                  VerticalAlignment="Center"
+                                                  SelectionChanged="OnLanguageChanged">
+                                            <ComboBoxItem Content="English (AU)"
+                                                          Tag="en-AU"
+                                                          IsSelected="True"/>
+                                            <ComboBoxItem Content="English (GB)"
+                                                          Tag="en-GB"/>
+                                            <ComboBoxItem Content="English (US)"
+                                                          Tag="en-US"/>
+                                        </ComboBox>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Danger zone -->
+                        <TextBlock Text="Danger zone"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   Foreground="#E84855"
+                                   Margin="2 8 0 6"
+                                   FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}"
+                                BorderBrush="#38E84855">
+                            <Border Style="{StaticResource SettingRow}"
+                                    BorderThickness="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="Clear notification history"
+                                            Style="{StaticResource SettingLabel}"
+                                            Foreground="#E84855"/>
+                                        <TextBlock
+                                            Text="Permanently deletes all recorded notification history."
+                                            Style="{StaticResource SettingSubLabel}"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Content="Clear history"
+                                            Style="{StaticResource GhostButton}"
+                                            Foreground="#E84855"
+                                            BorderBrush="#38E84855"
+                                            VerticalAlignment="Center"
+                                            Click="OnClearHistoryClick"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 6: ABOUT                                    -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="About">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Padding="24 20">
+                    <StackPanel>
+
+                        <!-- Logo and title -->
+                        <StackPanel HorizontalAlignment="Center"
+                                    Margin="0 10 0 20">
+                            <Border Width="56" Height="56"
+                                    Background="{StaticResource BgCardBrush}"
+                                    BorderBrush="#59C9930E"
+                                    BorderThickness="2"
+                                    CornerRadius="14"
+                                    HorizontalAlignment="Center"
+                                    Margin="0 0 0 12">
+                                <Ellipse x:Name="AboutBingDot"
+                                         Width="20" Height="20"
+                                         Fill="{StaticResource MtgbSuccess}"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="M · T · G · B"
+                                       FontFamily="Georgia"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource GoldTextBrush}"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock x:Name="VersionText"
+                                       Text="The Monitor That Goes Bing · v0.1.0"
+                                       FontFamily="Courier New"
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextDimBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0 4 0 0"/>
+                        </StackPanel>
+
+                        <!-- Origin quote -->
+                        <Border Background="{StaticResource BgCardBrush}"
+                                BorderBrush="{StaticResource BrassDimBrush}"
+                                BorderThickness="2 0 0 0"
+                                CornerRadius="0"
+                                Padding="16 12"
+                                Margin="0 0 0 14">
+                            <TextBlock
+                                Text="&quot;It monitors your prints. It goes Bing. Never leave a print behind again. But No ONE expects a Notification App, quietly waiting, to suddenly pop up and notify you, in the middle of your latest doom scrolling, or whatever it is you're doing alone, in front of the computer late at night, and I'm not judging, of the fact that the latest 8 hour print went from perfection to Spag bol (Minus the bol) in 2.3 nano seconds flat.&quot;"
+                                FontFamily="Courier New"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                FontStyle="Italic"
+                                TextWrapping="Wrap"
+                                LineHeight="20"/>
+                        </Border>
+
+                        <!-- Links -->
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Source code"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="MIT licence. The community may do as they wish."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="GitHub ↗"
+                                                Style="{StaticResource GhostButton}"
+                                                VerticalAlignment="Center"
+                                                Click="OnGitHubClick"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="The full origin story"
+                                                Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                                Text="As filed with the Redundant Department of Redundancy."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="Read ↗"
+                                                Style="{StaticResource GhostButton}"
+                                                VerticalAlignment="Center"
+                                                Click="OnOriginStoryClick"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- NHS line -->
+                        <TextBlock
+                            Text="Inspired by Monty Python's &quot;The Machine That Goes Ping&quot;. No NHS budget was harmed in the making of this app, although the Redundant Department of Redundancy was notified, twice, in triplicate."
+                            FontFamily="Courier New"
+                            FontSize="9"
+                            Foreground="{StaticResource TextDimBrush}"
+                            FontStyle="Italic"
+                            TextWrapping="Wrap"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            Margin="20 10 20 4"/>
+
+                        <TextBlock
+                            Text="Philosophically indebted to Sir Terry Pratchett."
+                            FontFamily="Courier New"
+                            FontSize="9"
+                            Foreground="{StaticResource TextDimBrush}"
+                            FontStyle="Italic"
+                            HorizontalAlignment="Center"
+                            Margin="0 2 0 20"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ── Footer ────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Background="{StaticResource BgDeepBrush}"
+                BorderBrush="#38C9930E"
+                BorderThickness="0 1 0 0"
+                Padding="20 10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="FooterStatusText"
+                           Grid.Column="0"
+                           Text="Not connected — enter credentials above"
+                           FontFamily="Courier New"
+                           FontSize="10"
+                           Foreground="{StaticResource TextDimBrush}"
+                           FontStyle="Italic"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Button Content="Save"
+                            Style="{StaticResource BrassButton}"
+                            Margin="0 0 8 0"
+                            Click="OnSaveClick"/>
+                    <Button Content="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            Click="OnCloseClick"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+    </Grid>
 </Window>

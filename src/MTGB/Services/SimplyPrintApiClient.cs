@@ -153,7 +153,7 @@ public class WebhookResponse : SimplyPrintResponse
 public interface ISimplyPrintApiClient
 {
     /// <summary>Test the current credentials are valid.</summary>
-    Task<bool> TestConnectionAsync(CancellationToken ct = default);
+    Task<bool> TestConnectionAsync(int? organisationId = null, CancellationToken ct = default);
 
     /// <summary>Get all printers for the organisation.</summary>
     Task<List<PrinterData>> GetPrintersAsync(CancellationToken ct = default);
@@ -238,24 +238,39 @@ public class SimplyPrintApiClient : ISimplyPrintApiClient
 
     // ── Endpoints ─────────────────────────────────────────────────
 
-    /// <inheritdoc/>
-    public async Task<bool> TestConnectionAsync(CancellationToken ct = default)
+    // In the implementation
+    public async Task<bool> TestConnectionAsync(
+        int? organisationId = null,
+        CancellationToken ct = default)
     {
         try
         {
             ApplyAuthHeader();
-            var response = await _http.GetFromJsonAsync<AccountTestResponse>(
-                OrgUrl("account/Test"), JsonOptions, ct);
+            var orgId = organisationId
+                ?? _settings.Value.OrganisationId;
+            var url = $"https://api.simplyprint.io/" + $"{orgId}/account/Test";
+
+            _logger.LogInformation(
+                "Testing connection: {Url}", url);
+
+            var response = await _http
+                .GetFromJsonAsync<AccountTestResponse>(
+                    url, JsonOptions, ct);
+
+            _logger.LogInformation(
+                "Test response: {Status} — {Message}",
+                response?.Status, response?.Message);
+
             return response?.Status == true;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Connection test failed.");
+            _logger.LogWarning(ex,
+                "Connection test failed.");
             return false;
         }
     }
 
-    /// <inheritdoc/>
     public async Task<List<PrinterData>> GetPrintersAsync(
         CancellationToken ct = default)
     {
