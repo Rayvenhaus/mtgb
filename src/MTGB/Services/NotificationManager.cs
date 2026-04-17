@@ -149,31 +149,28 @@ public class NotificationManager : INotificationManager
 
         foreach (var evt in events)
         {
+            _logger.LogInformation(
+                "Processing event '{EventId}' for {Printer}",
+                evt.EventId, evt.PrinterName);
+
             var suppression = EvaluateRules(evt, settings);
 
-            // Always log to history — even suppressed events
+            _logger.LogInformation(
+                "Event '{EventId}' suppressed: {Suppressed} — {Reason}",
+                evt.EventId, suppression.Suppressed,
+                suppression.Reason ?? "not suppressed");
+
             LogToHistory(evt, suppression);
 
             if (suppression.Suppressed)
-            {
-                _logger.LogDebug(
-                    "Event '{EventId}' for {Printer} suppressed: {Reason}",
-                    evt.EventId, evt.PrinterName, suppression.Reason);
                 continue;
-            }
 
-            // Grouping
             if (settings.Notifications.GroupingEnabled)
-            {
                 BufferForGrouping(evt);
-            }
             else
-            {
                 await DeliverToastAsync(evt, ct);
-            }
         }
 
-        // Flush any grouped notifications whose window has elapsed
         await FlushGroupBufferIfReadyAsync(ct);
     }
 

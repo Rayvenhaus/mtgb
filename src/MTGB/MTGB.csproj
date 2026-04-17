@@ -7,7 +7,7 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.2.15</Version>
+    <Version>0.2.16</Version>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing — Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
@@ -23,6 +23,9 @@
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
 	<PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageTags>notification;monitor;tray;windows;desktop;simplyprint;3d-printing;print-farm;filament;wpf;dotnet;csharp;windows10;windows11;open-source;community</PackageTags>
+	<NeutralLanguage>en-AU</NeutralLanguage>
   </PropertyGroup>
 
   <!-- NuGet Packages -->
@@ -78,6 +81,12 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="App.xaml" />

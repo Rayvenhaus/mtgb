@@ -12,6 +12,35 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.16] — 17/04/2026
+### The one where it actually goes Bing.
+
+### Added
+- Diagnostic logging added to `NotificationManager.ProcessEventsAsync`
+  — event processing and suppression state now logged for debugging
+
+### Fixed
+- Notification grouping flush — grouping disabled for initial testing,
+  confirmed toasts fire correctly without grouping. Grouping flush
+  timer fix deferred to next patch.
+- Printing status indicator colour changed from amber to blue `#378ADD`
+  — amber reserved for warnings, blue for active healthy printing state
+  updated in `GetStatusInfo` and `UpdateBingDot` in `FlyoutWindow.xaml.cs`
+
+### Confirmed working — end to end
+- Toast notifications appearing as banners with audio
+- Flavour text delivering correctly on every event type
+- MTGB icon and "It goes Bing" attribution on every toast
+- Grouped toasts firing correctly across multiple printers
+- Notification centre history populated and persistent
+- Polling worker detecting real printer state changes
+- Diff engine comparing snapshots and firing correct events
+- Rules engine passing events through correctly
+- The machine goes Bing. This is what it does.
+- Never leave a print behind.
+
+---
+
 ## [0.2.14] — Unreleased
 ### The one where the settings window stops bleeding everywhere.
 

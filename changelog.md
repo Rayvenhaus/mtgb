@@ -12,6 +12,18 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.15] — 17/04/2026
+### The one where Cancel earns its place.
+
+### Added
+- Cancel button disabled until changes are made — enables 
+  automatically when any setting is modified, resets after 
+  saving. No changes, no Cancel. The Ministry approves.
+- Unsaved changes warning on window X button — native close
+  intercepted via Closing event. Offers Save/No/Cancel with
+  appropriately stern Ministry messaging. Window hides rather
+  than destroys to preserve reopening capability.
+
 ## [0.2.14] — Unreleased
 ### The one where the settings window stops bleeding everywhere.
 

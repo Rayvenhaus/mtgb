@@ -137,7 +137,7 @@ public partial class FlyoutWindow : Window
                 Color.FromRgb(0xE8, 0x48, 0x55))
             : printing > 0
                 ? new SolidColorBrush(
-                    Color.FromRgb(0xF1, 0x8F, 0x01))
+                    Color.FromRgb(0x37, 0x8A, 0xDD))
                 : new SolidColorBrush(
                     Color.FromRgb(0x3B, 0xB2, 0x73));
     }
@@ -320,9 +320,8 @@ public partial class FlyoutWindow : Window
 
         return snapshot.State.ToLowerInvariant() switch
         {
-            "printing" or
-            "printing_completing" =>
-                (Color.FromRgb(0xF1, 0x8F, 0x01), "Printing"),
+            "printing" or "printing_completing" =>
+                (Color.FromRgb(0x37, 0x8A, 0xDD), "Printing"),
             "paused" or "pausing" =>
                 (Color.FromRgb(0xF1, 0x8F, 0x01), "Paused"),
             "error" or "printer_error" =>
