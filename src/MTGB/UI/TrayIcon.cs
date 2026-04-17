@@ -34,6 +34,8 @@ public class TrayIcon : IDisposable
     private TaskbarIcon? _taskbarIcon;
     private FlyoutWindow? _flyout;
     private bool _disposed;
+    private string _currentTooltipFlavour = string.Empty;
+    private string _lastTooltipState = string.Empty;
 
     // Icon states — each maps to a different .ico file
     // reflecting overall farm status at a glance
@@ -216,9 +218,9 @@ public class TrayIcon : IDisposable
         {
             var tooltip = offlineCount > 0
                 ? $"MTGB — {offlineCount} printer(s) offline. " +
-                  Pick(OfflineFlavour)
+                  GetTooltipFlavour("offline")
                 : $"MTGB — Attention required. " +
-                  Pick(FailedFlavour);
+                  GetTooltipFlavour("alert");
 
             SetIcon(IconAlert, tooltip);
         }
@@ -226,9 +228,9 @@ public class TrayIcon : IDisposable
         {
             var tooltip = printingCount == 1
                 ? $"MTGB — 1 printer active. " +
-                  Pick(PrintingFlavour)
+                  GetTooltipFlavour("printing")
                 : $"MTGB — {printingCount} printers active. " +
-                  Pick(PrintingFlavour);
+                  GetTooltipFlavour("printing");
 
             SetIcon(IconPrinting, tooltip);
         }
@@ -236,11 +238,28 @@ public class TrayIcon : IDisposable
         {
             SetIcon(IconIdle,
                 $"MTGB — All printers ready. " +
-                Pick(IdleFlavour));
+                GetTooltipFlavour("idle"));
         }
 
         // Update flyout if it's open
         _flyout?.RefreshPrinterCards(snapshots);
+    }
+
+    private string GetTooltipFlavour(string stateKey)
+    {
+        if (_lastTooltipState == stateKey &&
+            !string.IsNullOrEmpty(_currentTooltipFlavour))
+            return _currentTooltipFlavour;
+
+        _lastTooltipState = stateKey;
+        _currentTooltipFlavour = stateKey switch
+        {
+            "alert" => Pick(FailedFlavour),
+            "offline" => Pick(OfflineFlavour),
+            "printing" => Pick(PrintingFlavour),
+            _ => Pick(IdleFlavour)
+        };
+        return _currentTooltipFlavour;
     }
 
     private void SetIcon(string iconPath, string tooltip)

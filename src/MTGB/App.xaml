@@ -36,8 +36,8 @@
             <Color x:Key="BrassDimColor">#8B6508</Color>
             <Color x:Key="GoldTextColor">#F0C840</Color>
             <Color x:Key="TextPrimaryColor">#F0EDE8</Color>
-            <Color x:Key="TextSecondaryColor">#9A9080</Color>
-            <Color x:Key="TextDimColor">#5A5248</Color>
+            <Color x:Key="TextSecondaryColor">#C8C0B8</Color>
+            <Color x:Key="TextDimColor">#8A8078</Color>
 
             <SolidColorBrush x:Key="BgDeepBrush"
                              Color="{StaticResource BgDeepColor}"/>

@@ -59,9 +59,9 @@
             <Setter Property="FontFamily"
                     Value="Courier New"/>
             <Setter Property="FontSize"
-                    Value="10"/>
+                    Value="11"/>
             <Setter Property="Foreground"
-                    Value="{StaticResource TextDimBrush}"/>
+                    Value="{StaticResource TextSecondaryBrush}"/>
             <Setter Property="FontStyle"
                     Value="Italic"/>
             <Setter Property="Margin"

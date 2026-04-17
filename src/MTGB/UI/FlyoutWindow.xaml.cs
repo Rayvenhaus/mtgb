@@ -88,7 +88,6 @@ public partial class FlyoutWindow : Window
             if (!snapshots.Any())
             {
                 NoPrintersPanel.Visibility = Visibility.Visible;
-                UpdateHeaderSubtitle(0, 0);
                 return;
             }
 
@@ -103,7 +102,6 @@ public partial class FlyoutWindow : Window
                     s.State.Equals("error",
                         StringComparison.OrdinalIgnoreCase));
 
-            UpdateHeaderSubtitle(printingCount, alertCount);
             UpdateBingDot(printingCount, alertCount);
 
             foreach (var snapshot in snapshots.Values
@@ -116,18 +114,6 @@ public partial class FlyoutWindow : Window
             UpdateLastPolled();
             UpdateWebhookStatus();
         });
-    }
-
-    private void UpdateHeaderSubtitle(
-        int printing, int alerts)
-    {
-        HeaderSubtitle.Text = (printing, alerts) switch
-        {
-            (0, 0) => "ALL QUIET · IT GOES BING",
-            (_, 0) => $"{printing} PRINTING · IT GOES BING",
-            (0, _) => $"{alerts} NEED ATTENTION · IT GOES BING",
-            _ => $"{printing} PRINTING · {alerts} ALERTS"
-        };
     }
 
     private void UpdateBingDot(int printing, int alerts)
@@ -147,7 +133,6 @@ public partial class FlyoutWindow : Window
         var (statusColor, stateLabel) = GetStatusInfo(snapshot);
         var flavourText = _trayIcon.GetFlavourText(snapshot);
 
-        // Card border
         var card = new Border
         {
             Style = (Style)FindResource("PrinterCard"),
@@ -155,7 +140,6 @@ public partial class FlyoutWindow : Window
             Tag = snapshot.PrinterId
         };
 
-        // Hover effect
         card.MouseEnter += (_, _) =>
             card.Background = new SolidColorBrush(
                 Color.FromRgb(0x22, 0x22, 0x2A));
@@ -170,29 +154,33 @@ public partial class FlyoutWindow : Window
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition { Width = GridLength.Auto });
         topRow.ColumnDefinitions.Add(
-            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            new ColumnDefinition
+            {
+                Width = new GridLength(
+                1, GridUnitType.Star)
+            });
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition { Width = GridLength.Auto });
-        topRow.Margin = new Thickness(0, 0, 0, 5);
+        topRow.Margin = new Thickness(0, 0, 0, 6);
 
-        // Status dot
+        // Status dot — slightly bigger
         var dot = new Ellipse
         {
-            Width = 7,
-            Height = 7,
+            Width = 9,
+            Height = 9,
             Fill = new SolidColorBrush(statusColor),
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(0, 0, 7, 0)
+            Margin = new Thickness(0, 0, 8, 0)
         };
         Grid.SetColumn(dot, 0);
 
-        // Printer name
+        // Printer name — same, already good
         var nameText = new TextBlock
         {
             Text = snapshot.PrinterName,
             FontFamily = new FontFamily(
                 "Segoe UI Variable, Segoe UI"),
-            FontSize = 11,
+            FontSize = 13,
             FontWeight = FontWeights.SemiBold,
             Foreground = new SolidColorBrush(
                 Color.FromRgb(0xF0, 0xED, 0xE8)),
@@ -200,14 +188,14 @@ public partial class FlyoutWindow : Window
         };
         Grid.SetColumn(nameText, 1);
 
-        // State label
+        // State label — brighter and bigger
         var stateText = new TextBlock
         {
             Text = stateLabel.ToUpperInvariant(),
             FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0x9A, 0x90, 0x80)),
+            FontSize = 11,
+            FontWeight = FontWeights.Bold,
+            Foreground = new SolidColorBrush(statusColor),
             VerticalAlignment = VerticalAlignment.Center
         };
         Grid.SetColumn(stateText, 2);
@@ -224,32 +212,32 @@ public partial class FlyoutWindow : Window
         {
             var progressBg = new Border
             {
-                Height = 3,
+                Height = 4,
                 Background = new SolidColorBrush(
-                    Color.FromArgb(0x20, 0xFF, 0xFF, 0xFF)),
+                    Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF)),
                 CornerRadius = new CornerRadius(2),
-                Margin = new Thickness(0, 0, 0, 4)
+                Margin = new Thickness(0, 0, 0, 5)
             };
 
             var progressFill = new Border
             {
-                Height = 3,
+                Height = 4,
                 Background = new SolidColorBrush(statusColor),
                 CornerRadius = new CornerRadius(2),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Width = (snapshot.JobPercentage.Value / 100.0) *
-                        (280 - 20) // card width minus padding
+                        (280 - 20)
             };
 
             var progressGrid = new Grid();
             progressGrid.Children.Add(progressBg);
             progressGrid.Children.Add(progressFill);
-            progressGrid.Margin = new Thickness(0, 0, 0, 4);
+            progressGrid.Margin = new Thickness(0, 0, 0, 5);
 
             stack.Children.Add(progressGrid);
         }
 
-        // ── Meta row — filename + time remaining ─────────────────
+        // ── Meta row — filename + time ────────────────────────────
         var metaRow = new Grid();
         metaRow.ColumnDefinitions.Add(
             new ColumnDefinition
@@ -262,11 +250,12 @@ public partial class FlyoutWindow : Window
         var filenameText = new TextBlock
         {
             Text = TruncateFilename(
-                snapshot.ActiveJobFilename ?? GetIdleText(snapshot)),
+                snapshot.ActiveJobFilename ??
+                GetIdleText(snapshot)),
             FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
+            FontSize = 11,
             Foreground = new SolidColorBrush(
-                Color.FromRgb(0x5A, 0x52, 0x48)),
+                Color.FromRgb(0xC8, 0xC0, 0xB8)),
             TextTrimming = TextTrimming.CharacterEllipsis
         };
         Grid.SetColumn(filenameText, 0);
@@ -275,10 +264,10 @@ public partial class FlyoutWindow : Window
         {
             Text = FormatTimeRemaining(snapshot.JobTimeRemaining),
             FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
+            FontSize = 11,
+            FontWeight = FontWeights.Bold,
             Foreground = new SolidColorBrush(
-                Color.FromRgb(0x9A, 0x90, 0x80)),
-            FontWeight = FontWeights.Bold
+                Color.FromRgb(0xF0, 0xC8, 0x40))
         };
         Grid.SetColumn(timeText, 1);
 
@@ -495,11 +484,10 @@ public partial class FlyoutWindow : Window
         object sender, RoutedEventArgs e)
     {
         var muted = MuteToggle.IsChecked == true;
-        _onMuteToggle?.Invoke(muted);
-
-        HeaderSubtitle.Text = muted
-            ? "MUTED · BLESSED SILENCE"
-            : "ALL QUIET · IT GOES BING";
+        _settings.Value.Notifications.GlobalMuteEnabled = muted;
+        MutedBanner.Visibility = muted
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private void OnHistoryClick(

@@ -20,8 +20,7 @@
                                     CornerRadius="8"
                                     Padding="0 4"
                                     MinWidth="220">
-                                <StackPanel 
-                                    IsItemsHost="True"/>
+                                <StackPanel IsItemsHost="True"/>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -33,7 +32,7 @@
             <Style TargetType="MenuItem">
                 <Setter Property="Background" Value="#141417"/>
                 <Setter Property="Foreground" Value="#F0EDE8"/>
-                <Setter Property="FontFamily" 
+                <Setter Property="FontFamily"
                         Value="Segoe UI Variable, Segoe UI"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Padding" Value="16 9"/>
@@ -45,7 +44,7 @@
                                     Background="{TemplateBinding Background}"
                                     Padding="{TemplateBinding Padding}"
                                     BorderThickness="0">
-                                <TextBlock 
+                                <TextBlock
                                     Text="{TemplateBinding Header}"
                                     Foreground="{TemplateBinding Foreground}"
                                     FontFamily="{TemplateBinding FontFamily}"
@@ -53,7 +52,7 @@
                                     FontWeight="{TemplateBinding FontWeight}"/>
                             </Border>
                             <ControlTemplate.Triggers>
-                                <Trigger Property="IsHighlighted" 
+                                <Trigger Property="IsHighlighted"
                                          Value="True">
                                     <Setter TargetName="Bd"
                                             Property="Background"
@@ -101,7 +100,7 @@
 
         <MenuItem x:Name="MenuSettings"
                   Header="Settings"
-                  Foreground="#C9930E"/>
+                  Foreground="#F0C840"/>
 
         <MenuItem x:Name="MenuMute"
                   Header="Mute all notifications"

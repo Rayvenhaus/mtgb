@@ -12,6 +12,42 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.17] — 17/04/2026
+### The one where you can actually read the flyout.
+
+### Changed
+- Flyout printer card text sizes increased throughout —
+  state label 9→11px bold in status colour, filename 9→11px,
+  time 9→11px gold bold, printer name 11→13px, status dot 7→9px,
+  progress bar 3→4px
+- State label colour changed from grey to status colour —
+  matches the dot, immediately readable
+- Filename colour lifted from near-invisible #5A5248 to #C8C0B8
+- Time remaining now gold #F0C840 bold — stands out clearly
+- Global TextSecondary #9A9080 → #C8C0B8 across entire app
+- Global TextDim #5A5248 → #8A8078 across entire app
+- FlyoutWindow local colour palette updated to match
+
+### Added
+- Muted banner — amber "NOTIFICATIONS MUTED · BLESSED SILENCE."
+  appears below header when global mute is active
+- Taskbar icon tooltip flavour text now cached per state —
+  picks once and sticks until state changes, no longer
+  cycles through the pool on every 5 second icon update
+
+### Fixed
+- Mute toggle direction — checked=muted=right=amber,
+  unchecked=unmuted=left=brass dim. Previously showed green
+  regardless of state
+- Mute toggle off state — track correctly returns to brass dim
+  via ObjectAnimationUsingKeyFrames on trigger exit. WPF
+  property revert was restoring wrong colour
+- TrayContextMenu.xaml restored — file was empty, rebuilt
+  with updated readable colours throughout
+- Header status text removed — redundant with flyout card states
+
+---
+
 ## [0.2.16] — 17/04/2026
 ### The one where it actually goes Bing.
 
