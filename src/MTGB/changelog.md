@@ -1,5 +1,4 @@
 # Changelog
-
 All notable changes to MTGB — The Monitor That Goes Bing will be documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
@@ -8,6 +7,133 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ---
 
 ## [Unreleased]
+
+---
+
+## [0.3.0] — 2026-04-19
+### The one where the Ministry opens its doors for the first time.
+
+### Added
+#### MTGB Induction — Form MwA 621d/7 22
+- Five-screen first run wizard guiding new users through
+  credentials, startup preferences and telemetry consent
+- Screen 1 — Welcome from the Ministry of Perfectly Observed
+  Prints. We are here to help. We have forms.
+- Screen 2 — Credentials. Organisation ID and API key entry
+  with live connection test. Test Connection button disabled
+  until both fields are populated. Continue locked until
+  connection is verified green. The Ministry does not proceed
+  on faith alone.
+- Screen 3 — Standing Orders. Start with Windows toggle,
+  default OFF. The Ministry recommends it. Strongly. It has
+  filed a form about it.
+- Screen 4 — The Scribes. Anonymous telemetry opt-in, default
+  OFF. Full transparency — what is collected, what is never
+  collected, no llamas involved.
+- Screen 5 — Induction Complete. You are now in the system.
+  The system is, for once, on your side.
+- Five brass progress dots — current screen gold, completed
+  brass, pending dim
+- Exit at any point triggers full cleanup — credentials
+  deleted, org ID reset, startup registry entry removed,
+  OAuth tokens cleared, webhook secret deleted, settings
+  not saved. Next launch starts fresh. The Ministry has
+  no memory of you. Technically.
+- Inducted flag in appsettings.json — false until Screen 5
+  is completed. One flag. One truth.
+- Same colour palette as SettingsWindow and HistoryWindow —
+  dark background, brass accents, Courier New for Ministry
+  flavour text, Segoe UI Variable for body copy
+
+#### Notification sound
+- mtgbNotification.wav — the actual Monty Python Bing,
+  as it should be, doing its job
+- Plays on every toast delivery — single and grouped
+- Respects SoundEnabled setting
+- Respects GlobalMuteEnabled — muted means silence
+- Gracefully silent if wav file is missing
+
+#### AppSettings
+- Inducted — first run detection flag, default false
+- TelemetrySettings — Enabled flag, default false,
+  always opt-in never opt-out, the scribes are patient
+
+### Fixed
+
+#### StateDiffEngine — offline/online bounce grace period
+- printer.offline now requires 3 consecutive offline polls
+  before firing — 90 seconds at default interval
+- printer.online now requires 3 consecutive online polls
+  before firing after a confirmed offline
+- Bounce tracking — if printer returns before confirmation,
+  bounce count increments, no offline event fired
+- Instability warning fires at 3 bounces with 30-minute
+  cooldown per printer — one warning, not a flood
+- Post-reconnect diff compares against pre-offline snapshot —
+  filament that was low before going offline does not
+  re-fire on reconnect, only genuine new conditions reported
+- Eliminated the offline/online bounce flood that was
+  generating toasts every 60 seconds for flaky connections
+
+#### NotificationManager — toast line limit crash
+- Windows toast allows maximum 4 text elements — title
+  occupies slot 1, leaving 3 for detail lines
+- Previously crashed with InvalidOperationException when
+  3 or more events arrived simultaneously across multiple
+  printers
+- Now takes 2 detail lines and appends "...and N more"
+  when overflow — never exceeds the Windows limit
+
+#### NotificationManager — grouping flush timer
+- Group buffer previously only flushed when a new poll
+  arrived with events — a 5-second grouping window could
+  wait up to 30 seconds to deliver
+- Independent 1-second timer now owns the flush — completely
+  decoupled from the polling cycle
+- GroupingWindowSeconds now actually respected
+
+#### Settings persistence
+- appsettings.json was saving to the build output directory —
+  silent data loss on every rebuild and on installed builds
+- Now saves to %APPDATA%\MTGB\appsettings.json
+- Program.cs seeds user settings from build defaults on
+  first run — clean initial state, no missing keys
+
+#### TrayIcon
+- BuildContextMenu null reference on startup — context menu
+  was loading from Application.Current.Resources before the
+  resource dictionary was available
+- Rebuilt entirely in code — no resource dictionary
+  dependency, no timing issues, no nulls
+- mtgb.ico crash on toast delivery — icon was embedded as
+  resource but not copied to output directory for runtime
+  file path access — now correctly set as Content with
+  Copy if Newer
+
+#### DiagnosticMode
+- Removed from AppSettings entirely — was shipping as a
+  runtime flag that users could see in appsettings.json
+- Now driven by #if DEBUG compiler directive — visible in
+  Debug builds, completely absent in Release builds
+- appsettings.local.json no longer needed for this purpose
+
+#### csproj
+- Asset wildcard removed — was double-including files that
+  were also explicitly listed, causing RG1000 duplicate
+  key build error
+- NuGet packaging entries removed — MTGB is a WPF
+  application, not a NuGet package
+- Explicit asset entries only — clean, predictable,
+  no surprises
+
+### Technical notes
+- Version bumped to 0.3.0 — Phase 5 UI complete
+- InductionWindow registered as Transient in DI container
+- Induction cleanup is total — no partial state survives
+  an abandoned induction
+- The Ministry of Perfectly Observed Prints name confirmed
+  canonical. Pending update to full title in Phase 6.
+- No llamas were harmed
 
 ---
 
@@ -393,7 +519,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/rayvenhaus/mtgb/compare/v0.2.14...HEAD
+[Unreleased]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.18...v0.3.0
+[0.2.18]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.17...v0.2.18
 [0.2.14]: https://github.com/rayvenhaus/mtgb/compare/v0.2.13...v0.2.14
 [0.2.13]: https://github.com/rayvenhaus/mtgb/compare/v0.2.12...v0.2.13
 [0.2.12]: https://github.com/rayvenhaus/mtgb/compare/v0.2.11...v0.2.12
