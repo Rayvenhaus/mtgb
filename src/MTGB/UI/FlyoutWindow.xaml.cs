@@ -25,7 +25,6 @@ public partial class FlyoutWindow : Window
     private Action? _onSettingsClick;
     private Action? _onDashboardClick;
     private Action? _onExitClick;
-    private Action<bool>? _onMuteToggle;
 
     public FlyoutWindow(
         IOptions<AppSettings> settings,

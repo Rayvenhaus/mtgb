@@ -31,14 +31,16 @@ public partial class HistoryWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Force dark title bar
         var hwnd = new System.Windows.Interop
             .WindowInteropHelper(this).Handle;
         int darkMode = 1;
         DwmSetWindowAttribute(hwnd, 20,
             ref darkMode, sizeof(int));
 
-        LoadHistory();
+        // Defer history load until after render
+        Dispatcher.BeginInvoke(
+            System.Windows.Threading.DispatcherPriority.Loaded,
+            new Action(LoadHistory));
     }
 
     private void LoadHistory()

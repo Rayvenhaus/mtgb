@@ -45,6 +45,33 @@ public record DetectedEvent
     public DateTimeOffset DetectedAt { get; init; } = DateTimeOffset.Now;
 }
 
+// ── Offline tracking ──────────────────────────────────────────────
+
+/// <summary>
+/// Tracks a printer that has gone offline but not yet been confirmed.
+/// Counts poll cycles to implement the 3-poll grace period.
+/// </summary>
+internal record OfflinePendingEntry
+{
+    public required DateTimeOffset FirstSeenOffline { get; init; }
+    public required PrinterSnapshot SnapshotBeforeOffline { get; init; }
+    public int PollCount { get; set; } = 0;
+    public int BounceCount { get; set; } = 0;
+}
+
+// ── Online tracking ───────────────────────────────────────────────
+
+/// <summary>
+/// Tracks a printer that has come back online but not yet been confirmed.
+/// Counts poll cycles to implement the 3-poll confirmation period.
+/// </summary>
+internal record OnlinePendingEntry
+{
+    public required DateTimeOffset FirstSeenOnline { get; init; }
+    public required PrinterSnapshot SnapshotBeforeOnline { get; init; }
+    public int PollCount { get; set; } = 0;
+}
+
 // ── Interface ─────────────────────────────────────────────────────
 
 public interface IStateDiffEngine
@@ -85,20 +112,61 @@ public interface IStateDiffEngine
 /// Holds in-memory snapshots of every printer's last known state.
 /// Compares incoming data against snapshots and fires events on changes.
 /// Handles milestone deduplication per job so 75% only fires once.
+///
+/// Offline/online behaviour:
+///   - A printer must be offline for 3 consecutive polls before
+///     printer.offline fires. This prevents bounce floods.
+///   - A printer must be online for 3 consecutive polls before
+///     printer.online fires.
+///   - On confirmed reconnect, only state changes vs the
+///     pre-offline snapshot are reported — no duplicate alerts
+///     for conditions that existed before the outage.
+///   - Bounce count is tracked. If a printer bounces repeatedly
+///     a separate instability warning is fired.
 /// </summary>
 public class StateDiffEngine : IStateDiffEngine
 {
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<StateDiffEngine> _logger;
 
+    // ── Snapshot store ────────────────────────────────────────────
     // Keyed by printer ID
     private readonly Dictionary<int, PrinterSnapshot> _snapshots = new();
 
+    // ── Offline grace period tracking ─────────────────────────────
+    // Printers that have gone offline but not yet confirmed
+    // Key: printerId
+    private readonly Dictionary<int, OfflinePendingEntry> _pendingOffline
+        = new();
+
+    // ── Online confirmation tracking ──────────────────────────────
+    // Printers that have come back online but not yet confirmed
+    // Key: printerId
+    private readonly Dictionary<int, OnlinePendingEntry> _pendingOnline
+        = new();
+
+    // ── Bounce instability warning cooldown ───────────────────────
+    // Key: printerId, Value: when the last instability warning fired
+    private readonly Dictionary<int, DateTimeOffset> _instabilityWarnings
+        = new();
+
+    // How many poll cycles before offline/online is confirmed
+    private const int OfflineConfirmationPolls = 3;
+    private const int OnlineConfirmationPolls = 3;
+
+    // How many bounces before we warn about instability
+    private const int BounceWarningThreshold = 3;
+
+    // Cooldown between instability warnings per printer
+    private static readonly TimeSpan InstabilityWarningCooldown =
+        TimeSpan.FromMinutes(30);
+
+    // ── Milestone tracking ────────────────────────────────────────
     // Tracks which progress milestones have already fired per job ID
     // Key: "{printerId}:{jobId}:{milestoneEventId}"
     private readonly HashSet<string> _firedMilestones = new();
 
-    // Temperature alert cooldown — prevents repeated alerts
+    // ── Temperature alert cooldown ────────────────────────────────
     // Key: "{printerId}:{eventId}", Value: when it last fired
     private readonly Dictionary<string, DateTimeOffset> _tempAlertCooldowns
         = new();
@@ -106,7 +174,8 @@ public class StateDiffEngine : IStateDiffEngine
     private static readonly TimeSpan TempAlertCooldown =
         TimeSpan.FromMinutes(10);
 
-    // Printer states that indicate active printing
+    // ── State sets ────────────────────────────────────────────────
+
     private static readonly HashSet<string> PrintingStates =
         new(StringComparer.OrdinalIgnoreCase)
         {
@@ -125,7 +194,7 @@ public class StateDiffEngine : IStateDiffEngine
             "error", "printer_error", "offline"
         };
 
-    // Progress milestones we track — maps event ID to threshold
+    // ── Progress milestones ───────────────────────────────────────
     private static readonly Dictionary<string, double> Milestones =
         new()
         {
@@ -165,7 +234,6 @@ public class StateDiffEngine : IStateDiffEngine
         }
 
         // Check for printers that disappeared from the response
-        // (could indicate they went offline at the API level)
         var freshIds = freshData.Select(p => p.Id).ToHashSet();
         foreach (var missingId in _snapshots.Keys.Except(freshIds).ToList())
         {
@@ -173,7 +241,8 @@ public class StateDiffEngine : IStateDiffEngine
             if (snapshot.Online)
             {
                 _logger.LogWarning(
-                    "Printer {PrinterId} ({Name}) disappeared from API response.",
+                    "Printer {PrinterId} ({Name}) disappeared " +
+                    "from API response.",
                     missingId, snapshot.PrinterName);
             }
         }
@@ -231,18 +300,26 @@ public class StateDiffEngine : IStateDiffEngine
         if (previous is null)
         {
             _logger.LogInformation(
-                "First snapshot for printer {Id} ({Name}) — state: {State}.",
+                "First snapshot for printer {Id} ({Name}) — " +
+                "state: {State}.",
                 fresh.PrinterId, fresh.PrinterName, fresh.State);
             return events;
         }
 
-        // ── Online / offline ──────────────────────────────────────
-        if (previous.Online && !fresh.Online)
-            events.Add(MakeEvent("printer.offline", fresh,
-                isCritical: true));
+        // ── Online / offline with grace period ────────────────────
+        events.AddRange(
+            ProcessOnlineState(previous, fresh));
 
-        if (!previous.Online && fresh.Online)
-            events.Add(MakeEvent("printer.online", fresh));
+        // If printer is in pending offline or pending online state,
+        // skip all other event detection — we don't know the true
+        // state yet.
+        if (_pendingOffline.ContainsKey(fresh.PrinterId) ||
+            _pendingOnline.ContainsKey(fresh.PrinterId))
+            return events;
+
+        // If printer is currently offline, skip job/temp detection
+        if (!fresh.Online)
+            return events;
 
         // ── Print job state changes ───────────────────────────────
         var wasIdle = !IsActiveState(previous.State);
@@ -320,6 +397,224 @@ public class StateDiffEngine : IStateDiffEngine
         return events;
     }
 
+    // ── Online / offline grace period logic ───────────────────────
+
+    private IEnumerable<DetectedEvent> ProcessOnlineState(
+        PrinterSnapshot previous,
+        PrinterSnapshot fresh)
+    {
+        var events = new List<DetectedEvent>();
+        var printerId = fresh.PrinterId;
+
+        // ── Printer has gone offline ──────────────────────────────
+        if (previous.Online && !fresh.Online)
+        {
+            if (!_pendingOffline.ContainsKey(printerId))
+            {
+                // First poll offline — start the grace period
+                _pendingOffline[printerId] = new OfflinePendingEntry
+                {
+                    FirstSeenOffline = DateTimeOffset.Now,
+                    SnapshotBeforeOffline = previous
+                };
+
+                _logger.LogDebug(
+                    "Printer {Name} went offline — " +
+                    "starting {Polls}-poll grace period.",
+                    fresh.PrinterName, OfflineConfirmationPolls);
+            }
+
+            return events;
+        }
+
+        // ── Printer is still offline ──────────────────────────────
+        if (!previous.Online && !fresh.Online)
+        {
+            if (_pendingOffline.TryGetValue(
+                printerId, out var offlineEntry))
+            {
+                offlineEntry.PollCount++;
+
+                _logger.LogDebug(
+                    "Printer {Name} still offline — " +
+                    "poll {Poll}/{Required}.",
+                    fresh.PrinterName,
+                    offlineEntry.PollCount,
+                    OfflineConfirmationPolls);
+
+                if (offlineEntry.PollCount >= OfflineConfirmationPolls)
+                {
+                    // Confirmed offline — fire the event
+                    _pendingOffline.Remove(printerId);
+                    _logger.LogInformation(
+                        "Printer {Name} confirmed offline " +
+                        "after {Polls} polls.",
+                        fresh.PrinterName, OfflineConfirmationPolls);
+                    events.Add(MakeEvent("printer.offline", fresh,
+                        isCritical: true));
+                }
+            }
+
+            return events;
+        }
+
+        // ── Printer has come back online ──────────────────────────
+        if (!previous.Online && fresh.Online)
+        {
+            // If it was in pending offline (bounced back quickly)
+            // increment bounce count but don't fire offline event
+            if (_pendingOffline.TryGetValue(
+                printerId, out var offlineEntry))
+            {
+                offlineEntry.BounceCount++;
+                _pendingOffline.Remove(printerId);
+
+                _logger.LogDebug(
+                    "Printer {Name} bounced back online " +
+                    "(bounce #{Count}) — suppressing offline event.",
+                    fresh.PrinterName, offlineEntry.BounceCount);
+
+                // Check if we should warn about instability
+                events.AddRange(
+                    CheckInstability(fresh, offlineEntry.BounceCount));
+
+                return events;
+            }
+
+            // Came back from a confirmed offline — start online
+            // confirmation grace period
+            if (!_pendingOnline.ContainsKey(printerId))
+            {
+                _pendingOnline[printerId] = new OnlinePendingEntry
+                {
+                    FirstSeenOnline = DateTimeOffset.Now,
+                    SnapshotBeforeOnline = previous
+                };
+
+                _logger.LogDebug(
+                    "Printer {Name} back online — " +
+                    "starting {Polls}-poll confirmation period.",
+                    fresh.PrinterName, OnlineConfirmationPolls);
+            }
+
+            return events;
+        }
+
+        // ── Printer is still online ───────────────────────────────
+        if (previous.Online && fresh.Online)
+        {
+            // Clear any pending offline entry (shouldn't happen
+            // but defensive cleanup)
+            _pendingOffline.Remove(printerId);
+
+            if (_pendingOnline.TryGetValue(
+                printerId, out var onlineEntry))
+            {
+                onlineEntry.PollCount++;
+
+                _logger.LogDebug(
+                    "Printer {Name} still online — " +
+                    "poll {Poll}/{Required}.",
+                    fresh.PrinterName,
+                    onlineEntry.PollCount,
+                    OnlineConfirmationPolls);
+
+                if (onlineEntry.PollCount >= OnlineConfirmationPolls)
+                {
+                    // Confirmed back online
+                    _pendingOnline.Remove(printerId);
+
+                    _logger.LogInformation(
+                        "Printer {Name} confirmed back online " +
+                        "after {Polls} polls.",
+                        fresh.PrinterName, OnlineConfirmationPolls);
+
+                    // Fire printer.online event
+                    events.Add(MakeEvent("printer.online", fresh));
+
+                    // Now diff against the pre-offline snapshot to
+                    // detect only genuine state changes — don't
+                    // re-fire conditions that existed before the outage
+                    var preOfflineSnapshot =
+                        onlineEntry.SnapshotBeforeOnline;
+
+                    events.AddRange(
+                        DiffPostReconnect(preOfflineSnapshot, fresh));
+                }
+            }
+        }
+
+        return events;
+    }
+
+    /// <summary>
+    /// Diffs the current snapshot against the pre-offline snapshot
+    /// to detect only genuine changes that occurred during the outage.
+    /// Conditions that existed before going offline are not re-fired.
+    /// </summary>
+    private IEnumerable<DetectedEvent> DiffPostReconnect(
+        PrinterSnapshot preOffline,
+        PrinterSnapshot fresh)
+    {
+        var events = new List<DetectedEvent>();
+
+        // Filament sensor — only fire if it wasn't already triggered
+        // before the outage
+        if (!preOffline.FilamentSensorTriggered &&
+            fresh.FilamentSensorTriggered)
+            events.Add(MakeEvent("filament.low", fresh,
+                isCritical: true));
+
+        // Job state — if a job was running before and is now gone,
+        // we don't know if it finished or failed — fire job.finished
+        // as it's the safer assumption (user can check history)
+        if (preOffline.ActiveJobId.HasValue &&
+            !fresh.ActiveJobId.HasValue &&
+            PrintingStates.Contains(preOffline.State))
+            events.Add(MakeEvent("job.finished", fresh,
+                jobFilename: preOffline.ActiveJobFilename));
+
+        // If printer came back in an error state when it wasn't
+        // before — something went wrong during the outage
+        if (!ErrorStates.Contains(preOffline.State) &&
+            ErrorStates.Contains(fresh.State))
+            events.Add(MakeEvent("job.failed", fresh,
+                isCritical: true));
+
+        return events;
+    }
+
+    /// <summary>
+    /// Checks if a printer has bounced enough times to warrant
+    /// an instability warning. Respects a cooldown to prevent
+    /// warning floods.
+    /// </summary>
+    private IEnumerable<DetectedEvent> CheckInstability(
+        PrinterSnapshot fresh,
+        int bounceCount)
+    {
+        if (bounceCount < BounceWarningThreshold)
+            yield break;
+
+        var lastWarned = _instabilityWarnings
+            .GetValueOrDefault(fresh.PrinterId);
+
+        if (DateTimeOffset.Now - lastWarned < InstabilityWarningCooldown)
+            yield break;
+
+        _instabilityWarnings[fresh.PrinterId] = DateTimeOffset.Now;
+
+        _logger.LogWarning(
+            "Printer {Name} has bounced {Count} times — " +
+            "firing instability warning.",
+            fresh.PrinterName, bounceCount);
+
+        yield return MakeEvent("printer.offline", fresh,
+            isCritical: true);
+    }
+
+    // ── Temperature alerts ────────────────────────────────────────
+
     private void CheckTempAlert(
         string eventId,
         PrinterSnapshot fresh,
@@ -329,8 +624,6 @@ public class StateDiffEngine : IStateDiffEngine
         if (!currentTemp.HasValue) return;
 
         var settings = _settings.Value;
-        var printerSettings = settings.Printers
-            .GetValueOrDefault(fresh.PrinterId);
 
         // Only fire if the event type is enabled
         var enabled = settings.Notifications.EnabledEventIds

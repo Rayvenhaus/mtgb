@@ -47,70 +47,92 @@ internal class Program
     }
 
     private static IHost CreateHost(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((context, config) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureAppConfiguration((context, config) =>
+        {
+            var appDataDir = Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData),
+                "MTGB");
+
+            Directory.CreateDirectory(appDataDir);
+
+            var appDataSettings = Path.Combine(
+                appDataDir, "appsettings.json");
+            var builtInSettings = Path.Combine(
+                AppContext.BaseDirectory, "appsettings.json");
+
+            if (!File.Exists(appDataSettings) &&
+                File.Exists(builtInSettings))
             {
-                config
-                    .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json",
-                        optional: false,
-                        reloadOnChange: true)
-                    .AddJsonFile("appsettings.local.json",
-                        optional: true,
-                        reloadOnChange: true)
-                    .AddEnvironmentVariables("MTGB_")
-                    .AddCommandLine(args);
-            })
-            .ConfigureLogging((context, logging) =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-                logging.AddDebug();
-                logging.AddFile(Path.Combine(
-                    Environment.GetFolderPath(
-                        Environment.SpecialFolder.ApplicationData),
-                    "MTGB", "logs", "mtgb-.log"));
-            })
-            .ConfigureServices((context, services) =>
-            {
-                // ── Configuration ─────────────────────────────
-                services.Configure<AppSettings>(
-                    context.Configuration);
+                File.Copy(builtInSettings, appDataSettings);
+            }
 
-                // ── Security ──────────────────────────────────
-                services.AddSingleton<ICredentialManager,
-                    WindowsCredentialManager>();
-                services.AddSingleton<WebhookSecretManager>();
+            config
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json",
+                    optional: false,
+                    reloadOnChange: false)
+                .AddJsonFile(appDataSettings,
+                    optional: true,
+                    reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json",
+                    optional: true,
+                    reloadOnChange: true)
+                .AddEnvironmentVariables("MTGB_")
+                .AddCommandLine(args);
+        })
+        .ConfigureLogging((context, logging) =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
+            logging.AddDebug();
+            logging.AddFile(Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData),
+                "MTGB", "logs", "mtgb-.log"));
+        })
+        .ConfigureServices((context, services) =>
+        {
+            // ── Configuration ─────────────────────────────
+            services.Configure<AppSettings>(
+                context.Configuration);
 
-                // ── HTTP client ───────────────────────────────
-                services.AddHttpClient<ISimplyPrintApiClient,
-                    SimplyPrintApiClient>((provider, client) =>
-                    {
-                        client.BaseAddress = new Uri(
-                            "https://api.simplyprint.io/");
-                        client.Timeout = TimeSpan.FromSeconds(30);
-                        client.DefaultRequestHeaders.Add(
-                            "User-Agent", "MTGB/0.1.0");
-                    });
+            // ── Security ──────────────────────────────────
+            services.AddSingleton<ICredentialManager,
+                WindowsCredentialManager>();
+            services.AddSingleton<WebhookSecretManager>();
 
-                // ── Auth ──────────────────────────────────────
-                services.AddSingleton<IAuthService, AuthService>();
+            // ── HTTP client ───────────────────────────────
+            services.AddHttpClient<ISimplyPrintApiClient,
+                SimplyPrintApiClient>((provider, client) =>
+                {
+                    client.BaseAddress = new Uri(
+                        "https://api.simplyprint.io/");
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    client.DefaultRequestHeaders.Add(
+                        "User-Agent", "MTGB/0.1.0");
+                });
 
-                // ── Core services ─────────────────────────────
-                services.AddSingleton<IStateDiffEngine,
-                    StateDiffEngine>();
-                services.AddSingleton<INotificationManager,
-                    NotificationManager>();
+            // ── Auth ──────────────────────────────────────
+            services.AddSingleton<IAuthService, AuthService>();
 
-                // ── Background workers ────────────────────────
-                services.AddHostedService<PollingWorker>();
-                services.AddHostedService<WebhookWorker>();
+            // ── Core services ─────────────────────────────
+            services.AddSingleton<IStateDiffEngine,
+                StateDiffEngine>();
+            services.AddSingleton<INotificationManager,
+                NotificationManager>();
 
-                // ── UI ────────────────────────────────────────
-                services.AddTransient<FlyoutWindow>();
-                services.AddTransient<SettingsWindow>();
-                services.AddTransient<HistoryWindow>();
-                services.AddSingleton<TrayIcon>();
-            })
-            .Build();
+            // ── Background workers ────────────────────────
+            services.AddHostedService<PollingWorker>();
+            services.AddHostedService<WebhookWorker>();
+
+            // ── UI ────────────────────────────────────────
+            services.AddTransient<InductionWindow>();
+            services.AddTransient<FlyoutWindow>();
+            services.AddTransient<SettingsWindow>();
+            services.AddTransient<HistoryWindow>();
+            services.AddSingleton<TrayIcon>();
+        })
+        .Build();
 }

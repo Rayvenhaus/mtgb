@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -15,95 +14,67 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
-	<ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-	<StartupObject>MTGB.Program</StartupObject>
-	<Title>The Machine That Goes Bing</Title>
-	<PackageIcon>MTGB_128.png</PackageIcon>
-	<RepositoryType>git</RepositoryType>
-	<RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
-	<PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<PackageTags>notification;monitor;tray;windows;desktop;simplyprint;3d-printing;print-farm;filament;wpf;dotnet;csharp;windows10;windows11;open-source;community</PackageTags>
-	<NeutralLanguage>en-AU</NeutralLanguage>
-	<Company>Myndworx Asylum</Company>
+    <StartupObject>MTGB.Program</StartupObject>
+    <Title>The Machine That Goes Bing</Title>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
+    <PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>notification;monitor;tray;windows;desktop;simplyprint;3d-printing;print-farm;filament;wpf;dotnet;csharp;windows10;windows11;open-source;community</PackageTags>
+    <NeutralLanguage>en-AU</NeutralLanguage>
+    <Company>Myndworx Asylum</Company>
   </PropertyGroup>
-
-  <!-- NuGet Packages -->
   <ItemGroup>
-    <!-- HTTP client and API -->
+    <None Remove="Assets\mtgb.ico" />
+    <None Remove="UI\MTGB_32.png" />
+  </ItemGroup>
+
+  <!-- ── NuGet Packages ──────────────────────────────────────── -->
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-
-    <!-- JSON -->
     <PackageReference Include="System.Text.Json" Version="10.0.5" />
-
-    <!-- Windows notifications -->
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
-
-    <!-- Windows credential manager -->
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-
-    <!-- Tray icon support -->
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-
-    <!-- OAuth2 PKCE -->
     <PackageReference Include="IdentityModel.OidcClient" Version="5.2.1" />
   </ItemGroup>
 
-  <!-- App manifest for Windows -->
-
-  <!-- Resources -->
+  <!-- ── Assets ─────────────────────────────────────────────── -->
   <ItemGroup>
-    <Resource Include="Assets\**\*" />
-    <Content Include="Assets\**\*">
+    <Resource Include="Assets\MTGB_16.png" />
+    <Resource Include="Assets\MTGB_32.png" />
+    <Resource Include="Assets\MTGB_48.png" />
+    <Content Include="Assets\mtgb.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-    <Page Remove="NewFolder\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="UI\MTGB_32.png" />
+    <Content Include="Assets\MTGB_128.png" />
+    <Resource Include="Assets\MTGB_256.png" />
+    <Resource Include="UI\MTGB_32.png" />
   </ItemGroup>
 
-  <!-- Config files -->
+  <!-- ── Copy to output ─────────────────────────────────────── -->
   <ItemGroup>
+    <Content Include="Assets\mtgbNotification.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+
+  <!-- ── WPF entry point ────────────────────────────────────── -->
   <ItemGroup>
     <Page Include="App.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\MTGB_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Assets\MTGB_128.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Update="Assets\MTGB_256.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 
 </Project>

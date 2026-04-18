@@ -11,8 +11,8 @@
         BorderThickness="1"
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
-        Icon="/UI/MTGB_32.png"
-        Topmost="True">
+        Icon="/Assets/MTGB_32.png"
+        Topmost="True" ShowInTaskbar="False">
 
     <Window.Resources>
 
@@ -401,8 +401,7 @@
                                       Margin="12 0 0 0"/>
                         </Border>
 
-                        <!-- Tab content — ClipToBounds prevents
-                             scroll bleed-through on rounded cards -->
+                        <!-- Tab content -->
                         <Border Grid.Row="1"
                                 Background="{StaticResource BgRaisedBrush}"
                                 ClipToBounds="True">
@@ -622,7 +621,8 @@
                         <!-- Connect / Disconnect buttons -->
                         <StackPanel x:Name="ConnectButtonPanel"
                                     Orientation="Horizontal"
-                                    Margin="0 10 0 0" Height="32">
+                                    Margin="0 10 0 0"
+                                    Height="32">
                             <Button x:Name="ConnectButton"
                                     Content="Connect to SimplyPrint"
                                     Style="{StaticResource BrassButton}"
@@ -1516,6 +1516,7 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- Danger zone -->
                         <TextBlock Text="Danger zone"
                                    FontFamily="Courier New"
                                    FontSize="10"
@@ -1551,6 +1552,49 @@
                                 </Grid>
                             </Border>
                         </Border>
+
+                        <!-- Diagnostic mode — only shown when DiagnosticMode = true -->
+                        <StackPanel x:Name="DiagnosticPanel"
+                                    Visibility="Collapsed"
+                                    Margin="0 10 0 0">
+
+                            <TextBlock Text="Diagnostic mode"
+                                       FontFamily="Courier New"
+                                       FontSize="10"
+                                       Foreground="#378ADD"
+                                       Margin="2 8 0 6"
+                                       FontWeight="Bold"/>
+
+                            <Border Style="{StaticResource SectionCard}"
+                                    BorderBrush="#38378ADD">
+                                <Border Style="{StaticResource SettingRow}"
+                                        BorderThickness="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Dump API responses"
+                                                Style="{StaticResource SettingLabel}"
+                                                Foreground="#378ADD"/>
+                                            <TextBlock
+                                                Text="Writes raw JSON from all endpoints to %APPDATA%\MTGB\. Check logs for file paths."
+                                                Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="Dump API"
+                                                Style="{StaticResource GhostButton}"
+                                                Foreground="#378ADD"
+                                                BorderBrush="#38378ADD"
+                                                VerticalAlignment="Center"
+                                                Click="OnDumpApiClick"/>
+                                    </Grid>
+                                </Border>
+                            </Border>
+
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>

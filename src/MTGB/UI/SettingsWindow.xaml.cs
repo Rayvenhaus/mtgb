@@ -1,12 +1,14 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 using MTGB.Config;
 using MTGB.Core.Security;
 using MTGB.Services;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using Microsoft.Win32;
 
 namespace MTGB.UI;
 
@@ -105,6 +107,13 @@ public partial class SettingsWindow : Window
 
         // Show correct auth panel
         UpdateAuthPanels();
+
+        // Show diagnostic panel if DiagnosticMode is enabled
+        #if DEBUG
+            DiagnosticPanel.Visibility = Visibility.Visible;
+        #else
+            DiagnosticPanel.Visibility = Visibility.Collapsed;
+        #endif
 
         // Notifications
         GlobalMuteToggle.IsChecked =
@@ -896,9 +905,17 @@ public partial class SettingsWindow : Window
                     WriteIndented = true
                 });
 
+            // Save to %APPDATA%\MTGB\ — not the build output directory.
+            // AppContext.BaseDirectory breaks on installed builds.
+            var appDataDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData),
+                "MTGB");
+
+            Directory.CreateDirectory(appDataDir);
+
             var path = System.IO.Path.Combine(
-                AppContext.BaseDirectory,
-                "appsettings.json");
+                appDataDir, "appsettings.json");
 
             System.IO.File.WriteAllText(path, json);
 
@@ -1001,5 +1018,224 @@ public partial class SettingsWindow : Window
         // can be reopened without recreating it
         e.Cancel = true;
         Hide();
+    }
+
+    private async void OnDumpApiClick(
+    object sender, RoutedEventArgs e)
+    {
+        var btn = (Button)sender;
+        btn.IsEnabled = false;
+        btn.Content = "Dumping...";
+
+        try
+        {
+            var dumpDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData),
+                "MTGB");
+
+            Directory.CreateDirectory(dumpDir);
+
+            var orgId = _settings.Value.OrganisationId;
+            var baseUrl = $"https://api.simplyprint.io/{orgId}";
+
+            using var http = new System.Net.Http.HttpClient();
+            var apiKey = _credentials.Load(CredentialKey.ApiKey);
+            if (!string.IsNullOrWhiteSpace(apiKey))
+                http.DefaultRequestHeaders.Add(
+                    "X-API-KEY", apiKey);
+
+            // ── 1. Printers/Get ───────────────────────────────────
+            var printersResponse = await http.PostAsync(
+                $"{baseUrl}/printers/Get",
+                new System.Net.Http.StringContent(
+                    "{\"page\":1,\"page_size\":100}",
+                    System.Text.Encoding.UTF8,
+                    "application/json"));
+
+            var printersJson = await printersResponse.Content
+                .ReadAsStringAsync();
+
+            // Pretty print
+            var printersPretty = System.Text.Json.JsonSerializer
+                .Serialize(
+                    System.Text.Json.JsonSerializer
+                        .Deserialize<object>(printersJson),
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+            var printersPath = System.IO.Path.Combine(
+                dumpDir, "api_dump_printers.json");
+            await System.IO.File.WriteAllTextAsync(
+                printersPath, printersPretty);
+
+            _logger.LogInformation(
+                "Printers dump written to {Path}", printersPath);
+
+            // ── 2. Jobs/GetPaginatedPrintJobs ─────────────────────
+            var jobsResponse = await http.PostAsync(
+                $"{baseUrl}/jobs/GetPaginatedPrintJobs",
+                new System.Net.Http.StringContent(
+                    "{\"page\":1,\"page_size\":10}",
+                    System.Text.Encoding.UTF8,
+                    "application/json"));
+
+            var jobsJson = await jobsResponse.Content
+                .ReadAsStringAsync();
+
+            var jobsPretty = System.Text.Json.JsonSerializer
+                .Serialize(
+                    System.Text.Json.JsonSerializer
+                        .Deserialize<object>(jobsJson),
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+            var jobsPath = System.IO.Path.Combine(
+                dumpDir, "api_dump_jobs.json");
+            await System.IO.File.WriteAllTextAsync(
+                jobsPath, jobsPretty);
+
+            _logger.LogInformation(
+                "Jobs dump written to {Path}", jobsPath);
+
+            // ── 3. Jobs/GetDetails — most recent job ──────────────
+            // Extract first job UID from the jobs response
+            try
+            {
+                var jobsDoc = System.Text.Json.JsonDocument
+                    .Parse(jobsJson);
+
+                var firstUid = jobsDoc.RootElement
+                    .GetProperty("data")[0]
+                    .GetProperty("uid")
+                    .GetString();
+
+                if (!string.IsNullOrWhiteSpace(firstUid))
+                {
+                    var detailsResponse = await http.GetAsync(
+                        $"{baseUrl}/jobs/GetDetails" +
+                        $"?id={firstUid}");
+
+                    var detailsJson = await detailsResponse
+                        .Content.ReadAsStringAsync();
+
+                    var detailsPretty = System.Text.Json
+                        .JsonSerializer.Serialize(
+                            System.Text.Json.JsonSerializer
+                                .Deserialize<object>(detailsJson),
+                            new System.Text.Json.JsonSerializerOptions
+                            {
+                                WriteIndented = true
+                            });
+
+                    var detailsPath = System.IO.Path.Combine(
+                        dumpDir, "api_dump_job_details.json");
+                    await System.IO.File.WriteAllTextAsync(
+                        detailsPath, detailsPretty);
+
+                    _logger.LogInformation(
+                        "Job details dump written to {Path} " +
+                        "(job UID: {Uid})",
+                        detailsPath, firstUid);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "Could not dump job details — " +
+                    "no recent jobs found.");
+            }
+
+            // ── 4. Account/Test ───────────────────────────────────
+            var accountResponse = await http.GetAsync(
+                $"{baseUrl}/account/Test");
+
+            var accountJson = await accountResponse.Content
+                .ReadAsStringAsync();
+
+            var accountPretty = System.Text.Json.JsonSerializer
+                .Serialize(
+                    System.Text.Json.JsonSerializer
+                        .Deserialize<object>(accountJson),
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+            var accountPath = System.IO.Path.Combine(
+                dumpDir, "api_dump_account.json");
+            await System.IO.File.WriteAllTextAsync(
+                accountPath, accountPretty);
+
+            _logger.LogInformation(
+                "Account dump written to {Path}", accountPath);
+
+            // ── 5. Account/GetStatistics — last 30 days ───────────────
+            try
+            {
+                var endTs = DateTimeOffset.UtcNow
+                    .ToUnixTimeSeconds().ToString();
+                var startTs = DateTimeOffset.UtcNow
+                    .AddDays(-30).ToUnixTimeSeconds().ToString();
+
+                var statsBody =
+                    "{\"start_date\":\"" + startTs + "\"," +
+                    "\"end_date\":\"" + endTs + "\"}";
+
+                _logger.LogInformation(
+                    "Stats body: {Body}", statsBody);
+
+                var statsResp = await http.PostAsync(
+                    $"{baseUrl}/account/GetStatistics",
+                    new System.Net.Http.StringContent(
+                        statsBody,
+                        System.Text.Encoding.UTF8,
+                        "application/json"));
+
+                var statsJson = await statsResp.Content
+                    .ReadAsStringAsync();
+
+                _logger.LogInformation(
+                    "Stats raw response ({Status}): {Json}",
+                    (int)statsResp.StatusCode,
+                    statsJson);
+
+                var statsPath = System.IO.Path.Combine(
+                    dumpDir, "api_dump_statistics.json");
+
+                await System.IO.File.WriteAllTextAsync(
+                    statsPath, statsJson);
+
+                _logger.LogInformation(
+                    "Statistics dump written to {Path}", statsPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "Statistics dump failed — continuing.");
+            }
+
+            SetFooterStatus(
+                $"API dump complete — files written to {dumpDir}");
+
+            btn.Content = "Done ✓";
+            await Task.Delay(3000);
+            btn.Content = "Dump API";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "API dump failed.");
+            SetFooterStatus("API dump failed — check logs.",
+                isError: true);
+            btn.Content = "Dump API";
+        }
+        finally
+        {
+            btn.IsEnabled = true;
+        }
     }
 }

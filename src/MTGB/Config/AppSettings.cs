@@ -5,8 +5,15 @@ namespace MTGB.Config;
 /// Loaded from appsettings.json — never store secrets here.
 /// Secrets live in Windows Credential Manager.
 /// </summary>
+
 public class AppSettings
 {
+    /// <summary>
+    /// Whether the user has completed the MTGB Induction
+    /// (Form MwA 621d/7 22). False means show the wizard on next launch.
+    /// </summary>
+    public bool Inducted { get; set; } = false;
+
     /// <summary>
     /// SimplyPrint organisation ID — visible in the API base URL.
     /// </summary>
@@ -46,6 +53,13 @@ public class AppSettings
     /// UI and display preferences.
     /// </summary>
     public UiSettings Ui { get; set; } = new();
+
+    /// <summary>
+    /// Anonymous telemetry configuration.
+    /// Default off — always opt-in, never opt-out.
+    /// The scribes are patient.
+    /// </summary>
+    public TelemetrySettings Telemetry { get; set; } = new();
 }
 
 public enum AuthMode
@@ -137,7 +151,7 @@ public class QuietHoursSettings
     public string End { get; set; } = "08:00";
 
     /// <summary>
-    /// Whether critical alerts (printer offline, errors) 
+    /// Whether critical alerts (printer offline, errors)
     /// still fire during quiet hours.
     /// </summary>
     public bool AllowCritical { get; set; } = true;
@@ -178,4 +192,14 @@ public class UiSettings
     /// Whether to start MTGB with Windows.
     /// </summary>
     public bool StartWithWindows { get; set; } = true;
+}
+
+public class TelemetrySettings
+{
+    /// <summary>
+    /// Whether anonymous telemetry is enabled.
+    /// Default off — always opt-in, never opt-out.
+    /// The scribes are patient.
+    /// </summary>
+    public bool Enabled { get; set; } = false;
 }

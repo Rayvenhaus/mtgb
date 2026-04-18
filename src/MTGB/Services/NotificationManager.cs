@@ -77,7 +77,7 @@ public interface INotificationManager
 ///   6. Grouping
 ///   7. Deliver toast + log to history
 /// </summary>
-public class NotificationManager : INotificationManager
+public class NotificationManager : INotificationManager, IDisposable
 {
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<NotificationManager> _logger;
@@ -98,6 +98,7 @@ public class NotificationManager : INotificationManager
     private readonly List<DetectedEvent> _groupBuffer = new();
     private DateTimeOffset? _groupWindowStart;
     private readonly object _groupLock = new();
+    private readonly System.Threading.Timer _groupFlushTimer;
 
     // History file location
     private static readonly string HistoryFilePath = Path.Combine(
@@ -107,6 +108,11 @@ public class NotificationManager : INotificationManager
     // Windows App ID for toast notifications —
     // must match the app's registration in Windows
     private const string AppId = "MTGB.TheMonitorThatGoesBing";
+
+    // Notification sound
+    private static readonly string SoundFilePath = Path.Combine(
+        AppContext.BaseDirectory,
+        "Assets", "mtgbNotification.wav");
 
     public NotificationManager(
         IOptions<AppSettings> settings,
@@ -118,6 +124,17 @@ public class NotificationManager : INotificationManager
         // Register toast notification activator
         ToastNotificationManagerCompat.OnActivated +=
             OnToastActivated;
+
+        // Independent flush timer — checks the group buffer every
+        // second regardless of polling cycle timing.
+        // This ensures grouped toasts always fire within
+        // GroupingWindowSeconds of the first buffered event.
+        _groupFlushTimer = new System.Threading.Timer(
+            callback: _ => _ = FlushGroupBufferIfReadyAsync(
+                CancellationToken.None),
+            state: null,
+            dueTime: TimeSpan.FromSeconds(1),
+            period: TimeSpan.FromSeconds(1));
 
         // Load existing history from disk
         LoadHistory();
@@ -170,8 +187,6 @@ public class NotificationManager : INotificationManager
             else
                 await DeliverToastAsync(evt, ct);
         }
-
-        await FlushGroupBufferIfReadyAsync(ct);
     }
 
     /// <inheritdoc/>
@@ -189,6 +204,12 @@ public class NotificationManager : INotificationManager
             _history.Clear();
             PersistHistory();
         }
+    }
+
+    public void Dispose()
+    {
+        _groupFlushTimer.Dispose();
+        ToastNotificationManagerCompat.History.Clear();
     }
 
     // ── Rules engine ──────────────────────────────────────────────
@@ -286,6 +307,8 @@ public class NotificationManager : INotificationManager
                     toast.Tag = $"{evt.PrinterId}:{evt.EventId}";
                     toast.Group = "MTGB";
                 });
+
+                PlayNotificationSound();
 
                 _logger.LogInformation(
                     "Toast delivered: '{EventId}' for {Printer}.",
@@ -490,6 +513,33 @@ public class NotificationManager : INotificationManager
         }
     }
 
+    private void PlayNotificationSound()
+    {
+        if (!_settings.Value.Notifications.SoundEnabled) return;
+        if (_settings.Value.Notifications.GlobalMuteEnabled) return;
+
+        try
+        {
+            if (!File.Exists(SoundFilePath))
+            {
+                _logger.LogDebug(
+                    "Notification sound file not found at {Path}.",
+                    SoundFilePath);
+                return;
+            }
+
+            using var player = new System.Media.SoundPlayer(
+                SoundFilePath);
+            player.Play();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "Failed to play notification sound. " +
+                "The Ministry mourns the silence.");
+        }
+    }
+
     // ── Grouping ──────────────────────────────────────────────────
 
     private void BufferForGrouping(DetectedEvent evt)
@@ -521,19 +571,26 @@ public class NotificationManager : INotificationManager
             _groupWindowStart = null;
         }
 
-        if (toFlush.Count == 1)
+        try
         {
-            await DeliverToastAsync(toFlush[0], ct);
-            return;
+            if (toFlush.Count == 1)
+                await DeliverToastAsync(toFlush[0], ct);
+            else
+                await DeliverGroupedToastAsync(toFlush, ct);
         }
-
-        // Multiple events — deliver a grouped summary toast
-        await DeliverGroupedToastAsync(toFlush, ct);
+        catch (Exception ex)
+        {
+            // Must not throw — this runs on a timer thread.
+            // The individual deliver methods log their own errors
+            // but a rethrow here would kill the timer permanently.
+            _logger.LogError(ex,
+                "Unhandled error in group flush.");
+        }
     }
 
     private async Task DeliverGroupedToastAsync(
-        List<DetectedEvent> events,
-        CancellationToken ct)
+    List<DetectedEvent> events,
+    CancellationToken ct)
     {
         await Task.Run(() =>
         {
@@ -550,8 +607,10 @@ public class NotificationManager : INotificationManager
                     : $"{events.Count} events across " +
                       $"{printerNames.Count} printers";
 
-                var lines = events
-                    .Take(4)
+                // Windows toast allows max 4 text elements total.
+                // Title occupies slot 1 — leaving 3 slots for detail lines.
+                // Build the summary lines, capping at 3.
+                var allLines = events
                     .Select(e =>
                     {
                         var def = EventRegistry.GetById(e.EventId);
@@ -560,14 +619,25 @@ public class NotificationManager : INotificationManager
                     })
                     .ToList();
 
-                if (events.Count > 4)
-                    lines.Add($"...and {events.Count - 4} more");
+                List<string> toastLines;
+
+                if (allLines.Count <= 3)
+                {
+                    toastLines = allLines;
+                }
+                else
+                {
+                    // Take 2 lines + overflow indicator
+                    toastLines = allLines.Take(2).ToList();
+                    toastLines.Add(
+                        $"...and {allLines.Count - 2} more");
+                }
 
                 var builder = new ToastContentBuilder()
                     .AddText(title)
                     .AddAttributionText("MTGB — It goes Bing");
 
-                foreach (var line in lines)
+                foreach (var line in toastLines)
                     builder.AddText(line);
 
                 builder.Show(toast =>
@@ -575,6 +645,8 @@ public class NotificationManager : INotificationManager
                     toast.Tag = "mtgb-grouped";
                     toast.Group = "MTGB";
                 });
+
+                PlayNotificationSound();
 
                 _logger.LogInformation(
                     "Grouped toast delivered for {Count} events.",

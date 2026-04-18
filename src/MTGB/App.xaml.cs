@@ -41,13 +41,14 @@ public partial class App : Application
 
         SetupExceptionHandling();
 
-        // TODO: Re-enable once SettingsWindow is built
-        // if (IsFirstRun())
-        // {
-        //     _logger?.LogInformation(
-        //         "First run detected — launching setup.");
-        //     ShowFirstRunSetup();
-        // }
+
+        if (IsFirstRun())
+        {
+            _logger?.LogInformation(
+                "First run detected — launching Induction " +
+                "(Form MwA 621d/7 22). The Ministry awaits.");
+            ShowFirstRunSetup();
+        }
 
         _trayIcon = _services!.GetRequiredService<TrayIcon>();
         _trayIcon.Initialise();
@@ -65,18 +66,15 @@ public partial class App : Application
     }
 
     private bool IsFirstRun() =>
-        _settings?.Value.OrganisationId == 0 &&
-        _credentials?.Exists(CredentialKey.ApiKey) == false &&
-        _credentials?.Exists(
-            CredentialKey.OAuthAccessToken) == false;
+        !_settings!.Value.Inducted;
 
     private void ShowFirstRunSetup()
     {
         Dispatcher.Invoke(() =>
         {
-            var settingsWindow = _services!
-                .GetRequiredService<SettingsWindow>();
-            settingsWindow.ShowDialog();
+            var induction = _services!
+                .GetRequiredService<InductionWindow>();
+            induction.ShowDialog();
         });
     }
 

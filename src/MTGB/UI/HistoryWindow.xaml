@@ -11,7 +11,7 @@
         BorderBrush="#C9930E"
         BorderThickness="1"
         WindowStyle="SingleBorderWindow"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize" Icon="/Assets/MTGB_32.png">
 
     <Window.Resources>
 
