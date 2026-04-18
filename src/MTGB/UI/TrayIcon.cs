@@ -292,8 +292,21 @@ public class TrayIcon : IDisposable
             return;
         }
 
-        _flyout ??= _services.GetRequiredService<FlyoutWindow>();
-        _flyout.RefreshPrinterCards(_diffEngine.GetAllSnapshots());
+        if (_flyout is null)
+        {
+            _flyout = _services
+                .GetRequiredService<FlyoutWindow>();
+
+            // Wire flyout button callbacks
+            _flyout.SetCallbacks(
+                onHistory: () => OpenHistory(),
+                onSettings: () => OpenSettings(),
+                onDashboard: () => OpenSimplyPrintDashboard(),
+                onExit: () => ExitApplication());
+        }
+
+        _flyout.RefreshPrinterCards(
+            _diffEngine.GetAllSnapshots());
         _flyout.SlideUp();
     }
 

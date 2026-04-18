@@ -1,7 +1,6 @@
 # Changelog
 
-All notable changes to MTGB — The Monitor That Goes Bing will be 
-documented here.
+All notable changes to MTGB — The Monitor That Goes Bing will be documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -9,6 +8,32 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ---
 
 ## [Unreleased]
+
+---
+
+## [0.2.18] — 17/04/2026
+### The one where history is made. And recorded. And filtered.
+
+### Added
+- HistoryWindow — full notification history UI with:
+  - Colour-coded accent bars per event type
+  - Date grouping — Today, Yesterday, full date
+  - Filter buttons — All, Print jobs, Printer, Alerts, Suppressed
+  - Per-printer dropdown filter
+  - Suppressed entries shown dimmed with reason
+  - Footer entry count with Ministry flavour text
+  - Clear history with confirmation dialog
+  - Dark title bar via DwmSetWindowAttribute
+- Flyout button wiring — History, Settings, Dashboard and Exit
+  now correctly wired via SetCallbacks in TrayIcon.OnLeftClick
+- SyncMuteToggle now also syncs MutedBanner visibility on open
+
+### Fixed
+- FlyoutWindow.xaml.cs overwrite recovered — full code restored
+- HistoryWindow null guards on HistoryPanel, FooterCountText
+  and PrinterFilter — controls not yet initialised on first
+  ApplyFilter call
+- Configure method removed — replaced by SetCallbacks
 
 ---
 

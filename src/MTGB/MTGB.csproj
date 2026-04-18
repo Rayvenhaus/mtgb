@@ -7,9 +7,9 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.2.16</Version>
+    <Version>0.2.18</Version>
     <Authors>Steven Sheeley</Authors>
-    <Description>The Monitor That Goes Bing — Never leave a print behind.</Description>
+    <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -19,13 +19,14 @@
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 	<StartupObject>MTGB.Program</StartupObject>
 	<Title>The Machine That Goes Bing</Title>
-	<PackageIcon>MTGB_256.png</PackageIcon>
+	<PackageIcon>MTGB_128.png</PackageIcon>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
 	<PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageTags>notification;monitor;tray;windows;desktop;simplyprint;3d-printing;print-farm;filament;wpf;dotnet;csharp;windows10;windows11;open-source;community</PackageTags>
 	<NeutralLanguage>en-AU</NeutralLanguage>
+	<Company>Myndworx Asylum</Company>
   </PropertyGroup>
 
   <!-- NuGet Packages -->
@@ -95,6 +96,10 @@
     <Resource Include="UI\MTGB_32.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Assets\MTGB_128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="Assets\MTGB_256.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

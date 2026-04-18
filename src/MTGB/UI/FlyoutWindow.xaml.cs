@@ -21,7 +21,6 @@ public partial class FlyoutWindow : Window
     private readonly IOptions<AppSettings> _settings;
     private readonly TrayIcon _trayIcon;
 
-    // Injected via constructor — resolved from DI
     private Action? _onHistoryClick;
     private Action? _onSettingsClick;
     private Action? _onDashboardClick;
@@ -36,7 +35,6 @@ public partial class FlyoutWindow : Window
         _trayIcon = trayIcon;
         InitializeComponent();
 
-        // Fix for WPF transparency chrome issue
         SourceInitialized += (_, _) =>
         {
             var hwnd = new System.Windows.Interop
@@ -55,29 +53,20 @@ public partial class FlyoutWindow : Window
 
     // ── Wiring ────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Called by TrayIcon to wire up action callbacks.
-    /// </summary>
-    public void Configure(
+    public void SetCallbacks(
         Action onHistory,
         Action onSettings,
         Action onDashboard,
-        Action onExit,
-        Action<bool> onMuteToggle)
+        Action onExit)
     {
         _onHistoryClick = onHistory;
         _onSettingsClick = onSettings;
         _onDashboardClick = onDashboard;
         _onExitClick = onExit;
-        _onMuteToggle = onMuteToggle;
     }
 
     // ── Printer cards ─────────────────────────────────────────────
 
-    /// <summary>
-    /// Rebuilds the printer cards panel from current snapshots.
-    /// Called by TrayIcon whenever state changes.
-    /// </summary>
     public void RefreshPrinterCards(
         IReadOnlyDictionary<int, PrinterSnapshot> snapshots)
     {
@@ -156,14 +145,12 @@ public partial class FlyoutWindow : Window
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition
             {
-                Width = new GridLength(
-                1, GridUnitType.Star)
+                Width = new GridLength(1, GridUnitType.Star)
             });
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition { Width = GridLength.Auto });
         topRow.Margin = new Thickness(0, 0, 0, 6);
 
-        // Status dot — slightly bigger
         var dot = new Ellipse
         {
             Width = 9,
@@ -174,7 +161,6 @@ public partial class FlyoutWindow : Window
         };
         Grid.SetColumn(dot, 0);
 
-        // Printer name — same, already good
         var nameText = new TextBlock
         {
             Text = snapshot.PrinterName,
@@ -188,7 +174,6 @@ public partial class FlyoutWindow : Window
         };
         Grid.SetColumn(nameText, 1);
 
-        // State label — brighter and bigger
         var stateText = new TextBlock
         {
             Text = stateLabel.ToUpperInvariant(),
@@ -203,10 +188,9 @@ public partial class FlyoutWindow : Window
         topRow.Children.Add(dot);
         topRow.Children.Add(nameText);
         topRow.Children.Add(stateText);
-
         stack.Children.Add(topRow);
 
-        // ── Progress bar (only when printing) ────────────────────
+        // ── Progress bar ──────────────────────────────────────────
         if (snapshot.JobPercentage.HasValue &&
             snapshot.JobPercentage > 0)
         {
@@ -233,7 +217,6 @@ public partial class FlyoutWindow : Window
             progressGrid.Children.Add(progressBg);
             progressGrid.Children.Add(progressFill);
             progressGrid.Margin = new Thickness(0, 0, 0, 5);
-
             stack.Children.Add(progressGrid);
         }
 
@@ -262,7 +245,8 @@ public partial class FlyoutWindow : Window
 
         var timeText = new TextBlock
         {
-            Text = FormatTimeRemaining(snapshot.JobTimeRemaining),
+            Text = FormatTimeRemaining(
+                snapshot.JobTimeRemaining),
             FontFamily = new FontFamily("Courier New"),
             FontSize = 11,
             FontWeight = FontWeights.Bold,
@@ -273,7 +257,6 @@ public partial class FlyoutWindow : Window
 
         metaRow.Children.Add(filenameText);
         metaRow.Children.Add(timeText);
-
         stack.Children.Add(metaRow);
 
         card.Child = stack;
@@ -339,7 +322,6 @@ public partial class FlyoutWindow : Window
         if (string.IsNullOrWhiteSpace(filename))
             return string.Empty;
 
-        // Strip .gcode extension for cleanliness
         filename = filename.Replace(".gcode", "")
                            .Replace(".GCODE", "");
 
@@ -361,7 +343,8 @@ public partial class FlyoutWindow : Window
 
     private void UpdateLastPolled()
     {
-        LastPolledText.Text = $"Updated {DateTime.Now:HH:mm:ss}";
+        LastPolledText.Text =
+            $"Updated {DateTime.Now:HH:mm:ss}";
     }
 
     private void UpdateWebhookStatus()
@@ -376,13 +359,15 @@ public partial class FlyoutWindow : Window
     {
         MuteToggle.IsChecked =
             _settings.Value.Notifications.GlobalMuteEnabled;
+
+        MutedBanner.Visibility =
+            _settings.Value.Notifications.GlobalMuteEnabled
+                ? Visibility.Visible
+                : Visibility.Collapsed;
     }
 
     // ── Slide animation ───────────────────────────────────────────
 
-    /// <summary>
-    /// Positions the flyout above the taskbar and slides it up.
-    /// </summary>
     public void SlideUp()
     {
         Left = -9999;
@@ -447,9 +432,6 @@ public partial class FlyoutWindow : Window
         Top = workArea.Bottom - ActualHeight - 12;
     }
 
-    /// <summary>
-    /// Slides the flyout down and hides it.
-    /// </summary>
     public void SlideDown()
     {
         var slideOut = new DoubleAnimation
@@ -511,6 +493,8 @@ public partial class FlyoutWindow : Window
     private void OnExitClick(
         object sender, RoutedEventArgs e) =>
         _onExitClick?.Invoke();
+
+    // ── Native methods ────────────────────────────────────────────
 
     internal static class NativeMethods
     {

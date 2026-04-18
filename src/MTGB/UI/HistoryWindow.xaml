@@ -1,8 +1,231 @@
 <Window x:Class="MTGB.UI.HistoryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MTGB — History"
-        Width="600" Height="500"
-        WindowStartupLocation="CenterScreen">
-    <Grid/>
+        Title="MTGB — Notification History"
+        Width="700" Height="580"
+        MinWidth="700" MinHeight="480"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Background="#141417"
+        Foreground="#F0EDE8"
+        BorderBrush="#C9930E"
+        BorderThickness="1"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize">
+
+    <Window.Resources>
+
+        <Style x:Key="FilterButton" TargetType="Button">
+            <Setter Property="Background" Value="#1A1A1F"/>
+            <Setter Property="Foreground" Value="#C8C0B8"/>
+            <Setter Property="BorderBrush" Value="#38C9930E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable, Segoe UI"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="12 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"
+                                        Value="#22222A"/>
+                                <Setter Property="Foreground"
+                                        Value="#F0C840"/>
+                                <Setter Property="BorderBrush"
+                                        Value="#C9930E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FilterButtonActive" TargetType="Button"
+               BasedOn="{StaticResource FilterButton}">
+            <Setter Property="Background" Value="#20C9930E"/>
+            <Setter Property="Foreground" Value="#F0C840"/>
+            <Setter Property="BorderBrush" Value="#C9930E"/>
+        </Style>
+
+        <Style x:Key="ClearButton" TargetType="Button"
+               BasedOn="{StaticResource FilterButton}">
+            <Setter Property="Foreground" Value="#E84855"/>
+            <Setter Property="BorderBrush" Value="#38E84855"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Title bar ──────────────────────────────────────── -->
+        <Border Grid.Row="0"
+                Background="#0D0D0F"
+                BorderBrush="#38C9930E"
+                BorderThickness="0 0 0 1"
+                Padding="20 14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10"
+                             Fill="#3BB273"
+                             Margin="0 0 10 0"
+                             VerticalAlignment="Center"/>
+                    <StackPanel>
+                        <TextBlock Text="M · T · G · B"
+                                   FontFamily="Georgia"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="#F0C840"/>
+                        <TextBlock Text="NOTIFICATION HISTORY"
+                                   FontFamily="Courier New"
+                                   FontSize="9"
+                                   Foreground="#8A8078"
+                                   Margin="0 2 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="✕"
+                        Style="{StaticResource FilterButton}"
+                        Width="32" Height="32"
+                        Padding="0"
+                        FontSize="14"
+                        Click="OnCloseClick"/>
+            </Grid>
+        </Border>
+
+        <!-- ── Filter bar ─────────────────────────────────────── -->
+        <Border Grid.Row="1"
+                Background="#0D0D0F"
+                BorderBrush="#38C9930E"
+                BorderThickness="0 0 0 1"
+                Padding="16 10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <WrapPanel Orientation="Horizontal"
+                           VerticalAlignment="Center">
+
+                    <TextBlock Text="FILTER:"
+                               FontFamily="Courier New"
+                               FontSize="9"
+                               FontWeight="Bold"
+                               Foreground="#8B6508"
+                               VerticalAlignment="Center"
+                               Margin="0 0 10 0"/>
+
+                    <Button x:Name="FilterAll"
+                            Content="All"
+                            Style="{StaticResource FilterButtonActive}"
+                            Margin="0 0 4 0"
+                            Click="OnFilterAllClick"/>
+
+                    <Button x:Name="FilterJobs"
+                            Content="Print jobs"
+                            Style="{StaticResource FilterButton}"
+                            Margin="0 0 4 0"
+                            Click="OnFilterJobsClick"/>
+
+                    <Button x:Name="FilterPrinter"
+                            Content="Printer"
+                            Style="{StaticResource FilterButton}"
+                            Margin="0 0 4 0"
+                            Click="OnFilterPrinterClick"/>
+
+                    <Button x:Name="FilterAlerts"
+                            Content="Alerts"
+                            Style="{StaticResource FilterButton}"
+                            Margin="0 0 4 0"
+                            Click="OnFilterAlertsClick"/>
+
+                    <Button x:Name="FilterSuppressed"
+                            Content="Suppressed"
+                            Style="{StaticResource FilterButton}"
+                            Margin="0 0 12 0"
+                            Click="OnFilterSuppressedClick"/>
+
+                    <ComboBox x:Name="PrinterFilter"
+                              Width="130"
+                              Background="#1A1A1F"
+                              Foreground="#C8C0B8"
+                              BorderBrush="#38C9930E"
+                              FontFamily="Segoe UI Variable, Segoe UI"
+                              FontSize="11"
+                              VerticalAlignment="Center"
+                              SelectionChanged="OnPrinterFilterChanged">
+                        <ComboBoxItem Content="All printers"
+                                      IsSelected="True"/>
+                    </ComboBox>
+
+                </WrapPanel>
+
+                <Button Grid.Column="1"
+                        Content="Clear history"
+                        Style="{StaticResource ClearButton}"
+                        VerticalAlignment="Center"
+                        Click="OnClearHistoryClick"/>
+            </Grid>
+        </Border>
+
+        <!-- ── History list ───────────────────────────────────── -->
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="12 8">
+            <StackPanel x:Name="HistoryPanel"/>
+        </ScrollViewer>
+
+        <!-- ── Footer ─────────────────────────────────────────── -->
+        <Border Grid.Row="3"
+                Background="#0D0D0F"
+                BorderBrush="#38C9930E"
+                BorderThickness="0 1 0 0"
+                Padding="20 10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="FooterCountText"
+                           Grid.Column="0"
+                           FontFamily="Courier New"
+                           FontSize="10"
+                           Foreground="#8A8078"
+                           FontStyle="Italic"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="Close"
+                        Style="{StaticResource FilterButton}"
+                        Click="OnCloseClick"/>
+            </Grid>
+        </Border>
+
+    </Grid>
 </Window>
