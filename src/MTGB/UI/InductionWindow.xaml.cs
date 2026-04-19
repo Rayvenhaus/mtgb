@@ -7,19 +7,19 @@ using MTGB.Services;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using Application = System.Windows.Application;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
-using Windows.Networking.Connectivity;
 
 namespace MTGB.UI;
 
 /// <summary>
 /// MTGB Induction — Form MwA 621d/7 22.
-/// The Ministry of Perfectly Observed Prints welcomes you.
+/// The Ministry of Printer Observation & Void Containment welcomes you.
 /// We are here to help.
-/// We have forms.
+/// We have forms. In triplicate
 /// </summary>
 public partial class InductionWindow : Window
 {
@@ -28,26 +28,31 @@ public partial class InductionWindow : Window
     private readonly ISimplyPrintApiClient _apiClient;
     private readonly IAuthService _authService;
     private readonly ILogger<InductionWindow> _logger;
+    private readonly ICommunityMapService _communityMap;
 
     private int _currentScreen = 1;
-    private const int TotalScreens = 5;
+    private const int TotalScreens = 6;
     private bool _connectionVerified = false;
+
+    private List<CountryData> _countries = new();
+    private CountryData? _selectedCountry;
 
     public InductionWindow(
         IOptions<AppSettings> settings,
         ICredentialManager credentials,
         ISimplyPrintApiClient apiClient,
         IAuthService authService,
+        ICommunityMapService communityMap,
         ILogger<InductionWindow> logger)
     {
         _settings = settings;
         _credentials = credentials;
         _apiClient = apiClient;
         _authService = authService;
+        _communityMap = communityMap;
         _logger = logger;
 
         InitializeComponent();
-
         Loaded += OnLoaded;
     }
 
@@ -55,19 +60,31 @@ public partial class InductionWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Force dark title bar
         var hwnd = new System.Windows.Interop
             .WindowInteropHelper(this).Handle;
         int darkMode = 1;
         DwmSetWindowAttribute(hwnd, 20,
             ref darkMode, sizeof(int));
 
+        LoadCountries();
         UpdateScreen();
+    }
+
+    private void LoadCountries()
+    {
+        var countryList = _communityMap.LoadCountries();
+        if (countryList is null) return;
+
+        _countries = countryList.Countries;
+
+        CountrySelector.ItemsSource = _countries
+            .Select(c => c.Name)
+            .ToList();
     }
 
     // ── Navigation ────────────────────────────────────────────
 
-    private void OnContinueClick(
+    private async void OnContinueClick(
         object sender, RoutedEventArgs e)
     {
         if (_currentScreen == TotalScreens)
@@ -76,7 +93,6 @@ public partial class InductionWindow : Window
             return;
         }
 
-        // Screen 2 — must have verified connection
         if (_currentScreen == 2 && !_connectionVerified)
         {
             SetConnectionStatus(
@@ -85,21 +101,24 @@ public partial class InductionWindow : Window
             return;
         }
 
-        // Screen 3 — save startup preference
         if (_currentScreen == 3)
         {
             var startWithWindows =
                 StartupToggle.IsChecked == true;
-            _settings.Value.Ui.StartWithWindows =
-                startWithWindows;
+            _settings.Value.Ui.StartWithWindows = startWithWindows;
             SetWindowsStartup(startWithWindows);
         }
 
-        // Screen 4 — save telemetry preference
         if (_currentScreen == 4)
         {
             _settings.Value.Telemetry.Enabled =
                 TelemetryToggle.IsChecked == true;
+        }
+
+        // Screen 5 — community map registration
+        if (_currentScreen == 5)
+        {
+            await HandleRegistryScreenAsync();
         }
 
         _currentScreen++;
@@ -161,6 +180,13 @@ public partial class InductionWindow : Window
         // Inducted remains false — next launch starts fresh
         // Do NOT save settings — leave appsettings.json clean
 
+        // Clear community map registration if set on Screen 5
+        _settings.Value.CommunityMap.Registered = false;
+        _settings.Value.CommunityMap.CountryCode = null;
+        _settings.Value.CommunityMap.CountryName = null;
+        _settings.Value.CommunityMap.StateName = null;
+        _settings.Value.CommunityMap.DisplayName = null;
+
         _logger.LogInformation(
             "Induction cleanup complete. " +
             "The Ministry has filed the abandonment form. " +
@@ -173,7 +199,6 @@ public partial class InductionWindow : Window
 
     private void UpdateScreen()
     {
-        // Show/hide screens
         Screen1.Visibility = _currentScreen == 1
             ? Visibility.Visible : Visibility.Collapsed;
         Screen2.Visibility = _currentScreen == 2
@@ -184,22 +209,20 @@ public partial class InductionWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         Screen5.Visibility = _currentScreen == 5
             ? Visibility.Visible : Visibility.Collapsed;
+        Screen6.Visibility = _currentScreen == 6
+            ? Visibility.Visible : Visibility.Collapsed;
 
-        // Update progress dots
         UpdateDots();
 
-        // Update navigation buttons
         BackButton.Visibility = _currentScreen > 1
             ? Visibility.Visible : Visibility.Collapsed;
 
         ContinueButton.Content = _currentScreen == TotalScreens
             ? "DONE ✓" : "CONTINUE →";
 
-        // Lock Continue on screen 2 until connection verified
         ContinueButton.IsEnabled =
             _currentScreen != 2 || _connectionVerified;
 
-        // Update screen indicator
         ScreenIndicatorText.Text =
             $"{_currentScreen} of {TotalScreens}";
     }
@@ -208,17 +231,17 @@ public partial class InductionWindow : Window
     {
         var dots = new[]
         {
-            Dot1, Dot2, Dot3, Dot4, Dot5
-        };
+        Dot1, Dot2, Dot3, Dot4, Dot5, Dot6
+    };
 
         for (int i = 0; i < dots.Length; i++)
         {
             dots[i].Fill = new SolidColorBrush(
                 i + 1 == _currentScreen
-                    ? Color.FromRgb(0xF0, 0xC8, 0x40) // Gold — current
+                    ? Color.FromRgb(0xF0, 0xC8, 0x40)
                     : i + 1 < _currentScreen
-                        ? Color.FromRgb(0x8B, 0x65, 0x08) // Brass — done
-                        : Color.FromRgb(0x3A, 0x30, 0x28)); // Dim — pending
+                        ? Color.FromRgb(0x8B, 0x65, 0x08)
+                        : Color.FromRgb(0x3A, 0x30, 0x28));
         }
     }
 
@@ -395,6 +418,89 @@ public partial class InductionWindow : Window
             key.DeleteValue(appName,
                 throwOnMissingValue: false);
         }
+    }
+
+    // ── Registry screen ───────────────────────────────────────
+
+    private async Task HandleRegistryScreenAsync()
+    {
+        // If toggle is off — skip silently, no data sent
+        if (MapToggle.IsChecked != true) return;
+
+        if (_selectedCountry is null) return;
+
+        var stateName = _selectedCountry.HasStates
+            ? StateSelector.SelectedItem?.ToString()
+            : null;
+
+        await _communityMap.RegisterAsync(
+            _selectedCountry.Code,
+            _selectedCountry.Name,
+            stateName);
+    }
+
+    private void OnCountryChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var selectedName = CountrySelector.SelectedItem
+            ?.ToString();
+
+        _selectedCountry = _countries
+            .FirstOrDefault(c => c.Name == selectedName);
+
+        if (_selectedCountry is null) return;
+
+        // Show/hide state selector
+        if (_selectedCountry.HasStates)
+        {
+            StateSelectorPanel.Visibility = Visibility.Visible;
+            StateSelector.ItemsSource =
+                _selectedCountry.States;
+            StateSelector.SelectedIndex = -1;
+        }
+        else
+        {
+            StateSelectorPanel.Visibility = Visibility.Collapsed;
+            StateSelector.ItemsSource = null;
+        }
+
+        UpdateConfirmationText();
+    }
+
+    private void OnStateChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        UpdateConfirmationText();
+    }
+
+    private void OnMapToggleChanged(
+        object sender, RoutedEventArgs e)
+    {
+        MapSelectionPanel.Visibility =
+            MapToggle.IsChecked == true
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+    }
+
+    private void UpdateConfirmationText()
+    {
+        if (_selectedCountry is null)
+        {
+            RegistrationConfirmText.Text = string.Empty;
+            return;
+        }
+
+        var stateName = _selectedCountry.HasStates
+            ? StateSelector.SelectedItem?.ToString()
+            : null;
+
+        RegistrationConfirmText.Text = stateName is not null
+            ? $"You'll be added to the count of installations " +
+              $"in {_selectedCountry.Name}, in {stateName}."
+            : $"You'll be added to the count of installations " +
+              $"in {_selectedCountry.Name}.";
     }
 
     // ── Window drag ───────────────────────────────────────────

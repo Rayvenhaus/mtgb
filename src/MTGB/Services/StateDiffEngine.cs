@@ -24,6 +24,13 @@ public record PrinterSnapshot
     public double? NozzleTemp { get; init; }
     public double? BedTemp { get; init; }
     public bool FilamentSensorTriggered { get; init; }
+    public string? Integration { get; init; }
+    public string? ModelBrand { get; init; }
+    public string? ModelName { get; init; }
+    public int? CurrentLayer { get; init; }
+    public int? MaxLayer { get; init; }
+    public double? FilamentPercentRemaining { get; init; }
+    public bool FilamentLow { get; init; }
     public DateTimeOffset CapturedAt { get; init; }
 }
 
@@ -379,9 +386,12 @@ public class StateDiffEngine : IStateDiffEngine
             }
         }
 
-        // ── Filament sensor ───────────────────────────────────────
-        if (!previous.FilamentSensorTriggered &&
-            fresh.FilamentSensorTriggered)
+        // ── Filament low ──────────────────────────────────────────
+        // Uses spool percentage for Bambu and sensor-less printers,
+        // hardware sensor for printers that have one.
+        // Only fires when transitioning from not-low to low —
+        // not on every poll while already low.
+        if (!previous.FilamentLow && fresh.FilamentLow)
             events.Add(MakeEvent("filament.low", fresh,
                 isCritical: true));
 
@@ -657,19 +667,59 @@ public class StateDiffEngine : IStateDiffEngine
         var nozzleTemp = printer.Temps?.Current?.Tool?.FirstOrDefault();
         var bedTemp = printer.Temps?.Current?.Bed;
 
+        // ── Filament detection ────────────────────────────────────
+        // For Bambu printers filSensor is spurious — always false
+        // even when filament is loaded. Use filament[N].PercentRemaining
+        // instead. For printers with a real sensor, honour filSensor.
+        // Threshold: 20% remaining = low filament warning.
+        const double FilamentLowThreshold = 20.0;
+
+        var isBambu = string.Equals(
+            printer.Integration,
+            "Bambu",
+            StringComparison.OrdinalIgnoreCase);
+
+        bool filamentLow;
+        double? filamentPercentRemaining = null;
+
+        if (isBambu || !printer.HasFilamentSensor)
+        {
+            // Use spool data — watch the percentage directly
+            var lowestSpool = printer.Filament?
+                .Where(s => s.PercentRemaining.HasValue)
+                .OrderBy(s => s.PercentRemaining)
+                .FirstOrDefault();
+
+            filamentPercentRemaining = lowestSpool?.PercentRemaining;
+            filamentLow = lowestSpool?
+                .IsBelowThreshold(FilamentLowThreshold) ?? false;
+        }
+        else
+        {
+            // Use the hardware filament sensor
+            filamentLow = printer.FilamentSensorTriggered;
+        }
+
         return new PrinterSnapshot
         {
             PrinterId = data.Id,
             PrinterName = printer.Name,
             Online = printer.Online,
             State = printer.State,
+            Integration = printer.Integration,
+            ModelBrand = printer.Model?.Brand,
+            ModelName = printer.Model?.Name,
             ActiveJobId = job?.Id,
             ActiveJobFilename = job?.Filename,
             JobPercentage = job?.Percentage,
             JobTimeRemaining = job?.Time?.Remaining,
+            CurrentLayer = job?.Layer,
+            MaxLayer = job?.MaxLayer,
             NozzleTemp = nozzleTemp,
             BedTemp = bedTemp,
             FilamentSensorTriggered = printer.FilamentSensorTriggered,
+            FilamentPercentRemaining = filamentPercentRemaining,
+            FilamentLow = filamentLow,
             CapturedAt = DateTimeOffset.Now
         };
     }

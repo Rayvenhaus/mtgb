@@ -27,6 +27,7 @@
     <Company>Myndworx Asylum</Company>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\countries.json" />
     <None Remove="Assets\mtgb.ico" />
     <None Remove="UI\MTGB_32.png" />
   </ItemGroup>
@@ -54,6 +55,9 @@
     <Resource Include="Assets\MTGB_16.png" />
     <Resource Include="Assets\MTGB_32.png" />
     <Resource Include="Assets\MTGB_48.png" />
+    <Content Include="Assets\countries.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\mtgb.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using MTGB.Config;
 using MTGB.Core.Security;
 using MTGB.UI;
+using System.IO;
 using System.Windows;
 
 namespace MTGB;
@@ -41,6 +42,9 @@ public partial class App : Application
 
         SetupExceptionHandling();
 
+        // Register AppUserModelID so Windows associates toasts
+        // with the correct app icon and name
+        RegisterAppUserModelId();
 
         if (IsFirstRun())
         {
@@ -77,6 +81,42 @@ public partial class App : Application
             induction.ShowDialog();
         });
     }
+
+    private static void RegisterAppUserModelId()
+    {
+        const string appId = "MTGB.TheMonitorThatGoesBing";
+
+        // Set the AppUserModelID for the current process
+        // This must be called before any toast notifications fire
+        SetCurrentProcessExplicitAppUserModelID(appId);
+
+        // Register the app in the Start Menu for toast delivery
+        // Required for toasts to appear in Action Centre
+        var regPath = $@"SOFTWARE\Classes\AppUserModelId\{appId}";
+
+        using var key = Microsoft.Win32.Registry
+            .CurrentUser
+            .CreateSubKey(regPath);
+
+        if (key is null) return;
+
+        key.SetValue("DisplayName",
+            "The Monitor That Goes Bing");
+        key.SetValue("IconUri",
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "Assets", "mtgb.ico"));
+    }
+
+    [System.Runtime.InteropServices.DllImport(
+        "shell32.dll",
+        SetLastError = true)]
+
+    private static extern void
+        SetCurrentProcessExplicitAppUserModelID(
+            [System.Runtime.InteropServices.MarshalAs(
+            System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+        string appId);
 
     private void SetupExceptionHandling()
     {

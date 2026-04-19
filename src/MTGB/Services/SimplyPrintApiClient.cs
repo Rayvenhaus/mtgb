@@ -49,6 +49,7 @@ public class PrinterData
 
 /// <summary>
 /// Printer state and telemetry.
+/// Mapped from the actual API response — see api_dump_printers.json.
 /// </summary>
 public class PrinterInfo
 {
@@ -61,23 +62,190 @@ public class PrinterInfo
     [JsonPropertyName("online")]
     public bool Online { get; init; }
 
+    // ── Integration type ──────────────────────────────────────
+    // e.g. "Bambu", "Prusa", "Creality" — use for gating
+    // integration-specific behaviour
+    [JsonPropertyName("integration")]
+    public string? Integration { get; init; }
+
+    // ── Temperatures ──────────────────────────────────────────
     [JsonPropertyName("temps")]
     public PrinterTemps? Temps { get; init; }
 
+    // ── PSU ───────────────────────────────────────────────────
     [JsonPropertyName("hasPSU")]
     public int HasPsu { get; init; }
 
     [JsonPropertyName("psuOn")]
     public bool PsuOn { get; init; }
 
+    // ── Filament sensor ───────────────────────────────────────
+    // hasFilSensor: whether the printer has a filament sensor
+    // filSensor: current sensor state — spurious on Bambu,
+    // always check Integration before trusting this value
     [JsonPropertyName("hasFilSensor")]
     public bool HasFilamentSensor { get; init; }
 
     [JsonPropertyName("filSensor")]
     public bool FilamentSensorTriggered { get; init; }
 
+    // ── Filament spools ───────────────────────────────────────
+    // Populated even when docs say otherwise — trust the dump
+    // Each entry represents one loaded spool
+    [JsonPropertyName("filament")]
+    public List<FilamentSpool>? Filament { get; init; }
+
+    // ── Active job ────────────────────────────────────────────
     [JsonPropertyName("job")]
     public PrinterJob? Job { get; init; }
+
+    // ── Model info ────────────────────────────────────────────
+    [JsonPropertyName("model")]
+    public PrinterModel? Model { get; init; }
+
+    // ── Nozzle and bed config ─────────────────────────────────
+    // Tags structure from actual API — nozzleData not tags.nozzle
+    [JsonPropertyName("tags")]
+    public PrinterTags? Tags { get; init; }
+
+    // ── Firmware ──────────────────────────────────────────────
+    [JsonPropertyName("firmware")]
+    public string? Firmware { get; init; }
+
+    [JsonPropertyName("firmwareVersion")]
+    public string? FirmwareVersion { get; init; }
+
+    // ── Capabilities ──────────────────────────────────────────
+    [JsonPropertyName("capabilities")]
+    public PrinterCapabilities? Capabilities { get; init; }
+
+    // ── Host machine health ───────────────────────────────────
+    [JsonPropertyName("health")]
+    public PrinterHealth? Health { get; init; }
+
+    // ── AI ────────────────────────────────────────────────────
+    [JsonPropertyName("aiEnabled")]
+    public bool AiEnabled { get; init; }
+}
+
+/// <summary>
+/// A loaded filament spool.
+/// Populated from printer.filament[] in the API response.
+/// </summary>
+public class FilamentSpool
+{
+    // Total filament on spool in mm
+    [JsonPropertyName("total")]
+    public double? Total { get; init; }
+
+    // Remaining filament in mm
+    [JsonPropertyName("left")]
+    public double? Left { get; init; }
+
+    [JsonPropertyName("colorHex")]
+    public string? ColorHex { get; init; }
+
+    [JsonPropertyName("colorName")]
+    public string? ColorName { get; init; }
+
+    [JsonPropertyName("brand")]
+    public string? Brand { get; init; }
+
+    [JsonPropertyName("type")]
+    public string? Type { get; init; }
+
+    /// <summary>
+    /// Percentage of filament remaining — 0.0 to 100.0.
+    /// Returns null if total is zero or missing.
+    /// </summary>
+    public double? PercentRemaining =>
+        Total is > 0 && Left.HasValue
+            ? Left.Value / Total.Value * 100.0
+            : null;
+
+    /// <summary>
+    /// True if filament is below the configured low threshold.
+    /// Used instead of filSensor for printers without a sensor
+    /// or where filSensor is unreliable (e.g. Bambu).
+    /// </summary>
+    public bool IsBelowThreshold(double thresholdPercent) =>
+        PercentRemaining.HasValue &&
+        PercentRemaining.Value <= thresholdPercent;
+}
+
+/// <summary>
+/// Printer model information.
+/// </summary>
+public class PrinterModel
+{
+    [JsonPropertyName("brand")]
+    public string? Brand { get; init; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; init; }
+
+    [JsonPropertyName("image")]
+    public string? ImageUrl { get; init; }
+}
+
+/// <summary>
+/// Printer tags — nozzle and bed configuration.
+/// Note: actual API uses nozzleData[], not tags.nozzle.
+/// </summary>
+public class PrinterTags
+{
+    [JsonPropertyName("nozzleData")]
+    public List<NozzleData>? NozzleData { get; init; }
+
+    [JsonPropertyName("bedType")]
+    public BedType? BedType { get; init; }
+}
+
+public class NozzleData
+{
+    [JsonPropertyName("size")]
+    public double? Size { get; init; }
+
+    [JsonPropertyName("type")]
+    public string? Type { get; init; }
+}
+
+public class BedType
+{
+    [JsonPropertyName("type")]
+    public string? Type { get; init; }
+}
+
+/// <summary>
+/// Printer capabilities — gates what actions are available.
+/// Check capabilities.unsupported before sending commands.
+/// </summary>
+public class PrinterCapabilities
+{
+    [JsonPropertyName("unsupported")]
+    public List<string>? Unsupported { get; init; }
+
+    public bool Supports(string capability) =>
+        Unsupported is null ||
+        !Unsupported.Contains(
+            capability,
+            StringComparer.OrdinalIgnoreCase);
+}
+
+/// <summary>
+/// Host machine health metrics.
+/// CPU, memory and temperature of the host running the printer.
+/// </summary>
+public class PrinterHealth
+{
+    [JsonPropertyName("usage")]
+    public double? CpuUsage { get; init; }
+
+    [JsonPropertyName("temp")]
+    public double? CpuTemp { get; init; }
+
+    [JsonPropertyName("memory")]
+    public double? MemoryUsage { get; init; }
 }
 
 /// <summary>
@@ -123,6 +291,13 @@ public class PrinterJob
 
     [JsonPropertyName("time")]
     public JobTime? Time { get; init; }
+
+    // Current layer and max layer — available during active prints
+    [JsonPropertyName("layer")]
+    public int? Layer { get; init; }
+
+    [JsonPropertyName("maxLayer")]
+    public int? MaxLayer { get; init; }
 }
 
 public class JobTime

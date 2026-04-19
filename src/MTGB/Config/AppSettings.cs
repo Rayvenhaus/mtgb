@@ -15,6 +15,18 @@ public class AppSettings
     public bool Inducted { get; set; } = false;
 
     /// <summary>
+    /// Anonymous install ID — generated once on first run.
+    /// A random GUID. Never tied to a person or organisation.
+    /// The Ministry knows only this. Nothing more.
+    /// </summary>
+    public string InstallId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Community map registration settings.
+    /// </summary>
+    public CommunityMapSettings CommunityMap { get; set; } = new();
+
+    /// <summary>
     /// SimplyPrint organisation ID — visible in the API base URL.
     /// </summary>
     public int OrganisationId { get; set; }
@@ -22,6 +34,8 @@ public class AppSettings
     /// <summary>
     /// Authentication mode — ApiKey or OAuth2.
     /// </summary>
+    [System.Text.Json.Serialization.JsonConverter(
+        typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public AuthMode AuthMode { get; set; } = AuthMode.ApiKey;
 
     /// <summary>
@@ -202,4 +216,34 @@ public class TelemetrySettings
     /// The scribes are patient.
     /// </summary>
     public bool Enabled { get; set; } = false;
+}
+
+public class CommunityMapSettings
+{
+    /// <summary>
+    /// Whether registered on the community map.
+    /// </summary>
+    public bool Registered { get; set; } = false;
+
+    /// <summary>
+    /// ISO 3166-1 alpha-2 country code. e.g. "AU"
+    /// </summary>
+    public string? CountryCode { get; set; }
+
+    /// <summary>
+    /// Country name. e.g. "Australia"
+    /// </summary>
+    public string? CountryName { get; set; }
+
+    /// <summary>
+    /// State or territory name if applicable.
+    /// Null for countries with no state system.
+    /// </summary>
+    public string? StateName { get; set; }
+
+    /// <summary>
+    /// Human readable display name.
+    /// e.g. "Victoria, Australia" or "Fiji"
+    /// </summary>
+    public string? DisplayName { get; set; }
 }

@@ -382,7 +382,8 @@
         <TabControl Grid.Row="1"
                     x:Name="MainTabs"
                     Background="{StaticResource BgRaisedBrush}"
-                    BorderThickness="0">
+                    BorderThickness="0"
+                    SelectionChanged="OnTabChanged">
 
             <TabControl.Template>
                 <ControlTemplate TargetType="TabControl">
@@ -1601,7 +1602,254 @@
             </TabItem>
 
             <!-- ══════════════════════════════════════════════ -->
-            <!-- TAB 6: ABOUT                                    -->
+            <!-- TAB 6: PRIVACY                                  -->
+            <!-- ══════════════════════════════════════════════ -->
+            <TabItem Header="Privacy">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  Padding="24 20">
+                    <StackPanel>
+
+                        <TextBlock Text="Privacy"
+                       Style="{StaticResource SectionTitle}"/>
+                        <TextBlock
+                Text="The Ministry is transparent about what it knows. Which is very little. By design."
+                Style="{StaticResource SectionSubTitle}"/>
+
+                        <!-- ── Telemetry ──────────────────────────────── -->
+                        <TextBlock Text="Anonymous telemetry"
+                       FontFamily="Courier New"
+                       FontSize="10"
+                       Foreground="{StaticResource BrassDimBrush}"
+                       Margin="2 0 0 6"
+                       FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                    Text="Allow anonymous telemetry"
+                                    Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock
+                                    Text="Version, printer types, event counts. No names. No IDs. The scribes are discreet."
+                                    Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <ToggleButton
+                                x:Name="TelemetryEnabledToggle"
+                                Grid.Column="1"
+                                Style="{StaticResource MtgbToggle}"
+                                VerticalAlignment="Center"
+                                Click="OnTelemetryToggleChanged"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                            BorderThickness="0">
+                                    <StackPanel>
+                                        <TextBlock
+                                Text="What the scribes record"
+                                Style="{StaticResource SettingLabel}"/>
+                                        <TextBlock
+                                FontFamily="Courier New"
+                                FontSize="10"
+                                Foreground="{StaticResource TextDimBrush}"
+                                Margin="0 6 0 0"
+                                LineHeight="18">
+                                ✓  MTGB version &amp; Windows version&#x0a;
+                                ✓  Printer count &amp; integration type&#x0a;
+                                ✓  Which event types are enabled&#x0a;
+                                ✓  Poll &amp; toast success/failure counts&#x0a;
+                                ✓  A random anonymous install ID&#x0a;
+                                ✗  No API keys, org IDs or credentials&#x0a;
+                                ✗  No printer names or job filenames&#x0a;
+                                ✗  No IP addresses or anything identifying
+                                        </TextBlock>
+                                        <Button Content="Full transparency policy ↗"
+                                    Style="{StaticResource GhostButton}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0 10 0 0"
+                                    Click="OnTelemetryPolicyClick"/>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ── Community map ──────────────────────────── -->
+                        <TextBlock Text="Community map"
+                       FontFamily="Courier New"
+                       FontSize="10"
+                       Foreground="{StaticResource BrassDimBrush}"
+                       Margin="2 8 0 6"
+                       FontWeight="Bold"/>
+
+                        <Border Style="{StaticResource SectionCard}">
+                            <StackPanel>
+
+                                <!-- Status row -->
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                    Text="Registration status"
+                                    Style="{StaticResource SettingLabel}"/>
+                                            <StackPanel Orientation="Horizontal"
+                                            Margin="0 6 0 0">
+                                                <Ellipse x:Name="MapStatusDot"
+                                             Width="8" Height="8"
+                                             Fill="#5A5248"
+                                             VerticalAlignment="Center"
+                                             Margin="0 0 8 0"/>
+                                                <TextBlock x:Name="MapStatusText"
+                                               FontFamily="Courier New"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextDimBrush}"
+                                               Text="Checking..."
+                                               VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Button x:Name="MapRefreshButton"
+                                    Grid.Column="1"
+                                    Content="Refresh"
+                                    Style="{StaticResource GhostButton}"
+                                    VerticalAlignment="Center"
+                                    Click="OnMapStatusRefreshClick"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Opt out row — visible when registered -->
+                                <Border x:Name="MapOptOutPanel"
+                            Style="{StaticResource SettingRow}"
+                            Visibility="Collapsed">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                    Text="Remove my dot"
+                                    Style="{StaticResource SettingLabel}"
+                                    Foreground="#E84855"/>
+                                            <TextBlock
+                                    Text="The Ministry will file the departure form without complaint."
+                                    Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <Button x:Name="MapOptOutButton"
+                                    Grid.Column="1"
+                                    Content="Opt out"
+                                    Style="{StaticResource GhostButton}"
+                                    Foreground="#E84855"
+                                    BorderBrush="#38E84855"
+                                    VerticalAlignment="Center"
+                                    Click="OnMapOptOutClick"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Opt in row — visible when not registered -->
+                                <Border x:Name="MapOptInPanel"
+                            Style="{StaticResource SettingRow}"
+                            Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock
+                                Text="Add me to the map"
+                                Style="{StaticResource SettingLabel}"/>
+                                        <TextBlock
+                                Text="State or territory level only. The dots are anonymous."
+                                Style="{StaticResource SettingSubLabel}"/>
+
+                                        <!-- Country selector -->
+                                        <TextBlock Text="COUNTRY"
+                                       FontFamily="Courier New"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrassBrush}"
+                                       Margin="0 12 0 4"/>
+                                        <ComboBox x:Name="PrivacyCountrySelector"
+                                      Background="{StaticResource BgDeepBrush}"
+                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                      BorderBrush="#59C9930E"
+                                      FontFamily="Segoe UI Variable, Segoe UI"
+                                      FontSize="12"
+                                      Padding="10 7"
+                                      Margin="0 0 0 12"
+                                      SelectionChanged="OnPrivacyCountryChanged"/>
+
+                                        <!-- State selector -->
+                                        <StackPanel x:Name="PrivacyStateSelectorPanel"
+                                        Visibility="Collapsed"
+                                        Margin="0 0 0 12">
+                                            <TextBlock Text="STATE / TERRITORY"
+                                           FontFamily="Courier New"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource BrassBrush}"
+                                           Margin="0 0 0 4"/>
+                                            <ComboBox x:Name="PrivacyStateSelector"
+                                          Background="{StaticResource BgDeepBrush}"
+                                          Foreground="{StaticResource TextPrimaryBrush}"
+                                          BorderBrush="#59C9930E"
+                                          FontFamily="Segoe UI Variable, Segoe UI"
+                                          FontSize="12"
+                                          Padding="10 7"
+                                          SelectionChanged="OnPrivacyStateChanged"/>
+                                        </StackPanel>
+
+                                        <!-- Confirmation text -->
+                                        <Border Background="{StaticResource BgDeepBrush}"
+                                    BorderBrush="#38C9930E"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="12 10"
+                                    Margin="0 0 0 12">
+                                            <TextBlock x:Name="PrivacyConfirmText"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12"
+                                           Foreground="{StaticResource GoldTextBrush}"
+                                           TextWrapping="Wrap"/>
+                                        </Border>
+
+                                        <Button x:Name="MapOptInButton"
+                                    Content="Add me to the map"
+                                    Style="{StaticResource BrassButton}"
+                                    HorizontalAlignment="Left"
+                                    Click="OnMapOptInClick"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingRow}"
+                            BorderThickness="0">
+                                    <TextBlock
+                            FontFamily="Courier New"
+                            FontSize="10"
+                            Foreground="{StaticResource TextDimBrush}"
+                            FontStyle="Italic"
+                            TextWrapping="Wrap">
+                            State or territory level only. No city. No street. No postcode.
+                            The map is real. The dots are anonymous.
+                            There is nothing to see here. Except tiny little unassuming dots.
+                                    </TextBlock>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- TAB 7: ABOUT                                    -->
             <!-- ══════════════════════════════════════════════ -->
             <TabItem Header="About">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"

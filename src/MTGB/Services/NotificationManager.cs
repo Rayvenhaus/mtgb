@@ -81,6 +81,7 @@ public class NotificationManager : INotificationManager, IDisposable
 {
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<NotificationManager> _logger;
+    private readonly ITelemetryService _telemetry;
 
     // In-memory history log — persisted to disk on change
     private readonly List<NotificationHistoryEntry> _history = new();
@@ -105,10 +106,6 @@ public class NotificationManager : INotificationManager, IDisposable
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "MTGB", "history.json");
 
-    // Windows App ID for toast notifications —
-    // must match the app's registration in Windows
-    private const string AppId = "MTGB.TheMonitorThatGoesBing";
-
     // Notification sound
     private static readonly string SoundFilePath = Path.Combine(
         AppContext.BaseDirectory,
@@ -116,10 +113,12 @@ public class NotificationManager : INotificationManager, IDisposable
 
     public NotificationManager(
         IOptions<AppSettings> settings,
-        ILogger<NotificationManager> logger)
+        ILogger<NotificationManager> logger,
+        ITelemetryService telemetry)
     {
         _settings = settings;
         _logger = logger;
+        _telemetry = telemetry;
 
         // Register toast notification activator
         ToastNotificationManagerCompat.OnActivated +=
@@ -166,13 +165,13 @@ public class NotificationManager : INotificationManager, IDisposable
 
         foreach (var evt in events)
         {
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Processing event '{EventId}' for {Printer}",
                 evt.EventId, evt.PrinterName);
 
             var suppression = EvaluateRules(evt, settings);
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Event '{EventId}' suppressed: {Suppressed} — {Reason}",
                 evt.EventId, suppression.Suppressed,
                 suppression.Reason ?? "not suppressed");
@@ -308,6 +307,7 @@ public class NotificationManager : INotificationManager, IDisposable
                     toast.Group = "MTGB";
                 });
 
+                _telemetry.RecordToastSuccess();
                 PlayNotificationSound();
 
                 _logger.LogInformation(
@@ -316,6 +316,7 @@ public class NotificationManager : INotificationManager, IDisposable
             }
             catch (Exception ex)
             {
+                _telemetry.RecordToastFailure();
                 _logger.LogError(ex,
                     "Failed to deliver toast for event '{EventId}'.",
                     evt.EventId);

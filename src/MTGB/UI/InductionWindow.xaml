@@ -709,8 +709,147 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Screen 5 — Complete -->
+                <!-- Screen 5 — The Registry -->
                 <ScrollViewer x:Name="Screen5"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="32,28,32,16">
+                    <StackPanel>
+                        <TextBlock Text="SECTION D — THE REGISTRY"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="#8B6508"/>
+                        <Rectangle Height="1"
+                                   Fill="#C9930E"
+                                   Opacity="0.3"
+                                   Margin="0,12,0,20"/>
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="13"
+                                   Foreground="#C8C0B8"
+                                   TextWrapping="Wrap"
+                                   LineHeight="22"
+                                   Margin="0,0,0,16">
+                            The Ministry maintains a register of known installations. Participation is entirely voluntary. The map is real. The dots are anonymous.
+                            There is nothing to see here. Except tiny little unassuming dots.
+                        </TextBlock>
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="13"
+                                   Foreground="#C8C0B8"
+                                   TextWrapping="Wrap"
+                                   LineHeight="22"
+                                   Margin="0,0,0,24">
+                            If you choose to participate, your installation will be counted at the state or territory level — or country level where no state system exists. No city. No street.
+                            No postcode. Just a dot on a map that says someone here uses MTGB.
+                        </TextBlock>
+
+                        <!-- Map toggle -->
+                        <Border Background="#141417"
+                                BorderBrush="#C9930E"
+                                BorderThickness="0,0,0,1"
+                                Padding="0,16"
+                                Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0"
+                                            Margin="0,0,16,0">
+                                    <TextBlock Text="ADD ME TO THE MAP"
+                                       FontFamily="Courier New"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#F0EDE8"/>
+                                    <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                       FontSize="11"
+                                       Foreground="#8A8078"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0">
+                                    Default off. Your dot. Your choice. The Ministry will not sulk if you decline.
+                                    </TextBlock>
+                                </StackPanel>
+                                <ToggleButton x:Name="MapToggle"
+                                      Grid.Column="1"
+                                      Style="{StaticResource MtgbToggle}"
+                                      IsChecked="False"
+                                      VerticalAlignment="Center"
+                                      Click="OnMapToggleChanged"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Selection panel — shown when toggle is ON -->
+                        <StackPanel x:Name="MapSelectionPanel"
+                                    Visibility="Collapsed">
+
+                            <!-- Country selector -->
+                            <TextBlock Text="COUNTRY"
+                               FontFamily="Courier New"
+                               FontSize="10"
+                               FontWeight="Bold"
+                               Foreground="#C9930E"
+                               Margin="0,0,0,6"/>
+
+                            <ComboBox x:Name="CountrySelector"
+                                      Background="#141417"
+                                      Foreground="#F0EDE8"
+                                      BorderBrush="#3A3028"
+                                      FontFamily="Segoe UI Variable, Segoe UI"
+                                      FontSize="12"
+                                      Padding="10,8"
+                                      Margin="0,0,0,16"
+                                      SelectionChanged="OnCountryChanged"/>
+
+                            <!-- State/Territory selector — shown if country has states -->
+                            <StackPanel x:Name="StateSelectorPanel"
+                                        Visibility="Collapsed"
+                                        Margin="0,0,0,16">
+                                <TextBlock Text="STATE / TERRITORY"
+                                           FontFamily="Courier New"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="#C9930E"
+                                           Margin="0,0,0,6"/>
+                                <ComboBox x:Name="StateSelector"
+                                          Background="#141417"
+                                          Foreground="#F0EDE8"
+                                          BorderBrush="#3A3028"
+                                          FontFamily="Segoe UI Variable, Segoe UI"
+                                          FontSize="12"
+                                          Padding="10,8"
+                                          SelectionChanged="OnStateChanged"/>
+                            </StackPanel>
+
+                            <!-- Confirmation text -->
+                            <Border Background="#141417"
+                                    BorderBrush="#3A3028"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="14,12">
+                                <TextBlock x:Name="RegistrationConfirmText"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12"
+                                           Foreground="#F0C840"
+                                           TextWrapping="Wrap"
+                                           LineHeight="20"/>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock FontFamily="Courier New"
+                                   FontSize="10"
+                                   FontStyle="Italic"
+                                   Foreground="#5A5248"
+                                   TextWrapping="Wrap"
+                                   Margin="0,24,0,0"
+                                   TextAlignment="Center">
+                            You can opt out at any time via Settings → Privacy. The Ministry will file the departure form without complaint.
+                        </TextBlock>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Screen 6 — Complete -->
+                <ScrollViewer x:Name="Screen6"
                               Visibility="Collapsed"
                               VerticalScrollBarVisibility="Auto"
                               Padding="32,28,32,16">
@@ -784,7 +923,7 @@
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
                                        LineHeight="20">
-                                Form MwA 621d/7 22 — Ministry of Perfectly Observed Prints&#x0a;
+                                Form MwA 621d/7 22 — Ministry of Printer Observation &amp; Void Containment&#x0a;
                                 Filed. Stamped. Acknowledged.&#x0a;
                                 The scribe in the third row has already made four copies.
                             </TextBlock>
@@ -816,6 +955,10 @@
                          Fill="#3A3028"
                          Margin="4,0"/>
                 <Ellipse x:Name="Dot5"
+                         Width="8" Height="8"
+                         Fill="#3A3028"
+                         Margin="4,0"/>
+                <Ellipse x:Name="Dot6"
                          Width="8" Height="8"
                          Fill="#3A3028"
                          Margin="4,0"/>

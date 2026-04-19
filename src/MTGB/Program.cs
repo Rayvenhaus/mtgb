@@ -133,6 +133,33 @@ internal class Program
             services.AddTransient<SettingsWindow>();
             services.AddTransient<HistoryWindow>();
             services.AddSingleton<TrayIcon>();
+
+            // ── Community Map ─────────────────────────────
+            services.AddHttpClient<ICommunityMapService,
+                CommunityMapService>((provider, client) =>
+                {
+                    client.BaseAddress = new Uri(
+                        "https://community.myndworx.com/");
+                    client.Timeout = TimeSpan.FromSeconds(15);
+                    client.DefaultRequestHeaders.Add(
+                        "User-Agent",
+                        $"MTGB/{typeof(App).Assembly.GetName().Version?.ToString(3)}");
+                });
+
+            // ── Telemetry ─────────────────────────────────
+            services.AddHttpClient<ITelemetryService, TelemetryService>(
+                (provider, client) =>
+                {
+                    client.BaseAddress = new Uri(
+                        "https://community.myndworx.com/");
+                    client.Timeout = TimeSpan.FromSeconds(15);
+                    client.DefaultRequestHeaders.Add(
+                        "User-Agent",
+                        $"MTGB/{typeof(App).Assembly.GetName()
+                            .Version?.ToString(3)}");
+                });
+
+            services.AddHostedService<TelemetryWorker>();
         })
         .Build();
 }

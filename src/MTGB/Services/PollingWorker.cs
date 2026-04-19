@@ -22,6 +22,7 @@ public class PollingWorker : BackgroundService
     private readonly IStateDiffEngine _diffEngine;
     private readonly INotificationManager _notificationManager;
     private readonly IAuthService _authService;
+    private readonly ITelemetryService _telemetry;  
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<PollingWorker> _logger;
 
@@ -44,6 +45,7 @@ public class PollingWorker : BackgroundService
         IStateDiffEngine diffEngine,
         INotificationManager notificationManager,
         IAuthService authService,
+        ITelemetryService telemetry,
         IOptions<AppSettings> settings,
         ILogger<PollingWorker> logger)
     {
@@ -51,6 +53,7 @@ public class PollingWorker : BackgroundService
         _diffEngine = diffEngine;
         _notificationManager = notificationManager;
         _authService = authService;
+        _telemetry = telemetry;
         _settings = settings;
         _logger = logger;
     }
@@ -132,6 +135,7 @@ public class PollingWorker : BackgroundService
                     .ProcessEventsAsync(events, ct);
             }
 
+            _telemetry.RecordPollSuccess();
             ResetFailureCount();
         }
         catch (OperationCanceledException)
@@ -214,6 +218,8 @@ public class PollingWorker : BackgroundService
                 _consecutiveFailures,
                 MaxConsecutiveFailures);
         }
+
+        _telemetry.RecordPollFailure();
     }
 
     private void ResetFailureCount()

@@ -451,6 +451,43 @@ public class TrayIcon : IDisposable
 
         _logger.LogInformation(
             "Global mute {State} via tray menu.", state);
+
+        // Persist mute state so it survives restarts
+        SaveSettings();
+    }
+
+    private void SaveSettings()
+    {
+        try
+        {
+            var appDataDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData),
+                "MTGB");
+
+            System.IO.Directory.CreateDirectory(appDataDir);
+
+            var path = System.IO.Path.Combine(
+                appDataDir, "appsettings.json");
+
+            var json = System.Text.Json.JsonSerializer.Serialize(
+                _settings.Value,
+                new System.Text.Json.JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+            System.IO.File.WriteAllText(path, json);
+
+            _logger.LogDebug(
+                "Settings persisted after mute toggle.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "Failed to persist settings after mute toggle. " +
+                "The Ministry is mildly inconvenienced.");
+        }
     }
 
     private void ExitApplication()

@@ -26,12 +26,15 @@ public partial class SettingsWindow : Window
     private readonly IAuthService _authService;
     private readonly IStateDiffEngine _diffEngine;
     private readonly INotificationManager _notificationManager;
+    private readonly ICommunityMapService _communityMap;
     private readonly ILogger<SettingsWindow> _logger;
 
     private bool _isDirty = false;
     #pragma warning disable CS0414
     private bool _isLoading = true;
     #pragma warning restore CS0414
+    private List<CountryData> _privacyCountries = new();
+    private CountryData? _privacySelectedCountry;
 
     public SettingsWindow(
         IOptions<AppSettings> settings,
@@ -40,6 +43,7 @@ public partial class SettingsWindow : Window
         IAuthService authService,
         IStateDiffEngine diffEngine,
         INotificationManager notificationManager,
+        ICommunityMapService communityMap,
         ILogger<SettingsWindow> logger)
     {
         _settings = settings;
@@ -48,10 +52,10 @@ public partial class SettingsWindow : Window
         _authService = authService;
         _diffEngine = diffEngine;
         _notificationManager = notificationManager;
+        _communityMap = communityMap;
         _logger = logger;
 
         InitializeComponent();
-
         Loaded += OnLoaded;
         Closing += OnWindowClosing;
     }
@@ -167,6 +171,11 @@ public partial class SettingsWindow : Window
                 break;
             }
         }
+
+        // Privacy tab
+        TelemetryEnabledToggle.IsChecked =
+            s.Telemetry.Enabled;
+        LoadPrivacyCountries();
 
         _isLoading = false;
         _isDirty = false;
@@ -844,6 +853,240 @@ public partial class SettingsWindow : Window
             "Notification history cleared via Settings.");
     }
 
+    // ── Privacy tab ───────────────────────────────────────────────
+
+    private void LoadPrivacyCountries()
+    {
+        var countryList = _communityMap.LoadCountries();
+        if (countryList is null) return;
+
+        _privacyCountries = countryList.Countries;
+        PrivacyCountrySelector.ItemsSource =
+            _privacyCountries.Select(c => c.Name).ToList();
+    }
+
+    private void OnTelemetryToggleChanged(
+        object sender, RoutedEventArgs e)
+    {
+        _settings.Value.Telemetry.Enabled =
+            TelemetryEnabledToggle.IsChecked == true;
+        MarkDirty();
+    }
+
+    private void OnTelemetryPolicyClick(
+        object sender, RoutedEventArgs e) =>
+        OpenUrl(
+            "https://github.com/Rayvenhaus/mtgb/blob/main/TELEMETRY.md");
+
+    private async void OnMapStatusRefreshClick(
+        object sender, RoutedEventArgs e)
+    {
+        await RefreshMapStatusAsync();
+    }
+
+    private async Task RefreshMapStatusAsync()
+    {
+        // Amber — checking
+        MapStatusDot.Fill = new SolidColorBrush(
+            Color.FromRgb(0xF1, 0x8F, 0x01));
+        MapStatusText.Text = "Checking...";
+        MapStatusText.Foreground = new SolidColorBrush(
+            Color.FromRgb(0xF1, 0x8F, 0x01));
+        MapRefreshButton.IsEnabled = false;
+        MapOptOutPanel.Visibility = Visibility.Collapsed;
+        MapOptInPanel.Visibility = Visibility.Collapsed;
+
+        try
+        {
+            var displayName = await _communityMap
+                .GetStatusAsync();
+
+            if (displayName is not null)
+            {
+                // Green — registered
+                MapStatusDot.Fill = new SolidColorBrush(
+                    Color.FromRgb(0x3B, 0xB2, 0x73));
+                MapStatusText.Text =
+                    $"Registered — {displayName}";
+                MapStatusText.Foreground =
+                    new SolidColorBrush(
+                        Color.FromRgb(0x3B, 0xB2, 0x73));
+                MapOptOutPanel.Visibility =
+                    Visibility.Visible;
+            }
+            else
+            {
+                // Grey — not registered
+                MapStatusDot.Fill = new SolidColorBrush(
+                    Color.FromRgb(0x5A, 0x52, 0x48));
+                MapStatusText.Text = "Not registered";
+                MapStatusText.Foreground =
+                    new SolidColorBrush(
+                        Color.FromRgb(0x5A, 0x52, 0x48));
+                MapOptInPanel.Visibility =
+                    Visibility.Visible;
+            }
+        }
+        catch
+        {
+            MapStatusDot.Fill = new SolidColorBrush(
+                Color.FromRgb(0xE8, 0x48, 0x55));
+            MapStatusText.Text =
+                "Could not reach the Ministry.";
+            MapStatusText.Foreground =
+                new SolidColorBrush(
+                    Color.FromRgb(0xE8, 0x48, 0x55));
+        }
+        finally
+        {
+            MapRefreshButton.IsEnabled = true;
+        }
+    }
+
+    private async void OnMapOptOutClick(
+        object sender, RoutedEventArgs e)
+    {
+        MapOptOutButton.IsEnabled = false;
+        MapOptOutButton.Content = "Processing...";
+
+        var success = await _communityMap.UnregisterAsync();
+
+        if (success)
+        {
+            MapOptOutPanel.Visibility = Visibility.Collapsed;
+            MapStatusDot.Fill = new SolidColorBrush(
+                Color.FromRgb(0x5A, 0x52, 0x48));
+            MapStatusText.Text =
+                "Removed. The Ministry has filed the departure form.";
+            MapStatusText.Foreground =
+                new SolidColorBrush(
+                    Color.FromRgb(0x5A, 0x52, 0x48));
+            MapOptInPanel.Visibility = Visibility.Visible;
+            MarkDirty();
+        }
+        else
+        {
+            MapOptOutButton.Content = "Opt out";
+            MapOptOutButton.IsEnabled = true;
+            SetFooterStatus(
+                "Removal failed — check your connection.",
+                isError: true);
+        }
+    }
+
+    private void OnPrivacyCountryChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var selectedName = PrivacyCountrySelector
+            .SelectedItem?.ToString();
+
+        _privacySelectedCountry = _privacyCountries
+            .FirstOrDefault(c => c.Name == selectedName);
+
+        if (_privacySelectedCountry is null) return;
+
+        if (_privacySelectedCountry.HasStates)
+        {
+            PrivacyStateSelectorPanel.Visibility =
+                Visibility.Visible;
+            PrivacyStateSelector.ItemsSource =
+                _privacySelectedCountry.States;
+            PrivacyStateSelector.SelectedIndex = -1;
+        }
+        else
+        {
+            PrivacyStateSelectorPanel.Visibility =
+                Visibility.Collapsed;
+            PrivacyStateSelector.ItemsSource = null;
+        }
+
+        UpdatePrivacyConfirmText();
+    }
+
+    private void OnPrivacyStateChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        UpdatePrivacyConfirmText();
+    }
+
+    private void UpdatePrivacyConfirmText()
+    {
+        if (_privacySelectedCountry is null)
+        {
+            PrivacyConfirmText.Text = string.Empty;
+            return;
+        }
+
+        var stateName = _privacySelectedCountry.HasStates
+            ? PrivacyStateSelector.SelectedItem?.ToString()
+            : null;
+
+        PrivacyConfirmText.Text = stateName is not null
+            ? $"You'll be added to the count of installations " +
+              $"in {_privacySelectedCountry.Name}, " +
+              $"in {stateName}."
+            : $"You'll be added to the count of installations " +
+              $"in {_privacySelectedCountry.Name}.";
+    }
+
+    private async void OnMapOptInClick(
+        object sender, RoutedEventArgs e)
+    {
+        if (_privacySelectedCountry is null)
+        {
+            SetFooterStatus(
+                "Please select a country first.",
+                isError: true);
+            return;
+        }
+
+        var stateName = _privacySelectedCountry.HasStates
+            ? PrivacyStateSelector.SelectedItem?.ToString()
+            : null;
+
+        if (_privacySelectedCountry.HasStates &&
+            string.IsNullOrWhiteSpace(stateName))
+        {
+            SetFooterStatus(
+                "Please select a state or territory.",
+                isError: true);
+            return;
+        }
+
+        MapOptInButton.IsEnabled = false;
+        MapOptInButton.Content = "Processing...";
+
+        var success = await _communityMap.RegisterAsync(
+            _privacySelectedCountry.Code,
+            _privacySelectedCountry.Name,
+            stateName);
+
+        if (success)
+        {
+            MapOptInPanel.Visibility = Visibility.Collapsed;
+            MapStatusDot.Fill = new SolidColorBrush(
+                Color.FromRgb(0x3B, 0xB2, 0x73));
+            MapStatusText.Text =
+                $"Registered — " +
+                $"{_settings.Value.CommunityMap.DisplayName}";
+            MapStatusText.Foreground =
+                new SolidColorBrush(
+                    Color.FromRgb(0x3B, 0xB2, 0x73));
+            MapOptOutPanel.Visibility = Visibility.Visible;
+            MarkDirty();
+        }
+        else
+        {
+            MapOptInButton.Content = "Add me to the map";
+            MapOptInButton.IsEnabled = true;
+            SetFooterStatus(
+                "Registration failed — check your connection.",
+                isError: true);
+        }
+    }
+
     // ── About ─────────────────────────────────────────────────────
 
     private void OnGitHubClick(
@@ -935,6 +1178,15 @@ public partial class SettingsWindow : Window
                 "Failed to save settings.",
                 isError: true);
         }
+    }
+
+    private async void OnTabChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        // Only fire when Privacy tab (index 5) is selected
+        if (MainTabs.SelectedIndex == 5)
+            await RefreshMapStatusAsync();
     }
 
     // ── Footer status ─────────────────────────────────────────────

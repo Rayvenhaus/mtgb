@@ -1,0 +1,1562 @@
+{
+  "countries": [
+    {
+      "code": "AF",
+      "name": "Afghanistan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AL",
+      "name": "Albania",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DZ",
+      "name": "Algeria",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AO",
+      "name": "Angola",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AG",
+      "name": "Antigua and Barbuda",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "has_states": true,
+      "states": [
+        "Buenos Aires",
+        "Catamarca",
+        "Chaco",
+        "Chubut",
+        "Córdoba",
+        "Corrientes",
+        "Entre Ríos",
+        "Formosa",
+        "Jujuy",
+        "La Pampa",
+        "La Rioja",
+        "Mendoza",
+        "Misiones",
+        "Neuquén",
+        "Río Negro",
+        "Salta",
+        "San Juan",
+        "San Luis",
+        "Santa Cruz",
+        "Santa Fe",
+        "Santiago del Estero",
+        "Tierra del Fuego",
+        "Tucumán"
+      ]
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "has_states": true,
+      "states": [
+        "Australian Capital Territory",
+        "New South Wales",
+        "Northern Territory",
+        "Queensland",
+        "South Australia",
+        "Tasmania",
+        "Victoria",
+        "Western Australia"
+      ]
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "has_states": true,
+      "states": [
+        "Burgenland",
+        "Carinthia",
+        "Lower Austria",
+        "Salzburg",
+        "Styria",
+        "Tyrol",
+        "Upper Austria",
+        "Vienna",
+        "Vorarlberg"
+      ]
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BS",
+      "name": "Bahamas",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BD",
+      "name": "Bangladesh",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BB",
+      "name": "Barbados",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BZ",
+      "name": "Belize",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BJ",
+      "name": "Benin",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BT",
+      "name": "Bhutan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BO",
+      "name": "Bolivia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia and Herzegovina",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BW",
+      "name": "Botswana",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "has_states": true,
+      "states": [
+        "Acre",
+        "Alagoas",
+        "Amapá",
+        "Amazonas",
+        "Bahia",
+        "Ceará",
+        "Distrito Federal",
+        "Espírito Santo",
+        "Goiás",
+        "Maranhão",
+        "Mato Grosso",
+        "Mato Grosso do Sul",
+        "Minas Gerais",
+        "Pará",
+        "Paraíba",
+        "Paraná",
+        "Pernambuco",
+        "Piauí",
+        "Rio de Janeiro",
+        "Rio Grande do Norte",
+        "Rio Grande do Sul",
+        "Rondônia",
+        "Roraima",
+        "Santa Catarina",
+        "São Paulo",
+        "Sergipe",
+        "Tocantins"
+      ]
+    },
+    {
+      "code": "BN",
+      "name": "Brunei",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BF",
+      "name": "Burkina Faso",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "BI",
+      "name": "Burundi",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CV",
+      "name": "Cabo Verde",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KH",
+      "name": "Cambodia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CM",
+      "name": "Cameroon",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "has_states": true,
+      "states": [
+        "Alberta",
+        "British Columbia",
+        "Manitoba",
+        "New Brunswick",
+        "Newfoundland and Labrador",
+        "Northwest Territories",
+        "Nova Scotia",
+        "Nunavut",
+        "Ontario",
+        "Prince Edward Island",
+        "Quebec",
+        "Saskatchewan",
+        "Yukon"
+      ]
+    },
+    {
+      "code": "CF",
+      "name": "Central African Republic",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TD",
+      "name": "Chad",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "has_states": true,
+      "states": [
+        "Anhui",
+        "Beijing",
+        "Chongqing",
+        "Fujian",
+        "Gansu",
+        "Guangdong",
+        "Guangxi",
+        "Guizhou",
+        "Hainan",
+        "Hebei",
+        "Heilongjiang",
+        "Henan",
+        "Hong Kong",
+        "Hubei",
+        "Hunan",
+        "Inner Mongolia",
+        "Jiangsu",
+        "Jiangxi",
+        "Jilin",
+        "Liaoning",
+        "Macau",
+        "Ningxia",
+        "Qinghai",
+        "Shaanxi",
+        "Shandong",
+        "Shanghai",
+        "Shanxi",
+        "Sichuan",
+        "Tianjin",
+        "Tibet",
+        "Xinjiang",
+        "Yunnan",
+        "Zhejiang"
+      ]
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KM",
+      "name": "Comoros",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CG",
+      "name": "Congo",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CR",
+      "name": "Costa Rica",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CU",
+      "name": "Cuba",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CZ",
+      "name": "Czech Republic",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DJ",
+      "name": "Djibouti",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DM",
+      "name": "Dominica",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DO",
+      "name": "Dominican Republic",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GQ",
+      "name": "Equatorial Guinea",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ER",
+      "name": "Eritrea",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SZ",
+      "name": "Eswatini",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ET",
+      "name": "Ethiopia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "FJ",
+      "name": "Fiji",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GA",
+      "name": "Gabon",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GM",
+      "name": "Gambia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "has_states": true,
+      "states": [
+        "Baden-Württemberg",
+        "Bavaria",
+        "Berlin",
+        "Brandenburg",
+        "Bremen",
+        "Hamburg",
+        "Hesse",
+        "Lower Saxony",
+        "Mecklenburg-Vorpommern",
+        "North Rhine-Westphalia",
+        "Rhineland-Palatinate",
+        "Saarland",
+        "Saxony",
+        "Saxony-Anhalt",
+        "Schleswig-Holstein",
+        "Thuringia"
+      ]
+    },
+    {
+      "code": "GH",
+      "name": "Ghana",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GD",
+      "name": "Grenada",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GN",
+      "name": "Guinea",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GW",
+      "name": "Guinea-Bissau",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GY",
+      "name": "Guyana",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "HT",
+      "name": "Haiti",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "HN",
+      "name": "Honduras",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "has_states": true,
+      "states": [
+        "Andaman and Nicobar Islands",
+        "Andhra Pradesh",
+        "Arunachal Pradesh",
+        "Assam",
+        "Bihar",
+        "Chandigarh",
+        "Chhattisgarh",
+        "Dadra and Nagar Haveli and Daman and Diu",
+        "Delhi",
+        "Goa",
+        "Gujarat",
+        "Haryana",
+        "Himachal Pradesh",
+        "Jammu and Kashmir",
+        "Jharkhand",
+        "Karnataka",
+        "Kerala",
+        "Ladakh",
+        "Lakshadweep",
+        "Madhya Pradesh",
+        "Maharashtra",
+        "Manipur",
+        "Meghalaya",
+        "Mizoram",
+        "Nagaland",
+        "Odisha",
+        "Puducherry",
+        "Punjab",
+        "Rajasthan",
+        "Sikkim",
+        "Tamil Nadu",
+        "Telangana",
+        "Tripura",
+        "Uttar Pradesh",
+        "Uttarakhand",
+        "West Bengal"
+      ]
+    },
+    {
+      "code": "ID",
+      "name": "Indonesia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IR",
+      "name": "Iran",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IQ",
+      "name": "Iraq",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "JM",
+      "name": "Jamaica",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "JP",
+      "name": "Japan",
+      "has_states": true,
+      "states": [
+        "Aichi",
+        "Akita",
+        "Aomori",
+        "Chiba",
+        "Ehime",
+        "Fukui",
+        "Fukuoka",
+        "Fukushima",
+        "Gifu",
+        "Gunma",
+        "Hiroshima",
+        "Hokkaido",
+        "Hyogo",
+        "Ibaraki",
+        "Ishikawa",
+        "Iwate",
+        "Kagawa",
+        "Kagoshima",
+        "Kanagawa",
+        "Kochi",
+        "Kumamoto",
+        "Kyoto",
+        "Mie",
+        "Miyagi",
+        "Miyazaki",
+        "Nagano",
+        "Nagasaki",
+        "Nara",
+        "Niigata",
+        "Oita",
+        "Okayama",
+        "Okinawa",
+        "Osaka",
+        "Saga",
+        "Saitama",
+        "Shiga",
+        "Shimane",
+        "Shizuoka",
+        "Tochigi",
+        "Tokushima",
+        "Tokyo",
+        "Tottori",
+        "Toyama",
+        "Wakayama",
+        "Yamagata",
+        "Yamaguchi",
+        "Yamanashi"
+      ]
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KE",
+      "name": "Kenya",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KI",
+      "name": "Kiribati",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KG",
+      "name": "Kyrgyzstan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LA",
+      "name": "Laos",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LS",
+      "name": "Lesotho",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LR",
+      "name": "Liberia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LY",
+      "name": "Libya",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MG",
+      "name": "Madagascar",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MW",
+      "name": "Malawi",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MY",
+      "name": "Malaysia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MV",
+      "name": "Maldives",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ML",
+      "name": "Mali",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MH",
+      "name": "Marshall Islands",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MR",
+      "name": "Mauritania",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MU",
+      "name": "Mauritius",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "has_states": true,
+      "states": [
+        "Aguascalientes",
+        "Baja California",
+        "Baja California Sur",
+        "Campeche",
+        "Chiapas",
+        "Chihuahua",
+        "Ciudad de México",
+        "Coahuila",
+        "Colima",
+        "Durango",
+        "Guanajuato",
+        "Guerrero",
+        "Hidalgo",
+        "Jalisco",
+        "México",
+        "Michoacán",
+        "Morelos",
+        "Nayarit",
+        "Nuevo León",
+        "Oaxaca",
+        "Puebla",
+        "Querétaro",
+        "Quintana Roo",
+        "San Luis Potosí",
+        "Sinaloa",
+        "Sonora",
+        "Tabasco",
+        "Tamaulipas",
+        "Tlaxcala",
+        "Veracruz",
+        "Yucatán",
+        "Zacatecas"
+      ]
+    },
+    {
+      "code": "FM",
+      "name": "Micronesia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MD",
+      "name": "Moldova",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MC",
+      "name": "Monaco",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ME",
+      "name": "Montenegro",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MA",
+      "name": "Morocco",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MZ",
+      "name": "Mozambique",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "MM",
+      "name": "Myanmar",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NA",
+      "name": "Namibia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NR",
+      "name": "Nauru",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NP",
+      "name": "Nepal",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NI",
+      "name": "Nicaragua",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NE",
+      "name": "Niger",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NG",
+      "name": "Nigeria",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PK",
+      "name": "Pakistan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PW",
+      "name": "Palau",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PA",
+      "name": "Panama",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PG",
+      "name": "Papua New Guinea",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PE",
+      "name": "Peru",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PH",
+      "name": "Philippines",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "RU",
+      "name": "Russia",
+      "has_states": true,
+      "states": [
+        "Altai Krai",
+        "Altai Republic",
+        "Amur Oblast",
+        "Arkhangelsk Oblast",
+        "Astrakhan Oblast",
+        "Belgorod Oblast",
+        "Bryansk Oblast",
+        "Chechen Republic",
+        "Chelyabinsk Oblast",
+        "Chukotka Autonomous Okrug",
+        "Chuvash Republic",
+        "Irkutsk Oblast",
+        "Ivanovo Oblast",
+        "Jewish Autonomous Oblast",
+        "Kabardino-Balkarian Republic",
+        "Kaliningrad Oblast",
+        "Kalmykia",
+        "Kaluga Oblast",
+        "Kamchatka Krai",
+        "Karachay-Cherkess Republic",
+        "Kemerovo Oblast",
+        "Khabarovsk Krai",
+        "Khanty-Mansi Autonomous Okrug",
+        "Kirov Oblast",
+        "Komi Republic",
+        "Kostroma Oblast",
+        "Krasnodar Krai",
+        "Krasnoyarsk Krai",
+        "Kurgan Oblast",
+        "Kursk Oblast",
+        "Leningrad Oblast",
+        "Lipetsk Oblast",
+        "Magadan Oblast",
+        "Mari El Republic",
+        "Mordovia",
+        "Moscow",
+        "Moscow Oblast",
+        "Murmansk Oblast",
+        "Nizhny Novgorod Oblast",
+        "North Ossetia",
+        "Novgorod Oblast",
+        "Novosibirsk Oblast",
+        "Omsk Oblast",
+        "Orenburg Oblast",
+        "Oryol Oblast",
+        "Penza Oblast",
+        "Perm Krai",
+        "Primorsky Krai",
+        "Pskov Oblast",
+        "Republic of Adygea",
+        "Republic of Bashkortostan",
+        "Republic of Buryatia",
+        "Republic of Dagestan",
+        "Republic of Ingushetia",
+        "Republic of Karelia",
+        "Republic of Khakassia",
+        "Republic of Sakha",
+        "Republic of Tatarstan",
+        "Rostov Oblast",
+        "Ryazan Oblast",
+        "Saint Petersburg",
+        "Sakhalin Oblast",
+        "Samara Oblast",
+        "Saratov Oblast",
+        "Smolensk Oblast",
+        "Stavropol Krai",
+        "Sverdlovsk Oblast",
+        "Tambov Oblast",
+        "Tomsk Oblast",
+        "Tula Oblast",
+        "Tver Oblast",
+        "Tyumen Oblast",
+        "Tyva Republic",
+        "Udmurt Republic",
+        "Ulyanovsk Oblast",
+        "Vladimir Oblast",
+        "Volgograd Oblast",
+        "Vologda Oblast",
+        "Voronezh Oblast",
+        "Yamalo-Nenets Autonomous Okrug",
+        "Yaroslavl Oblast",
+        "Zabaykalsky Krai"
+      ]
+    },
+    {
+      "code": "RW",
+      "name": "Rwanda",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "KN",
+      "name": "Saint Kitts and Nevis",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "LC",
+      "name": "Saint Lucia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "VC",
+      "name": "Saint Vincent and the Grenadines",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "WS",
+      "name": "Samoa",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ST",
+      "name": "Sao Tome and Principe",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SN",
+      "name": "Senegal",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SC",
+      "name": "Seychelles",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SL",
+      "name": "Sierra Leone",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SG",
+      "name": "Singapore",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SB",
+      "name": "Solomon Islands",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SO",
+      "name": "Somalia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "has_states": true,
+      "states": [
+        "Eastern Cape",
+        "Free State",
+        "Gauteng",
+        "KwaZulu-Natal",
+        "Limpopo",
+        "Mpumalanga",
+        "North West",
+        "Northern Cape",
+        "Western Cape"
+      ]
+    },
+    {
+      "code": "SS",
+      "name": "South Sudan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "has_states": true,
+      "states": [
+        "Andalusia",
+        "Aragon",
+        "Asturias",
+        "Balearic Islands",
+        "Basque Country",
+        "Canary Islands",
+        "Cantabria",
+        "Castilla-La Mancha",
+        "Castile and León",
+        "Catalonia",
+        "Ceuta",
+        "Extremadura",
+        "Galicia",
+        "La Rioja",
+        "Madrid",
+        "Melilla",
+        "Murcia",
+        "Navarre",
+        "Valencia"
+      ]
+    },
+    {
+      "code": "LK",
+      "name": "Sri Lanka",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SD",
+      "name": "Sudan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SR",
+      "name": "Suriname",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "SY",
+      "name": "Syria",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TW",
+      "name": "Taiwan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TJ",
+      "name": "Tajikistan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TZ",
+      "name": "Tanzania",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TL",
+      "name": "Timor-Leste",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TG",
+      "name": "Togo",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TO",
+      "name": "Tonga",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TT",
+      "name": "Trinidad and Tobago",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TR",
+      "name": "Turkey",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TM",
+      "name": "Turkmenistan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "TV",
+      "name": "Tuvalu",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "UG",
+      "name": "Uganda",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "AE",
+      "name": "United Arab Emirates",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom",
+      "has_states": true,
+      "states": [
+        "England",
+        "Northern Ireland",
+        "Scotland",
+        "Wales"
+      ]
+    },
+    {
+      "code": "US",
+      "name": "United States",
+      "has_states": true,
+      "states": [
+        "Alabama",
+        "Alaska",
+        "Arizona",
+        "Arkansas",
+        "California",
+        "Colorado",
+        "Connecticut",
+        "Delaware",
+        "Florida",
+        "Georgia",
+        "Hawaii",
+        "Idaho",
+        "Illinois",
+        "Indiana",
+        "Iowa",
+        "Kansas",
+        "Kentucky",
+        "Louisiana",
+        "Maine",
+        "Maryland",
+        "Massachusetts",
+        "Michigan",
+        "Minnesota",
+        "Mississippi",
+        "Missouri",
+        "Montana",
+        "Nebraska",
+        "Nevada",
+        "New Hampshire",
+        "New Jersey",
+        "New Mexico",
+        "New York",
+        "North Carolina",
+        "North Dakota",
+        "Ohio",
+        "Oklahoma",
+        "Oregon",
+        "Pennsylvania",
+        "Rhode Island",
+        "South Carolina",
+        "South Dakota",
+        "Tennessee",
+        "Texas",
+        "Utah",
+        "Vermont",
+        "Virginia",
+        "Washington",
+        "Washington D.C.",
+        "West Virginia",
+        "Wisconsin",
+        "Wyoming"
+      ]
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistan",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "VU",
+      "name": "Vanuatu",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "VE",
+      "name": "Venezuela",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "YE",
+      "name": "Yemen",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ZM",
+      "name": "Zambia",
+      "has_states": false,
+      "states": []
+    },
+    {
+      "code": "ZW",
+      "name": "Zimbabwe",
+      "has_states": false,
+      "states": []
+    }
+  ]
+}
