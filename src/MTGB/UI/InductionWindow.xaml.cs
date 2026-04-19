@@ -66,8 +66,15 @@ public partial class InductionWindow : Window
         DwmSetWindowAttribute(hwnd, 20,
             ref darkMode, sizeof(int));
 
+        // Wire field validation
+        OrgIdInput.TextChanged += (_, _) =>
+            UpdateTestConnectionButton();
+        ApiKeyInput.PasswordChanged += (_, _) =>
+            UpdateTestConnectionButton();
+
         LoadCountries();
         UpdateScreen();
+        UpdateTestConnectionButton();
     }
 
     private void LoadCountries()
@@ -80,6 +87,27 @@ public partial class InductionWindow : Window
         CountrySelector.ItemsSource = _countries
             .Select(c => c.Name)
             .ToList();
+    }
+
+    private void UpdateTestConnectionButton()
+    {
+        var orgIdFilled = !string.IsNullOrWhiteSpace(
+            OrgIdInput.Text);
+        var apiKeyFilled = ApiKeyInput.SecurePassword.Length > 0;
+        var bothFilled = orgIdFilled && apiKeyFilled;
+
+        TestConnectionButton.IsEnabled = bothFilled;
+
+        // Colour the button to signal readiness
+        TestConnectionButton.Foreground =
+            new SolidColorBrush(bothFilled
+                ? Color.FromRgb(0xC9, 0x93, 0x0E) // Brass — ready
+                : Color.FromRgb(0x5A, 0x52, 0x48)); // Dim — not ready
+
+        TestConnectionButton.BorderBrush =
+            new SolidColorBrush(bothFilled
+                ? Color.FromRgb(0xC9, 0x93, 0x0E) // Brass — ready
+                : Color.FromRgb(0x3A, 0x30, 0x28)); // Dim — not ready
     }
 
     // ── Navigation ────────────────────────────────────────────
@@ -337,9 +365,18 @@ public partial class InductionWindow : Window
                     : Color.FromRgb(0x5A, 0x52, 0x48);
 
         ConnectionDot.Fill = new SolidColorBrush(colour);
-        ConnectionStatusText.Foreground =
-            new SolidColorBrush(colour);
+        ConnectionStatusText.Foreground = new SolidColorBrush(colour);
         ConnectionStatusText.Text = message;
+
+        // Update button colour to reflect result
+        TestConnectionButton.Foreground =
+            new SolidColorBrush(colour);
+        TestConnectionButton.BorderBrush =
+            new SolidColorBrush(isSuccess
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)  // Green — success
+                : isError
+                    ? Color.FromRgb(0xE8, 0x48, 0x55)  // Red — failure
+                    : Color.FromRgb(0xC9, 0x93, 0x0E)); // Brass — pending
     }
 
     // ── Completion ────────────────────────────────────────────

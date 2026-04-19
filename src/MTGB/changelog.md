@@ -10,6 +10,51 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.1] — 2026-04-19
+### The one where the Ministry learned to count.
+
+### Added
+
+#### History window — Stats view
+- Stats tab added to the title bar alongside History tab
+- Toggle between history list and stats view instantly —
+  no loading, no network calls, derived entirely from
+  local notification history and settings
+- Telemetry section
+  - Enabled/disabled status with colour indicator
+  - Anonymous install ID — partially masked for display,
+    full ID never shown in the UI
+- Community map section
+  - Registration status — registered or not
+  - Display name if registered — e.g. "Victoria, Australia"
+- Notification history section
+  - Total events recorded
+  - Notifications delivered
+  - Notifications suppressed
+  - Critical alerts fired
+  - Prints finished
+  - Prints failed — red when non-zero, grey when clean
+- Event breakdown section
+  - Top 10 delivered event types by count
+  - Ordered by frequency — most fired first
+  - Empty state handled gracefully
+- Footer note — history is local only, capped at 1000 entries
+- The Ministry now knows how it is doing.
+  It is cautiously pleased with the numbers.
+
+### Technical notes
+- Version bumped to 0.4.1 — Phase 8 complete
+- Stats view builds on demand when tab is clicked —
+  no background computation, no stale data
+- HistoryWindow now injects IOptions&#x3C;AppSettings&#x3E;
+  for telemetry and community map status display
+- No network calls in the stats view — everything
+  derived from what MTGB already knows locally
+- Phase 8 closed. The scribes have put down their quills.
+  Temporarily.
+
+---
+
 ## [0.4.0] — 2026-04-19
 ### The one where the scribes got their quills.
 
@@ -660,6 +705,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+
+[0.4.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.18...v0.3.0
 [0.2.18]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.17...v0.2.18

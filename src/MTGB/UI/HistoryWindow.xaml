@@ -77,43 +77,60 @@
 
         <!-- ── Title bar ──────────────────────────────────────── -->
         <Border Grid.Row="0"
-                Background="#0D0D0F"
-                BorderBrush="#38C9930E"
-                BorderThickness="0 0 0 1"
-                Padding="20 14">
+        Background="#0D0D0F"
+        BorderBrush="#38C9930E"
+        BorderThickness="0 0 0 1"
+        Padding="20 14">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal"
-                            VerticalAlignment="Center">
+                    VerticalAlignment="Center">
                     <Ellipse Width="10" Height="10"
-                             Fill="#3BB273"
-                             Margin="0 0 10 0"
-                             VerticalAlignment="Center"/>
+                     Fill="#3BB273"
+                     Margin="0 0 10 0"
+                     VerticalAlignment="Center"/>
                     <StackPanel>
                         <TextBlock Text="M · T · G · B"
-                                   FontFamily="Georgia"
-                                   FontSize="14"
-                                   FontWeight="Bold"
-                                   Foreground="#F0C840"/>
+                           FontFamily="Georgia"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#F0C840"/>
                         <TextBlock Text="NOTIFICATION HISTORY"
-                                   FontFamily="Courier New"
-                                   FontSize="9"
-                                   Foreground="#8A8078"
-                                   Margin="0 2 0 0"/>
+                           FontFamily="Courier New"
+                           FontSize="9"
+                           Foreground="#8A8078"
+                           Margin="0 2 0 0"/>
                     </StackPanel>
                 </StackPanel>
 
-                <Button Grid.Column="1"
-                        Content="✕"
-                        Style="{StaticResource FilterButton}"
-                        Width="32" Height="32"
-                        Padding="0"
-                        FontSize="14"
-                        Click="OnCloseClick"/>
+                <!-- View toggle -->
+                <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="0 0 12 0">
+                    <Button x:Name="ViewHistoryButton"
+                    Content="History"
+                    Style="{StaticResource FilterButtonActive}"
+                    Margin="0 0 4 0"
+                    Click="OnViewHistoryClick"/>
+                    <Button x:Name="ViewStatsButton"
+                    Content="Stats"
+                    Style="{StaticResource FilterButton}"
+                    Click="OnViewStatsClick"/>
+                </StackPanel>
+
+                <Button Grid.Column="2"
+                Content="✕"
+                Style="{StaticResource FilterButton}"
+                Width="32" Height="32"
+                Padding="0"
+                FontSize="14"
+                Click="OnCloseClick"/>
             </Grid>
         </Border>
 
@@ -193,12 +210,25 @@
             </Grid>
         </Border>
 
-        <!-- ── History list ───────────────────────────────────── -->
-        <ScrollViewer Grid.Row="2"
-                      VerticalScrollBarVisibility="Auto"
-                      Padding="12 8">
-            <StackPanel x:Name="HistoryPanel"/>
-        </ScrollViewer>
+        <!-- ── Content area ───────────────────────────────────── -->
+        <Grid Grid.Row="2">
+
+            <!-- History view -->
+            <ScrollViewer x:Name="HistoryView"
+                  VerticalScrollBarVisibility="Auto"
+                  Padding="12 8">
+                <StackPanel x:Name="HistoryPanel"/>
+            </ScrollViewer>
+
+            <!-- Stats view -->
+            <ScrollViewer x:Name="StatsView"
+                  Visibility="Collapsed"
+                  VerticalScrollBarVisibility="Auto"
+                  Padding="20 16">
+                <StackPanel x:Name="StatsPanel"/>
+            </ScrollViewer>
+
+        </Grid>
 
         <!-- ── Footer ─────────────────────────────────────────── -->
         <Border Grid.Row="3"

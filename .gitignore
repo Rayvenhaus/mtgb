@@ -420,6 +420,7 @@ FodyWeavers.xsd
 
 # MTGB specific - never commit these
 appsettings.local.json
+src/MTGB/appsettings.local.json
 secrets.json
 **/OAuthSecrets.cs
 **/client_secrets.json

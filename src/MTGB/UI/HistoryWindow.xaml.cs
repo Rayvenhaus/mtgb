@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MTGB.Config;
 using MTGB.Services;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +11,7 @@ namespace MTGB.UI;
 public partial class HistoryWindow : Window
 {
     private readonly INotificationManager _notificationManager;
+    private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<HistoryWindow> _logger;
 
     private string _activeFilter = "all";
@@ -21,6 +24,7 @@ public partial class HistoryWindow : Window
         ILogger<HistoryWindow> logger)
     {
         _notificationManager = notificationManager;
+        _settings = settings;
         _logger = logger;
 
         InitializeComponent();
@@ -389,6 +393,243 @@ public partial class HistoryWindow : Window
         });
 
         return panel;
+    }
+
+    // ── View toggle ───────────────────────────────────────────────
+
+    private void OnViewHistoryClick(
+        object sender, RoutedEventArgs e)
+    {
+        HistoryView.Visibility = Visibility.Visible;
+        StatsView.Visibility = Visibility.Collapsed;
+        ViewHistoryButton.Style =
+            (Style)FindResource("FilterButtonActive");
+        ViewStatsButton.Style =
+            (Style)FindResource("FilterButton");
+    }
+
+    private void OnViewStatsClick(
+        object sender, RoutedEventArgs e)
+    {
+        HistoryView.Visibility = Visibility.Collapsed;
+        StatsView.Visibility = Visibility.Visible;
+        ViewHistoryButton.Style =
+            (Style)FindResource("FilterButton");
+        ViewStatsButton.Style =
+            (Style)FindResource("FilterButtonActive");
+
+        BuildStatsView();
+    }
+
+    // ── Stats view ────────────────────────────────────────────────
+
+    private void BuildStatsView()
+    {
+        StatsPanel.Children.Clear();
+
+        var settings = _settings.Value;
+        var entries = _allEntries;
+
+        // ── Section: Telemetry status ─────────────────────────────
+        StatsPanel.Children.Add(
+            BuildStatsSectionHeader("TELEMETRY"));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Anonymous telemetry",
+            settings.Telemetry.Enabled
+                ? "Enabled"
+                : "Disabled",
+            settings.Telemetry.Enabled
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)
+                : Color.FromRgb(0x8A, 0x80, 0x78)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Install ID",
+            string.IsNullOrWhiteSpace(settings.InstallId)
+                ? "Not yet generated"
+                : $"{settings.InstallId[..8]}••••••••" +
+                  $"••••••••••••••••••••",
+            Color.FromRgb(0x8A, 0x80, 0x78)));
+
+        // ── Section: Community map ────────────────────────────────
+        StatsPanel.Children.Add(
+            BuildStatsSectionHeader("COMMUNITY MAP"));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Registration status",
+            settings.CommunityMap.Registered
+                ? $"Registered — " +
+                  $"{settings.CommunityMap.DisplayName}"
+                : "Not registered",
+            settings.CommunityMap.Registered
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)
+                : Color.FromRgb(0x8A, 0x80, 0x78)));
+
+        // ── Section: Notification history ─────────────────────────
+        StatsPanel.Children.Add(
+            BuildStatsSectionHeader("NOTIFICATION HISTORY"));
+
+        var totalEntries = entries.Count;
+        var suppressed = entries.Count(e => e.WasSuppressed);
+        var delivered = totalEntries - suppressed;
+        var critical = entries.Count(e => e.IsCritical);
+        var failures = entries.Count(e =>
+            e.EventId == "job.failed");
+        var successes = entries.Count(e =>
+            e.EventId == "job.finished");
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Total events recorded",
+            totalEntries.ToString(),
+            Color.FromRgb(0xF0, 0xC8, 0x40)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Notifications delivered",
+            delivered.ToString(),
+            Color.FromRgb(0x3B, 0xB2, 0x73)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Notifications suppressed",
+            suppressed.ToString(),
+            Color.FromRgb(0x8A, 0x80, 0x78)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Critical alerts",
+            critical.ToString(),
+            Color.FromRgb(0xE8, 0x48, 0x55)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Prints finished",
+            successes.ToString(),
+            Color.FromRgb(0x3B, 0xB2, 0x73)));
+
+        StatsPanel.Children.Add(BuildStatsRow(
+            "Prints failed",
+            failures.ToString(),
+            failures > 0
+                ? Color.FromRgb(0xE8, 0x48, 0x55)
+                : Color.FromRgb(0x8A, 0x80, 0x78)));
+
+        // ── Section: Event breakdown ──────────────────────────────
+        StatsPanel.Children.Add(
+            BuildStatsSectionHeader("EVENT BREAKDOWN"));
+
+        var eventCounts = entries
+            .Where(e => !e.WasSuppressed)
+            .GroupBy(e => e.EventDisplayName)
+            .OrderByDescending(g => g.Count())
+            .Take(10);
+
+        foreach (var group in eventCounts)
+        {
+            StatsPanel.Children.Add(BuildStatsRow(
+                group.Key,
+                group.Count().ToString(),
+                Color.FromRgb(0xC9, 0x93, 0x0E)));
+        }
+
+        if (!eventCounts.Any())
+        {
+            StatsPanel.Children.Add(new TextBlock
+            {
+                Text = "No events delivered yet. " +
+                       "The Ministry is at peace.",
+                FontFamily = new FontFamily("Courier New"),
+                FontSize = 10,
+                FontStyle = FontStyles.Italic,
+                Foreground = new SolidColorBrush(
+                    Color.FromRgb(0x8A, 0x80, 0x78)),
+                Margin = new Thickness(4, 8, 4, 4)
+            });
+        }
+
+        // ── Footer note ───────────────────────────────────────────
+        StatsPanel.Children.Add(new TextBlock
+        {
+            Text = "Statistics are derived from local " +
+                   "notification history only.\n" +
+                   "History is capped at 1000 entries.",
+            FontFamily = new FontFamily("Courier New"),
+            FontSize = 9,
+            FontStyle = FontStyles.Italic,
+            Foreground = new SolidColorBrush(
+                Color.FromRgb(0x5A, 0x52, 0x48)),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(4, 20, 4, 4)
+        });
+    }
+
+    private Border BuildStatsSectionHeader(string title)
+    {
+        return new Border
+        {
+            Padding = new Thickness(4, 16, 4, 6),
+            Child = new TextBlock
+            {
+                Text = title,
+                FontFamily = new FontFamily("Courier New"),
+                FontSize = 9,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(
+                    Color.FromRgb(0x8B, 0x65, 0x08))
+            }
+        };
+    }
+
+    private Border BuildStatsRow(
+        string label,
+        string value,
+        Color valueColour)
+    {
+        var row = new Border
+        {
+            Background = new SolidColorBrush(
+                Color.FromRgb(0x1A, 0x1A, 0x1F)),
+            BorderBrush = new SolidColorBrush(
+                Color.FromArgb(0x20, 0xC9, 0x93, 0x0E)),
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Padding = new Thickness(8, 10, 8, 10)
+        };
+
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition { Width = GridLength.Auto });
+
+        var labelText = new TextBlock
+        {
+            Text = label,
+            FontFamily = new FontFamily(
+                "Segoe UI Variable, Segoe UI"),
+            FontSize = 12,
+            Foreground = new SolidColorBrush(
+                Color.FromRgb(0xC8, 0xC0, 0xB8)),
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var valueText = new TextBlock
+        {
+            Text = value,
+            FontFamily = new FontFamily("Courier New"),
+            FontSize = 12,
+            FontWeight = FontWeights.Bold,
+            Foreground = new SolidColorBrush(valueColour),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(16, 0, 0, 0)
+        };
+
+        Grid.SetColumn(labelText, 0);
+        Grid.SetColumn(valueText, 1);
+
+        grid.Children.Add(labelText);
+        grid.Children.Add(valueText);
+        row.Child = grid;
+
+        return row;
     }
 
     // ── Filter handlers ───────────────────────────────────────────
