@@ -10,6 +10,147 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.0] — 2026-04-19
+### The one where the scribes got their quills.
+
+### Added
+
+#### Server infrastructure — community.myndworx.com
+- Apache2 VirtualHost with SSL via Let's Encrypt —
+  community.myndworx.com live and serving
+- MariaDB schema — five tables, five views, properly
+  indexed with foreign key constraints and cascade
+  deletes. The scribes have somewhere to write.
+  - installations — one row per anonymous install ID
+  - telemetry_pings — daily ping data per installation
+  - printer_types — fleet composition per ping
+  - enabled_events — enabled event types per ping
+  - install_locations — community map registrations
+  - v_active_installations — active installs last 30 days
+  - v_version_distribution — version adoption breakdown
+  - v_integration_popularity — printer type popularity
+  - v_event_popularity — which events users actually use
+  - v_map_by_country — community map by region
+- ingest.php — telemetry POST receiver with 23-hour
+  rate limiting per install ID. Boring beautiful
+  anonymous numbers, accepted gracefully.
+- register.php — community map POST and DELETE.
+  The dot arrives. The dot departs. The Ministry
+  files the appropriate forms.
+- status.php — community map GET. The dot exists,
+  or it does not. There is no middle ground.
+- config.php + config.local.php — DB connection with
+  local override pattern. Credentials never committed.
+- response.php — shared JSON response helper.
+  All API responses consistent, nothing leaks.
+- .htaccess — clean URL routing, PHP file access
+  blocked, config files blocked, [END] flag prevents
+  rewrite loop through block rules
+
+#### TelemetryService
+- Collects and POSTs the daily anonymous ping
+- Interlocked counters for poll and toast success/failure
+  — thread-safe, reset atomically on each ping
+- Snapshots printer fleet from StateDiffEngine —
+  integration type and model only, no names
+- Silently fails on network errors — never crashes MTGB
+- The scribes will try again tomorrow
+
+#### TelemetryWorker
+- BackgroundService — starts with the app
+- 5-minute startup delay before first ping
+- Hourly check cycle — actual rate limiting enforced
+  server-side at 23 hours
+- Re-checks Telemetry.Enabled on every cycle —
+  opt-out in Settings takes effect immediately
+  without requiring a restart
+
+#### CommunityMapService
+- Register, status and opt-out HTTP calls
+- Loads bundled countries.json for dropdown data
+- Persists registration state locally in AppSettings
+- Generates anonymous install ID on first use
+
+#### countries.json
+- 195 countries — full ISO 3166-1 alpha-2 coverage
+- States and territories for AU, US, CA, GB, DE,
+  IN, BR, AR, MX, JP, RU, ZA, ES, AT
+- Country-only for all others — Fiji, Singapore,
+  New Zealand etc
+- Bundled as Content asset, copied to output directory
+- Works completely offline — no API call required
+
+#### AppSettings
+- InstallId — anonymous GUID generated once on first
+  run, never tied to a person or organisation
+- CommunityMapSettings — registered flag, country code,
+  country name, state name, display name
+
+#### Induction — Screen 5 — The Registry
+- Section D — The Ministry maintains a register of
+  known installations. Participation is entirely
+  voluntary. The map is real. The dots are anonymous.
+  There is nothing to see here. Except tiny little
+  unassuming dots.
+- Country dropdown — 195 countries, alphabetical
+- State/territory dropdown — appears only when
+  country has states, hidden otherwise
+- Live confirmation text — updates as selection
+  changes. "You'll be added to the count of
+  installations in Australia, in Victoria."
+- ADD ME TO THE MAP toggle — default OFF
+- Continue with toggle OFF skips silently —
+  no data sent, no complaint filed
+- TotalScreens bumped from 5 to 6
+- Sixth brass dot added to progress indicator
+- Exit cleanup extended — community map registration
+  cleared on abandoned induction
+
+#### Settings — Privacy tab (Tab 6)
+- Anonymous telemetry toggle — synced to
+  Telemetry.Enabled, persisted on Save
+- Full transparency blurb — what the scribes record,
+  what they never record
+- Link to TELEMETRY.md — full policy in the repo
+- Community map status — live DB poll on tab open
+  - Amber dot while checking
+  - Green dot when registered, shows display name
+  - Grey dot when not registered
+- Opt out button — visible when registered
+  - Processing... state while request fires
+  - Confirms removal, switches to opt-in view
+- Opt in panel — visible when not registered
+  - Inline chained dropdowns — same as Induction
+  - Live confirmation text
+  - Add me to the map button
+- Refresh button — re-polls DB on demand
+
+### Changed
+
+#### PollingWorker
+- Telemetry counters wired up — RecordPollSuccess
+  called after successful poll, RecordPollFailure
+  called in HandleFailure
+
+#### NotificationManager
+- Telemetry counters wired up — RecordToastSuccess
+  called after successful delivery, RecordToastFailure
+  called in catch block
+
+### Technical notes
+- Version bumped to 0.4.0 — telemetry and community
+  map complete
+- community.myndworx.com subdomain live with SSL
+- Server stack: Apache2 / MariaDB / PHP 8.5.5
+- All server endpoints validated with curl
+- Rate limiting enforced server-side — client fires
+  hourly, server accepts once per 23 hours
+- No llamas were harmed in the construction of
+  this telemetry system
+- The scribes are grateful
+
+---
+
 ## [0.3.0] — 2026-04-19
 ### The one where the Ministry opens its doors for the first time.
 
@@ -519,7 +660,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...HEAD
+[0.4.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.18...v0.3.0
 [0.2.18]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.17...v0.2.18
 [0.2.14]: https://github.com/rayvenhaus/mtgb/compare/v0.2.13...v0.2.14
