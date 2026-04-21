@@ -1,0 +1,67 @@
+<Package
+	xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+	xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+	xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+	xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+	IgnorableNamespaces="uap rescap desktop">
+
+<Identity
+	Name="MyndworxAsylum.MTGB"
+	Publisher="CN=Myndworx Asylum"
+	Version="0.4.1.0"
+	ProcessorArchitecture="x64"/>
+
+<Properties>
+	<DisplayName>MTGB — The Monitor That Goes Bing</DisplayName>
+	<PublisherDisplayName>Myndworx Asylum</PublisherDisplayName>
+	<Logo>Assets\MTGB_50x50.png</Logo>
+	<Description>Never leave a print behind. MTGB watches your SimplyPrint 3D printers from the Windows system tray and notifies you when things happen.</Description>
+</Properties>
+
+<Dependencies>
+	<TargetDeviceFamily
+		Name="Windows.Desktop"
+		MinVersion="10.0.17763.0"
+		MaxVersionTested="10.0.22621.0"/>
+</Dependencies>
+
+<Resources>
+	<Resource Language="en-AU"/>
+	<Resource Language="en-US"/>
+	<Resource Language="en-GB"/>
+</Resources>
+
+<Applications>
+	<Application
+		Id="MTGB"
+		Executable="MTGB.exe"
+		EntryPoint="Windows.FullTrustApplication">
+		
+		<uap:VisualElements
+			DisplayName="MTGB — The Monitor That Goes Bing"
+			Description="Never leave a print behind."
+			BackgroundColor="transparent"
+			Square150x150Logo="Assets\MTGB_150x150.png"
+			Square44x44Logo="Assets\MTGB_44x44.png">
+			<uap:DefaultTile
+				Wide310x150Logo="Assets\MTGB_310x150.png"
+				Square71x71Logo="Assets\MTGB_71x71.png"
+				Square310x310Logo="Assets\MTGB_310x310.png"
+				ShortName="MTGB"/>
+			
+			<uap:SplashScreen Image="Assets\MTGB_620x300.png"/>
+		</uap:VisualElements>
+		
+		<Extensions>
+			<desktop:Extension Category="windows.startupTask"
+							   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10">
+				<desktop:StartupTask
+					TaskId="MTGBStartupTask"
+					Enabled="false"
+					DisplayName="MTGB — The Monitor That Goes Bing"/>
+			</desktop:Extension>
+		</Extensions>
+	</Application>
+</Applications>
+	<Capabilities/>
+</Package>

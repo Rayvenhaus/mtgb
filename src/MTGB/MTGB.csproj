@@ -6,7 +6,7 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
@@ -17,20 +17,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <StartupObject>MTGB.Program</StartupObject>
-    <Title>The Machine That Goes Bing</Title>
+    <Title>The Monitor That Goes Bing</Title>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Rayvenhaus/mtgb</RepositoryUrl>
-    <PackageProjectUrl>https://www.myndworx.com/fabrication-facility/index.html</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://www.myndworx.com/fabrication-facility/mtgb/</PackageProjectUrl>
     <PackageTags>notification;monitor;tray;windows;desktop;simplyprint;3d-printing;print-farm;filament;wpf;dotnet;csharp;windows10;windows11;open-source;community</PackageTags>
     <NeutralLanguage>en-AU</NeutralLanguage>
     <Company>Myndworx Asylum</Company>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Assets\countries.json" />
-    <None Remove="Assets\mtgb.ico" />
-    <None Remove="UI\MTGB_32.png" />
-  </ItemGroup>
 
   <!-- ── NuGet Packages ──────────────────────────────────────── -->
   <ItemGroup>
@@ -54,16 +48,23 @@
   <ItemGroup>
     <Resource Include="Assets\MTGB_16.png" />
     <Resource Include="Assets\MTGB_32.png" />
+    <Resource Include="Assets\MTGB_44x44.png" />
     <Resource Include="Assets\MTGB_48.png" />
+	<Resource Include="Assets\MTGB_50x50.png" />
+	<Resource Include="Assets\MTGB_71x71.png" />
+    <Resource Include="Assets\MTGB_128.png" />
+	<Resource Include="Assets\MTGB_150x150.png" />
+	<Resource Include="Assets\MTGB_256.png" />
+	<Resource Include="Assets\MTGB_310x150.png" />
+	<Resource Include="Assets\MTGB_310x310.png" />
+	<Resource Include="Assets\MTGB_620x300.png" />
+	<Resource Include="Assets\MTGB_1024.png" />
     <Content Include="Assets\countries.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\mtgb.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\MTGB_128.png" />
-    <Resource Include="Assets\MTGB_256.png" />
-    <Resource Include="UI\MTGB_32.png" />
   </ItemGroup>
 
   <!-- ── Copy to output ─────────────────────────────────────── -->
@@ -79,6 +80,21 @@
   <!-- ── WPF entry point ────────────────────────────────────── -->
   <ItemGroup>
     <Page Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+
+  <!-- ── MSIX packaging ──────────────────────────────────────── -->
+  <PropertyGroup>
+	<AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+	<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<AppxManifest Include="Package.appxmanifest">
+	  <SubType>Designer</SubType>
+	</AppxManifest>
   </ItemGroup>
 
 </Project>

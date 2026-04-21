@@ -21,6 +21,7 @@ public partial class HistoryWindow : Window
 
     public HistoryWindow(
         INotificationManager notificationManager,
+        IOptions<AppSettings> settings,
         ILogger<HistoryWindow> logger)
     {
         _notificationManager = notificationManager;

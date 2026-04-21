@@ -10,6 +10,63 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.0] — 2026-04-21
+### The one where MTGB learned to pack its bags.
+
+### Added
+
+#### MSIX packaging
+- Package.appxmanifest — Windows 10/11 MSIX package manifest
+  - Identity: MyndworxAsylum.MTGB
+  - Minimum Windows version: 10.0.17763.0 (Windows 10 1809)
+  - Full trust application entry point
+  - Startup task extension — integrates with Windows
+    startup apps settings panel
+  - All required tile sizes declared
+- MSIX publish profile — self-contained win-x64 build,
+  ReadyToRun enabled, no trimming
+- Portable publish profile — same build config,
+  flat directory output for ZIP distribution
+
+#### MSIX tile assets
+- Seven tile sizes generated from MTGB_1024.png source
+  - 44×44 — app list
+  - 50×50 — package logo
+  - 71×71 — small tile
+  - 150×150 — medium tile
+  - 310×150 — wide tile — logo left, M·T·G·B title right
+  - 310×310 — large tile
+  - 620×300 — splash screen
+- Art Deco aesthetic throughout — dark #0D0D0F background,
+  brass #C9930E border, logo centred with padding
+- assets.ps1 — PowerShell generation script included
+  in repo root for future asset regeneration
+
+#### Distribution pipeline — package.ps1
+- Single script produces both MSIX and portable ZIP
+- Accepts version, signing, and certificate parameters
+- Cleans dist\ directory before each run
+- Writes versioned manifest into publish output
+- Runs MakeAppx.exe from Windows SDK 10.0.22621
+- Signing step ready — wired when SignPath approves
+- Output naming: MTGB-{version}-x64.msix
+                 MTGB-{version}-x64-portable.zip
+- The Ministry has packaged MTGB.
+  No llamas were harmed in the process.
+
+### Technical notes
+- Version bumped to 0.5.0 — Phase 7 distribution in progress
+- Windows SDK 10.0.22621 required for MakeAppx.exe
+- .NET 8.0.420 SDK installed alongside .NET 10.0.202
+- Both SDKs coexist — MTGB targets net8.0-windows10.0.19041.0
+- SignPath.io open source application submitted —
+  approval pending
+- Auto-update service and GitHub Actions pipeline
+  remaining Phase 7 items
+- First distributable build: 87.8 MB MSIX, 89.4 MB ZIP
+
+---
+
 ## [0.4.1] — 2026-04-19
 ### The one where the Ministry learned to count.
 
@@ -705,7 +762,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-
+[0.5.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.18...v0.3.0

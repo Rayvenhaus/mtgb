@@ -7,8 +7,6 @@ using MTGB.Services;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
