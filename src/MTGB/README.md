@@ -3,7 +3,7 @@
 > *It monitors your prints. It goes Bing. Never leave a print behind.*
 
 A Windows 10/11 system tray notification app for [SimplyPrint](https://simplyprint.io).  
-Because No ONE expects a Notification App.
+Because No ONE expects a Notification App. Or a Spanish Inquisition.
 
 ---
 

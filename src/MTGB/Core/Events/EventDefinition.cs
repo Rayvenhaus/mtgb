@@ -225,6 +225,18 @@ public static class EventRegistry
             Category = "Filament",
             IsCritical = true,
             EnabledByDefault = true
+        },
+
+        // ── System events (internal) ──────────────────────────────────
+        new()
+        {
+            Id = "update.available",
+            DisplayName = "Update available",
+            Description = "Fires when a new version of MTGB is available.",
+            Source = EventSource.Polling,
+            Category = "System",
+            IsCritical = false,
+            EnabledByDefault = true
         }
     };
 
@@ -245,4 +257,5 @@ public static class EventRegistry
     /// </summary>
     public static IEnumerable<string> Categories =>
         All.Select(e => e.Category).Distinct();
+
 }

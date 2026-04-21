@@ -346,6 +346,7 @@ public class NotificationManager : INotificationManager, IDisposable
             "progress.75" => $"{evt.PrinterName} — 75% complete",
             "temp.nozzle.low" => $"{evt.PrinterName} — Nozzle temp alert",
             "temp.bed.low" => $"{evt.PrinterName} — Bed temp alert",
+            "update.available" => $"MTGB update available",
             _ => $"{evt.PrinterName} — {displayName}"
         };
     }
@@ -466,6 +467,8 @@ public class NotificationManager : INotificationManager, IDisposable
                                  "Much like our confidence.",
             "temp.bed.low" => "Bed temperature dropping. " +
                                  "Tuck it in. Put the kettle on.",
+            "update.available" => $"Version {evt.JobFilename} is ready to install. " +
+                                    "Click Update to download and install now.",
             _ => null
         };
 
@@ -510,6 +513,13 @@ public class NotificationManager : INotificationManager, IDisposable
                         .AddArgument("action", "cancel")
                         .AddArgument("printerId",
                             evt.PrinterId.ToString()));
+                break;
+
+            case "update.available":
+                builder.AddButton(new ToastButton()
+                    .SetContent("Update")
+                    .AddArgument("action", "update")
+                    .AddArgument("version", evt.JobFilename));
                 break;
         }
     }

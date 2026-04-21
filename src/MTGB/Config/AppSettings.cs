@@ -74,6 +74,11 @@ public class AppSettings
     /// The scribes are patient.
     /// </summary>
     public TelemetrySettings Telemetry { get; set; } = new();
+
+    /// <summary>
+    /// Update check settings.
+    /// </summary>
+    public UpdateSettings Update { get; set; } = new();
 }
 
 public enum AuthMode
@@ -246,4 +251,19 @@ public class CommunityMapSettings
     /// e.g. "Victoria, Australia" or "Fiji"
     /// </summary>
     public string? DisplayName { get; set; }
+}
+
+public class UpdateSettings
+{
+    /// <summary>
+    /// When the last update check was performed.
+    /// Null if never checked.
+    /// </summary>
+    public DateTimeOffset? LastChecked { get; set; }
+
+    /// <summary>
+    /// The last version we notified the user about.
+    /// Prevents repeated toasts for the same version.
+    /// </summary>
+    public string? LastNotifiedVersion { get; set; }
 }

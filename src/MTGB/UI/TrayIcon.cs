@@ -15,10 +15,10 @@ namespace MTGB.UI;
 
 /// <summary>
 /// MTGB System Tray Icon.
-/// 
+///
 /// Left click  → Flyout panel slides up from taskbar.
 /// Right click → Minimal context menu (Mute, Settings, Exit).
-/// 
+///
 /// Owns the NotifyIcon lifetime, routes toast actions to the API,
 /// and keeps the tray icon state in sync with the printer farm.
 /// </summary>
@@ -28,6 +28,7 @@ public class TrayIcon : IDisposable
     private readonly ISimplyPrintApiClient _apiClient;
     private readonly INotificationManager _notificationManager;
     private readonly IStateDiffEngine _diffEngine;
+    private readonly IUpdateService _updateService;
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<TrayIcon> _logger;
 
@@ -39,12 +40,9 @@ public class TrayIcon : IDisposable
 
     // Icon states — each maps to a different .ico file
     // reflecting overall farm status at a glance
-    private static readonly string IconIdle =
-        "Assets/mtgb.ico";
-    private static readonly string IconPrinting =
-        "Assets/mtgb.ico";
-    private static readonly string IconAlert =
-        "Assets/mtgb.ico";
+    private static readonly string IconIdle = "Assets/mtgb.ico";
+    private static readonly string IconPrinting = "Assets/mtgb.ico";
+    private static readonly string IconAlert = "Assets/mtgb.ico";
 
     // Cache of flavour text per printer — keyed by printerId
     // Value is (state when picked, flavour text)
@@ -52,8 +50,6 @@ public class TrayIcon : IDisposable
         _flavourCache = new();
 
     // ── Flavour text pools ────────────────────────────────────────
-    // These mirror the NotificationManager pools —
-    // same voice, same energy, in the tray hover tooltips
 
     private static readonly string[] IdleFlavour =
     {
@@ -117,6 +113,7 @@ public class TrayIcon : IDisposable
         ISimplyPrintApiClient apiClient,
         INotificationManager notificationManager,
         IStateDiffEngine diffEngine,
+        IUpdateService updateService,
         IOptions<AppSettings> settings,
         ILogger<TrayIcon> logger)
     {
@@ -124,6 +121,7 @@ public class TrayIcon : IDisposable
         _apiClient = apiClient;
         _notificationManager = notificationManager;
         _diffEngine = diffEngine;
+        _updateService = updateService;
         _settings = settings;
         _logger = logger;
     }
@@ -159,27 +157,18 @@ public class TrayIcon : IDisposable
 
     // ── Icon state loop ───────────────────────────────────────────
 
-    /// <summary>
-    /// Periodically updates the tray icon and tooltip
-    /// to reflect the current farm state.
-    /// Runs on a background thread, updates UI on dispatcher.
-    /// </summary>
     private async Task StartIconStateLoopAsync()
     {
         while (!_disposed)
         {
             try
             {
-                await Task.Delay(
-                    TimeSpan.FromSeconds(5));
-
-                Application.Current?.Dispatcher.Invoke(
-                    UpdateIconState);
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                Application.Current?.Dispatcher.Invoke(UpdateIconState);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex,
-                    "Icon state loop error.");
+                _logger.LogWarning(ex, "Icon state loop error.");
             }
         }
     }
@@ -211,8 +200,7 @@ public class TrayIcon : IDisposable
             s.State.Equals("printing",
                 StringComparison.OrdinalIgnoreCase));
 
-        var offlineCount = snapshots.Values.Count(s =>
-            !s.Online);
+        var offlineCount = snapshots.Values.Count(s => !s.Online);
 
         if (hasAlert)
         {
@@ -294,10 +282,8 @@ public class TrayIcon : IDisposable
 
         if (_flyout is null)
         {
-            _flyout = _services
-                .GetRequiredService<FlyoutWindow>();
+            _flyout = _services.GetRequiredService<FlyoutWindow>();
 
-            // Wire flyout button callbacks
             _flyout.SetCallbacks(
                 onHistory: () => OpenHistory(),
                 onSettings: () => OpenSettings(),
@@ -305,8 +291,7 @@ public class TrayIcon : IDisposable
                 onExit: () => ExitApplication());
         }
 
-        _flyout.RefreshPrinterCards(
-            _diffEngine.GetAllSnapshots());
+        _flyout.RefreshPrinterCards(_diffEngine.GetAllSnapshots());
         _flyout.SlideUp();
     }
 
@@ -324,36 +309,20 @@ public class TrayIcon : IDisposable
         };
 
         menu.Items.Add(BuildMenuItem(
-            "MTGB — The Ministry",
-            null,
-            isHeader: true));
-
+            "MTGB — The Ministry", null, isHeader: true));
         menu.Items.Add(new Separator());
-
         menu.Items.Add(BuildMenuItem(
-            "Open Dashboard",
-            () => OpenSimplyPrintDashboard()));
-
+            "Open Dashboard", () => OpenSimplyPrintDashboard()));
         menu.Items.Add(BuildMenuItem(
-            "Notification History",
-            () => OpenHistory()));
-
+            "Notification History", () => OpenHistory()));
         menu.Items.Add(BuildMenuItem(
-            "Settings",
-            () => OpenSettings()));
-
+            "Settings", () => OpenSettings()));
         menu.Items.Add(new Separator());
-
         menu.Items.Add(BuildMenuItem(
-            "Toggle Mute",
-            () => ToggleMute()));
-
+            "Toggle Mute", () => ToggleMute()));
         menu.Items.Add(new Separator());
-
         menu.Items.Add(BuildMenuItem(
-            "Exit",
-            () => ExitApplication(),
-            isDanger: true));
+            "Exit", () => ExitApplication(), isDanger: true));
 
         return menu;
     }
@@ -382,17 +351,13 @@ public class TrayIcon : IDisposable
             Header = header,
             IsEnabled = !isHeader,
             Foreground = isHeader
-                ? new SolidColorBrush(
-                    Color.FromRgb(0xF0, 0xC8, 0x40))
+                ? new SolidColorBrush(Color.FromRgb(0xF0, 0xC8, 0x40))
                 : isDanger
-                    ? new SolidColorBrush(
-                        Color.FromRgb(0xE8, 0x48, 0x55))
-                    : new SolidColorBrush(
-                        Color.FromRgb(0xF0, 0xED, 0xE8)),
+                    ? new SolidColorBrush(Color.FromRgb(0xE8, 0x48, 0x55))
+                    : new SolidColorBrush(Color.FromRgb(0xF0, 0xED, 0xE8)),
             Background = new SolidColorBrush(
                 Color.FromRgb(0x14, 0x14, 0x17)),
-            FontFamily = new FontFamily(
-                "Segoe UI Variable, Segoe UI"),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
             FontSize = 12
         };
 
@@ -408,7 +373,7 @@ public class TrayIcon : IDisposable
     {
         var orgId = _settings.Value.OrganisationId;
         var url = orgId > 0
-            ? $"https://simplyprint.io/panel/printers"
+            ? "https://simplyprint.io/panel/printers"
             : "https://simplyprint.io/panel";
 
         System.Diagnostics.Process.Start(
@@ -421,25 +386,21 @@ public class TrayIcon : IDisposable
 
     private void OpenHistory()
     {
-        var history = _services
-            .GetRequiredService<HistoryWindow>();
+        var history = _services.GetRequiredService<HistoryWindow>();
         history.Show();
         history.Activate();
     }
 
     private void OpenSettings()
     {
-        var settings = _services
-            .GetRequiredService<SettingsWindow>();
+        var settings = _services.GetRequiredService<SettingsWindow>();
         settings.Show();
         settings.Activate();
     }
 
     private void ToggleMute()
     {
-        var current = _settings.Value
-            .Notifications.GlobalMuteEnabled;
-
+        var current = _settings.Value.Notifications.GlobalMuteEnabled;
         _settings.Value.Notifications.GlobalMuteEnabled = !current;
 
         var state = !current ? "enabled" : "disabled";
@@ -452,7 +413,6 @@ public class TrayIcon : IDisposable
         _logger.LogInformation(
             "Global mute {State} via tray menu.", state);
 
-        // Persist mute state so it survives restarts
         SaveSettings();
     }
 
@@ -520,12 +480,10 @@ public class TrayIcon : IDisposable
     {
         var success = e.Action switch
         {
-            "pause" => await _apiClient
-                .PausePrintAsync(e.PrinterId),
-            "resume" => await _apiClient
-                .ResumePrintAsync(e.PrinterId),
-            "cancel" => await _apiClient
-                .CancelPrintAsync(e.PrinterId),
+            "pause" => await _apiClient.PausePrintAsync(e.PrinterId),
+            "resume" => await _apiClient.ResumePrintAsync(e.PrinterId),
+            "cancel" => await _apiClient.CancelPrintAsync(e.PrinterId),
+            "update" => await HandleUpdateActionAsync(),
             _ => false
         };
 
@@ -540,15 +498,38 @@ public class TrayIcon : IDisposable
         }
     }
 
+    // ── Update action ─────────────────────────────────────────────
+
+    private async Task<bool> HandleUpdateActionAsync()
+    {
+        var release = _updateService.GetCachedRelease();
+
+        if (release is null)
+        {
+            _logger.LogWarning(
+                "Update toast action fired but no " +
+                "cached release found. " +
+                "The Ministry is confused.");
+            return false;
+        }
+
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var window = new UpdateWindow(
+                _updateService,
+                release,
+                _services.GetRequiredService<ILogger<UpdateWindow>>());
+
+            window.ShowDialog();
+        });
+
+        return true;
+    }
+
     // ── Flavour text for printer cards ────────────────────────────
 
-    /// <summary>
-    /// Returns contextual flavour text for a printer's current state.
-    /// Used by FlyoutWindow for hover tooltips on printer cards.
-    /// </summary>
     public string GetFlavourText(PrinterSnapshot snapshot)
     {
-        // Check cache — if state hasn't changed, return cached text
         if (_flavourCache.TryGetValue(
             snapshot.PrinterId, out var cached) &&
             cached.state == snapshot.State &&
@@ -557,7 +538,6 @@ public class TrayIcon : IDisposable
             return cached.text;
         }
 
-        // State changed or not cached — pick a new one
         var text = PickFlavourText(snapshot);
         _flavourCache[snapshot.PrinterId] =
             (snapshot.Online ? snapshot.State : "offline", text);
@@ -585,12 +565,9 @@ public class TrayIcon : IDisposable
                         "Three quarters of the anxiety remains.",
                     _ => Pick(PrintingFlavour)
                 },
-            "paused" or "pausing" =>
-                Pick(PausedFlavour),
-            "error" or "printer_error" =>
-                Pick(FailedFlavour),
-            "idle" or "operational" =>
-                Pick(IdleFlavour),
+            "paused" or "pausing" => Pick(PausedFlavour),
+            "error" or "printer_error" => Pick(FailedFlavour),
+            "idle" or "operational" => Pick(IdleFlavour),
             _ => Pick(IdleFlavour)
         };
     }
@@ -605,7 +582,6 @@ public class TrayIcon : IDisposable
         _taskbarIcon?.Dispose();
         _flyout?.Close();
 
-        _logger.LogInformation(
-            "Tray icon disposed. Goodbye.");
+        _logger.LogInformation("Tray icon disposed. Goodbye.");
     }
 }

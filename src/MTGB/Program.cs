@@ -132,6 +132,7 @@ internal class Program
             services.AddTransient<FlyoutWindow>();
             services.AddTransient<SettingsWindow>();
             services.AddTransient<HistoryWindow>();
+            services.AddTransient<UpdateWindow>();
             services.AddSingleton<TrayIcon>();
 
             // ── Community Map ─────────────────────────────
@@ -160,6 +161,22 @@ internal class Program
                 });
 
             services.AddHostedService<TelemetryWorker>();
+
+            // ── Update Service ────────────────────────────
+            services.AddHttpClient<IUpdateService, UpdateService>(
+                (provider, client) =>
+                {
+                    client.BaseAddress = new Uri(
+                        "https://community.myndworx.com/");
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    client.DefaultRequestHeaders.Add(
+                        "User-Agent",
+                        $"MTGB/{typeof(App).Assembly.GetName()
+                            .Version?.ToString(3)} " +
+                        "(https://github.com/Rayvenhaus/mtgb)");
+                });
+
+            services.AddHostedService<UpdateWorker>();
         })
         .Build();
 }

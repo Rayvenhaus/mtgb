@@ -10,6 +10,61 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.1] — 2026-04-21
+### The one where MTGB learned to update itself.
+
+### Added
+
+#### Auto-update service
+- UpdateService — checks community.myndworx.com/mtgb/v1/release/latest
+  on startup and every 72 hours during non-quiet hours.
+  Never touches GitHub directly — the community endpoint owns
+  the release data. Scales to any number of installs without
+  rate limit concerns. Silent failure on all network errors.
+  The Ministry handles its own distribution.
+- UpdateWorker — BackgroundService with 2 minute startup delay.
+  Re-checks opt-in status and quiet hours on every cycle.
+  Caches release info so the toast action never makes a
+  redundant network call.
+- UpdateWindow — modal update dialog with Art Deco brass aesthetic
+  matching the rest of the MTGB UI.
+  Shows available version, current version, and release notes.
+  Progress bar updates during MSIX download.
+  OK TO INSTALL button disabled until download completes —
+  the user may read everything or nothing, their choice.
+  LATER button defers without installing.
+  On install — MSIX launches, MTGB exits immediately.
+  The Ministry applies updates without drama.
+
+#### Server — release endpoint
+- release_info table in mtgb_community DB —
+  version, release_date, msix_url, zip_url,
+  release_notes, is_current flag.
+  One active row at a time. Historical rows retained.
+  To ship a new release — insert a new row.
+  The endpoint handles the rest.
+- GET /mtgb/v1/release/latest — returns current release info.
+  Seeded with v0.5.0 placeholder pending first public release.
+
+#### AppSettings
+- UpdateSettings — LastChecked timestamp and
+  LastNotifiedVersion string. Persisted to appsettings.json.
+  Prevents duplicate toasts for the same version across restarts.
+
+#### EventRegistry
+- update.available — System category, not critical,
+  enabled by default. Fires when a newer version is found.
+
+### Technical notes
+- Version bumped to 0.5.1
+- UpdateWindow constructed directly — not registered in DI.
+  ILogger resolved from service provider at construction time.
+- MTGB exits immediately on install confirmation —
+  the MSIX installer handles the rest silently.
+- No llamas were updated in the testing of this feature.
+
+---
+
 ## [0.5.0] — 2026-04-21
 ### The one where MTGB learned to pack its bags.
 
@@ -762,6 +817,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+[0.5.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...v0.4.0
@@ -782,4 +838,3 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [0.2.2]: https://github.com/rayvenhaus/mtgb/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/rayvenhaus/mtgb/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rayvenhaus/mtgb/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/rayvenhaus/mtgb/releases/tag/v0.1.0
