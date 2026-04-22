@@ -107,14 +107,11 @@ jobs:
       - name: Rename assets
         shell: pwsh
         run: |
-          $v = "${{ steps.version.outputs.VERSION_FULL }}"
-          $msix = "dist\MTGB-$v-x64.msix"
-          $zip  = "dist\MTGB-$v-x64-portable.zip"
-
-          # Rename to clean version tag format for GitHub release
+          $v   = "${{ steps.version.outputs.VERSION_FULL }}"
           $tag = "${{ steps.version.outputs.TAG }}"
-          Rename-Item $msix "dist\MTGB-$tag-x64.msix"
-          Rename-Item $zip  "dist\MTGB-$tag-x64-portable.zip"
+
+          Rename-Item "dist\MTGB-$v-x64.msix"         "MTGB-$tag-x64.msix"
+          Rename-Item "dist\MTGB-$v-x64-portable.zip" "MTGB-$tag-x64-portable.zip"
 
           Write-Host "Assets renamed."
           dir dist\
