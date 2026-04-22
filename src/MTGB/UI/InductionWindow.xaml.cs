@@ -7,6 +7,7 @@ using MTGB.Services;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -15,9 +16,9 @@ namespace MTGB.UI;
 
 /// <summary>
 /// MTGB Induction — Form MwA 621d/7 22.
-/// The Ministry of Printer Observation & Void Containment welcomes you.
+/// The Ministry of Printer Observation &amp; Void Containment welcomes you.
 /// We are here to help.
-/// We have forms. In triplicate
+/// We have forms. In triplicate.
 /// </summary>
 public partial class InductionWindow : Window
 {
@@ -29,7 +30,7 @@ public partial class InductionWindow : Window
     private readonly ICommunityMapService _communityMap;
 
     private int _currentScreen = 1;
-    private const int TotalScreens = 6;
+    private const int TotalScreens = 7;
     private bool _connectionVerified = false;
 
     private List<CountryData> _countries = new();
@@ -64,11 +65,8 @@ public partial class InductionWindow : Window
         DwmSetWindowAttribute(hwnd, 20,
             ref darkMode, sizeof(int));
 
-        // Wire field validation
-        OrgIdInput.TextChanged += (_, _) =>
-            UpdateTestConnectionButton();
-        ApiKeyInput.PasswordChanged += (_, _) =>
-            UpdateTestConnectionButton();
+        OrgIdInput.TextChanged += (_, _) => UpdateTestConnectionButton();
+        ApiKeyInput.PasswordChanged += (_, _) => UpdateTestConnectionButton();
 
         LoadCountries();
         UpdateScreen();
@@ -89,23 +87,19 @@ public partial class InductionWindow : Window
 
     private void UpdateTestConnectionButton()
     {
-        var orgIdFilled = !string.IsNullOrWhiteSpace(
-            OrgIdInput.Text);
+        var orgIdFilled = !string.IsNullOrWhiteSpace(OrgIdInput.Text);
         var apiKeyFilled = ApiKeyInput.SecurePassword.Length > 0;
         var bothFilled = orgIdFilled && apiKeyFilled;
 
         TestConnectionButton.IsEnabled = bothFilled;
 
-        // Colour the button to signal readiness
-        TestConnectionButton.Foreground =
-            new SolidColorBrush(bothFilled
-                ? Color.FromRgb(0xC9, 0x93, 0x0E) // Brass — ready
-                : Color.FromRgb(0x5A, 0x52, 0x48)); // Dim — not ready
+        TestConnectionButton.Foreground = new SolidColorBrush(bothFilled
+            ? Color.FromRgb(0xC9, 0x93, 0x0E)
+            : Color.FromRgb(0x5A, 0x52, 0x48));
 
-        TestConnectionButton.BorderBrush =
-            new SolidColorBrush(bothFilled
-                ? Color.FromRgb(0xC9, 0x93, 0x0E) // Brass — ready
-                : Color.FromRgb(0x3A, 0x30, 0x28)); // Dim — not ready
+        TestConnectionButton.BorderBrush = new SolidColorBrush(bothFilled
+            ? Color.FromRgb(0xC9, 0x93, 0x0E)
+            : Color.FromRgb(0x3A, 0x30, 0x28));
     }
 
     // ── Navigation ────────────────────────────────────────────
@@ -129,8 +123,7 @@ public partial class InductionWindow : Window
 
         if (_currentScreen == 3)
         {
-            var startWithWindows =
-                StartupToggle.IsChecked == true;
+            var startWithWindows = StartupToggle.IsChecked == true;
             _settings.Value.Ui.StartWithWindows = startWithWindows;
             SetWindowsStartup(startWithWindows);
         }
@@ -141,10 +134,17 @@ public partial class InductionWindow : Window
                 TelemetryToggle.IsChecked == true;
         }
 
-        // Screen 5 — community map registration
         if (_currentScreen == 5)
         {
             await HandleRegistryScreenAsync();
+        }
+
+        // Moving to Screen 6 — generate install ID and
+        // populate the summary screen
+        if (_currentScreen == 5)
+        {
+            _settings.Value.GetOrCreateInstallId();
+            PopulateSummaryScreen();
         }
 
         _currentScreen++;
@@ -175,38 +175,20 @@ public partial class InductionWindow : Window
         _logger.LogInformation(
             "User exited Induction — cleaning up and shutting down.");
 
-        // ── Clean up everything set during induction ──────────────
-
-        // Remove startup registry entry if it was set on Screen 3
         SetWindowsStartup(false);
-
-        // Clear org ID — connection was not confirmed to completion
         _settings.Value.OrganisationId = 0;
-
-        // Clear telemetry preference — consent was not completed
         _settings.Value.Telemetry.Enabled = false;
+        _settings.Value.InstallId = string.Empty;
 
-        // Clear credentials if a connection was tested on Screen 2
-        // The user did not complete the induction so we treat it
-        // as unconsented storage
         if (_credentials.Exists(CredentialKey.ApiKey))
             _credentials.Delete(CredentialKey.ApiKey);
-
-        // Clear webhook secret — will be regenerated on next induction
         if (_credentials.Exists(CredentialKey.WebhookSecret))
             _credentials.Delete(CredentialKey.WebhookSecret);
-
-        // Clear OAuth tokens if any were stored during Screen 2
         if (_credentials.Exists(CredentialKey.OAuthAccessToken))
             _credentials.Delete(CredentialKey.OAuthAccessToken);
-
         if (_credentials.Exists(CredentialKey.OAuthRefreshToken))
             _credentials.Delete(CredentialKey.OAuthRefreshToken);
 
-        // Inducted remains false — next launch starts fresh
-        // Do NOT save settings — leave appsettings.json clean
-
-        // Clear community map registration if set on Screen 5
         _settings.Value.CommunityMap.Registered = false;
         _settings.Value.CommunityMap.CountryCode = null;
         _settings.Value.CommunityMap.CountryName = null;
@@ -237,6 +219,8 @@ public partial class InductionWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         Screen6.Visibility = _currentScreen == 6
             ? Visibility.Visible : Visibility.Collapsed;
+        Screen7.Visibility = _currentScreen == 7
+            ? Visibility.Visible : Visibility.Collapsed;
 
         UpdateDots();
 
@@ -257,8 +241,8 @@ public partial class InductionWindow : Window
     {
         var dots = new[]
         {
-        Dot1, Dot2, Dot3, Dot4, Dot5, Dot6
-    };
+            Dot1, Dot2, Dot3, Dot4, Dot5, Dot6, Dot7
+        };
 
         for (int i = 0; i < dots.Length; i++)
         {
@@ -269,6 +253,45 @@ public partial class InductionWindow : Window
                         ? Color.FromRgb(0x8B, 0x65, 0x08)
                         : Color.FromRgb(0x3A, 0x30, 0x28));
         }
+    }
+
+    // ── Summary screen ────────────────────────────────────────
+
+    private void PopulateSummaryScreen()
+    {
+        var s = _settings.Value;
+
+        // Connection
+        SummaryOrgId.Text = s.OrganisationId.ToString();
+        SummaryAuthMode.Text = s.AuthMode.ToString();
+
+        // Standing Orders
+        SummaryStartWithWindows.Text =
+            s.Ui.StartWithWindows ? "Enabled" : "Disabled";
+        SummaryStartWithWindows.Foreground = new SolidColorBrush(
+            s.Ui.StartWithWindows
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)
+                : Color.FromRgb(0x8A, 0x80, 0x78));
+
+        // Telemetry
+        SummaryTelemetry.Text =
+            s.Telemetry.Enabled ? "Enabled" : "Disabled";
+        SummaryTelemetry.Foreground = new SolidColorBrush(
+            s.Telemetry.Enabled
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)
+                : Color.FromRgb(0x8A, 0x80, 0x78));
+
+        // Community map
+        SummaryCommunityMap.Text = s.CommunityMap.Registered
+            ? $"Registered — {s.CommunityMap.DisplayName}"
+            : "Not registered";
+        SummaryCommunityMap.Foreground = new SolidColorBrush(
+            s.CommunityMap.Registered
+                ? Color.FromRgb(0x3B, 0xB2, 0x73)
+                : Color.FromRgb(0x8A, 0x80, 0x78));
+
+        // Install ID
+        SummaryInstallId.Text = s.InstallId;
     }
 
     // ── Connection test ───────────────────────────────────────
@@ -366,15 +389,12 @@ public partial class InductionWindow : Window
         ConnectionStatusText.Foreground = new SolidColorBrush(colour);
         ConnectionStatusText.Text = message;
 
-        // Update button colour to reflect result
-        TestConnectionButton.Foreground =
-            new SolidColorBrush(colour);
-        TestConnectionButton.BorderBrush =
-            new SolidColorBrush(isSuccess
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)  // Green — success
-                : isError
-                    ? Color.FromRgb(0xE8, 0x48, 0x55)  // Red — failure
-                    : Color.FromRgb(0xC9, 0x93, 0x0E)); // Brass — pending
+        TestConnectionButton.Foreground = new SolidColorBrush(colour);
+        TestConnectionButton.BorderBrush = new SolidColorBrush(isSuccess
+            ? Color.FromRgb(0x3B, 0xB2, 0x73)
+            : isError
+                ? Color.FromRgb(0xE8, 0x48, 0x55)
+                : Color.FromRgb(0xC9, 0x93, 0x0E));
     }
 
     // ── Completion ────────────────────────────────────────────
@@ -396,8 +416,7 @@ public partial class InductionWindow : Window
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                "Failed to complete induction.");
+            _logger.LogError(ex, "Failed to complete induction.");
             MessageBox.Show(
                 "Something went wrong saving your settings.\n\n" +
                 ex.Message,
@@ -420,10 +439,7 @@ public partial class InductionWindow : Window
 
         var json = JsonSerializer.Serialize(
             _settings.Value,
-            new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            new JsonSerializerOptions { WriteIndented = true });
 
         File.WriteAllText(path, json);
     }
@@ -450,8 +466,7 @@ public partial class InductionWindow : Window
         }
         else
         {
-            key.DeleteValue(appName,
-                throwOnMissingValue: false);
+            key.DeleteValue(appName, throwOnMissingValue: false);
         }
     }
 
@@ -459,9 +474,7 @@ public partial class InductionWindow : Window
 
     private async Task HandleRegistryScreenAsync()
     {
-        // If toggle is off — skip silently, no data sent
         if (MapToggle.IsChecked != true) return;
-
         if (_selectedCountry is null) return;
 
         var stateName = _selectedCountry.HasStates
@@ -478,20 +491,17 @@ public partial class InductionWindow : Window
         object sender,
         System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        var selectedName = CountrySelector.SelectedItem
-            ?.ToString();
+        var selectedName = CountrySelector.SelectedItem?.ToString();
 
         _selectedCountry = _countries
             .FirstOrDefault(c => c.Name == selectedName);
 
         if (_selectedCountry is null) return;
 
-        // Show/hide state selector
         if (_selectedCountry.HasStates)
         {
             StateSelectorPanel.Visibility = Visibility.Visible;
-            StateSelector.ItemsSource =
-                _selectedCountry.States;
+            StateSelector.ItemsSource = _selectedCountry.States;
             StateSelector.SelectedIndex = -1;
         }
         else

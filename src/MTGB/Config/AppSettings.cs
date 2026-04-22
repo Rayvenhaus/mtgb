@@ -5,7 +5,6 @@ namespace MTGB.Config;
 /// Loaded from appsettings.json — never store secrets here.
 /// Secrets live in Windows Credential Manager.
 /// </summary>
-
 public class AppSettings
 {
     /// <summary>
@@ -15,11 +14,25 @@ public class AppSettings
     public bool Inducted { get; set; } = false;
 
     /// <summary>
-    /// Anonymous install ID — generated once on first run.
+    /// Anonymous install ID — generated once at Induction.
     /// A random GUID. Never tied to a person or organisation.
     /// The Ministry knows only this. Nothing more.
     /// </summary>
     public string InstallId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Returns the existing install ID or generates and stores
+    /// a new one if it doesn't exist yet.
+    /// Call once during Induction — persisted with SaveSettings().
+    /// </summary>
+    public string GetOrCreateInstallId()
+    {
+        if (!string.IsNullOrWhiteSpace(InstallId))
+            return InstallId;
+
+        InstallId = Guid.NewGuid().ToString();
+        return InstallId;
+    }
 
     /// <summary>
     /// Community map registration settings.
@@ -89,50 +102,34 @@ public enum AuthMode
 
 public class PollingSettings
 {
-    /// <summary>
-    /// Whether polling is enabled.
-    /// </summary>
+    /// <summary>Whether polling is enabled.</summary>
     public bool Enabled { get; set; } = true;
 
-    /// <summary>
-    /// Polling interval in seconds. Minimum 10.
-    /// </summary>
+    /// <summary>Polling interval in seconds. Minimum 10.</summary>
     public int IntervalSeconds { get; set; } = 30;
 }
 
 public class WebhookSettings
 {
-    /// <summary>
-    /// Whether the local webhook receiver is enabled.
-    /// </summary>
+    /// <summary>Whether the local webhook receiver is enabled.</summary>
     public bool Enabled { get; set; } = false;
 
-    /// <summary>
-    /// Local port to listen on for incoming webhook POSTs.
-    /// </summary>
+    /// <summary>Local port to listen on for incoming webhook POSTs.</summary>
     public int Port { get; set; } = 7878;
 
-    /// <summary>
-    /// SimplyPrint webhook ID — stored after auto-registration.
-    /// </summary>
+    /// <summary>SimplyPrint webhook ID — stored after auto-registration.</summary>
     public int? RegisteredWebhookId { get; set; }
 }
 
 public class NotificationSettings
 {
-    /// <summary>
-    /// Master kill switch — overrides everything.
-    /// </summary>
+    /// <summary>Master kill switch — overrides everything.</summary>
     public bool GlobalMuteEnabled { get; set; } = false;
 
-    /// <summary>
-    /// Whether to group multiple events into a single toast.
-    /// </summary>
+    /// <summary>Whether to group multiple events into a single toast.</summary>
     public bool GroupingEnabled { get; set; } = true;
 
-    /// <summary>
-    /// Time window in seconds to batch grouped notifications.
-    /// </summary>
+    /// <summary>Time window in seconds to batch grouped notifications.</summary>
     public int GroupingWindowSeconds { get; set; } = 5;
 
     /// <summary>
@@ -141,32 +138,22 @@ public class NotificationSettings
     /// </summary>
     public List<string> EnabledEventIds { get; set; } = new();
 
-    /// <summary>
-    /// Whether to play a sound with notifications.
-    /// </summary>
+    /// <summary>Whether to play a sound with notifications.</summary>
     public bool SoundEnabled { get; set; } = true;
 
-    /// <summary>
-    /// Whether to show action buttons on toasts (Pause, Cancel etc).
-    /// </summary>
+    /// <summary>Whether to show action buttons on toasts (Pause, Cancel etc).</summary>
     public bool ActionButtonsEnabled { get; set; } = true;
 }
 
 public class QuietHoursSettings
 {
-    /// <summary>
-    /// Whether quiet hours are enabled.
-    /// </summary>
+    /// <summary>Whether quiet hours are enabled.</summary>
     public bool Enabled { get; set; } = false;
 
-    /// <summary>
-    /// Start time in HH:mm format. e.g. "22:00"
-    /// </summary>
+    /// <summary>Start time in HH:mm format. e.g. "22:00"</summary>
     public string Start { get; set; } = "22:00";
 
-    /// <summary>
-    /// End time in HH:mm format. e.g. "08:00"
-    /// </summary>
+    /// <summary>End time in HH:mm format. e.g. "08:00"</summary>
     public string End { get; set; } = "08:00";
 
     /// <summary>
@@ -178,9 +165,7 @@ public class QuietHoursSettings
 
 public class PrinterSettings
 {
-    /// <summary>
-    /// Whether this printer is monitored at all.
-    /// </summary>
+    /// <summary>Whether this printer is monitored at all.</summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
@@ -189,27 +174,19 @@ public class PrinterSettings
     /// </summary>
     public List<string>? EnabledEventIds { get; set; }
 
-    /// <summary>
-    /// Display name override — defaults to SimplyPrint printer name.
-    /// </summary>
+    /// <summary>Display name override — defaults to SimplyPrint printer name.</summary>
     public string? DisplayName { get; set; }
 }
 
 public class UiSettings
 {
-    /// <summary>
-    /// Whether the tray icon is visible.
-    /// </summary>
+    /// <summary>Whether the tray icon is visible.</summary>
     public bool TrayIconEnabled { get; set; } = true;
 
-    /// <summary>
-    /// UI language code. e.g. "en-AU", "en-GB", "de-DE"
-    /// </summary>
+    /// <summary>UI language code. e.g. "en-AU", "en-GB", "de-DE"</summary>
     public string Language { get; set; } = "en-AU";
 
-    /// <summary>
-    /// Whether to start MTGB with Windows.
-    /// </summary>
+    /// <summary>Whether to start MTGB with Windows.</summary>
     public bool StartWithWindows { get; set; } = true;
 }
 
@@ -225,19 +202,13 @@ public class TelemetrySettings
 
 public class CommunityMapSettings
 {
-    /// <summary>
-    /// Whether registered on the community map.
-    /// </summary>
+    /// <summary>Whether registered on the community map.</summary>
     public bool Registered { get; set; } = false;
 
-    /// <summary>
-    /// ISO 3166-1 alpha-2 country code. e.g. "AU"
-    /// </summary>
+    /// <summary>ISO 3166-1 alpha-2 country code. e.g. "AU"</summary>
     public string? CountryCode { get; set; }
 
-    /// <summary>
-    /// Country name. e.g. "Australia"
-    /// </summary>
+    /// <summary>Country name. e.g. "Australia"</summary>
     public string? CountryName { get; set; }
 
     /// <summary>

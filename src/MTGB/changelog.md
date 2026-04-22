@@ -10,6 +10,61 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.2] — 2026-04-22
+
+### The one where the Ministry started keeping proper records.
+
+### Added
+
+#### Induction — Screen 6 — Summary
+- New screen between The Registry and Induction Complete
+  showing a full summary of what was configured during
+  the induction. The Ministry believes in transparency.
+  Even about itself.
+- Connection — Organisation ID and auth mode
+- Standing Orders — Start with Windows, green if enabled
+- The Scribes — Telemetry status, green if enabled
+- The Registry — Community map status and location
+  if registered
+- Your Identity — Full anonymous install ID displayed
+  with a note explaining what it is and where it lives
+- All settings shown with colour indicators —
+  green for enabled, dim for disabled
+- TotalScreens bumped to 7
+- Seventh brass dot added to progress indicator
+
+#### AppSettings
+- GetOrCreateInstallId() — generates a cryptographically
+  random GUID on first call and stores it. Returns the
+  existing ID on subsequent calls. Called once during
+  Induction when transitioning to the summary screen.
+  The Ministry now assigns your identity at induction,
+  not lazily on first use.
+
+### Fixed
+
+#### InductionWindow — ComboBox styling
+- Country and state dropdowns were rendering white text
+  on white background — completely invisible
+- Fixed with a full custom ControlTemplate for both
+  ComboBox and ComboBoxItem — dark background, brass
+  border, gold chevron, themed highlight and selected
+  states. The Ministry can now see what it is selecting.
+
+#### InductionWindow — Screen 4 telemetry list
+- Bullet point lists were rendering on a single line
+  due to &#x0a; entities not being interpreted correctly
+  in the TextBlock context
+- Replaced with individual TextBlock elements in a
+  StackPanel — each bullet on its own line, TextWrapping
+  works correctly per item. The scribes are legible.
+
+### Technical notes
+- Version bumped to 0.5.2
+- No llamas were harmed in the redesign of Screen 6
+
+---
+
 ## [0.5.1] — 2026-04-21
 ### The one where MTGB learned to update itself.
 
@@ -817,6 +872,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+[0.5.2]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.0...v0.4.1
