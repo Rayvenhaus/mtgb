@@ -425,3 +425,8 @@ secrets.json
 **/OAuthSecrets.cs
 **/client_secrets.json
 src/MTGB/Config/OAuthConfig.cs
+
+# Allow publish profiles — required for GitHub Actions pipeline
+!*.pubxml
+!src/MTGB/Properties/PublishProfiles/MSIX.pubxml
+!src/MTGB/Properties/PublishProfiles/Portable.pubxml
