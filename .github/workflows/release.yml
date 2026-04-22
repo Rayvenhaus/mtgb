@@ -52,25 +52,25 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # ── Find MakeAppx ─-----------------───────────────────────
+      # ── Find MakeAppx ────────────────────────────────────────
       - name: Find MakeAppx
-      id: makeappx
-      shell: pwsh
-      run: |
-        $makeAppx = Get-ChildItem `
-          "C:\Program Files (x86)\Windows Kits\10\bin" `
-          -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue |
-          Where-Object { $_.FullName -match "x64" } |
-          Sort-Object FullName -Descending |
-          Select-Object -First 1 -ExpandProperty FullName
+        id: makeappx
+        shell: pwsh
+        run: |
+          $makeAppx = Get-ChildItem `
+            "C:\Program Files (x86)\Windows Kits\10\bin" `
+            -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match "x64" } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
 
-        if (-not $makeAppx) {
-            Write-Error "MakeAppx.exe not found on runner."
-            exit 1
-        }
+          if (-not $makeAppx) {
+              Write-Error "MakeAppx.exe not found on runner."
+              exit 1
+          }
 
-        Write-Host "Found MakeAppx at: $makeAppx"
-        echo "MAKEAPPX_PATH=$makeAppx" >> $env:GITHUB_ENV
+          Write-Host "Found MakeAppx at: $makeAppx"
+          echo "MAKEAPPX_PATH=$makeAppx" >> $env:GITHUB_ENV
 
       # ── Restore ───────────────────────────────────────────────
       - name: Restore
