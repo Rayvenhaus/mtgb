@@ -6,7 +6,7 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.5.0</Version>
+    <Version>0.5.2</Version>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
@@ -89,6 +89,7 @@
   <PropertyGroup>
 	<AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
 	<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+	<DefaultLanguage>en-au</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>
