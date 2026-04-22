@@ -56,11 +56,16 @@ jobs:
       - name: Install Windows SDK
         shell: pwsh
         run: |
-          winget install Microsoft.WindowsSDK.10.0.22621 `
+          $result = winget install Microsoft.WindowsSDK.10.0.22621 `
             --accept-package-agreements `
             --accept-source-agreements `
             --silent
-          Write-Host "Windows SDK installed."
+          # Exit code 2147942487 means already installed — not an error
+          if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 2147942487) {
+              Write-Error "Windows SDK install failed: $LASTEXITCODE"
+              exit 1
+          }
+          Write-Host "Windows SDK ready."
 
       # ── Restore ───────────────────────────────────────────────
       - name: Restore
