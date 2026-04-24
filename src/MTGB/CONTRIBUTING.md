@@ -255,6 +255,57 @@ Visual Studio will apply them automatically.
 
 ---
 
+## UI and Theming
+
+MTGB uses a centralised theme resource dictionary at:
+`src/MTGB/UI/Themes/mtgbTheme.xaml`
+
+This is the **single source of truth** for all colours, brushes,
+and control styles. If you are contributing UI changes:
+
+- **Never hardcode colours** in XAML or C# — use theme token references
+- **Never add styles to individual window resources** — add them to
+  `mtgbTheme.xaml` if they are reusable, or to the window's local
+  resources only if they are genuinely window-specific
+- **Reference brushes by key** in XAML:
+  `Foreground="{StaticResource GoldPrimaryBrush}"`
+- **Reference colours in C#** using the palette constants defined
+  at the top of each codebehind file — do not write `Color.FromRgb`
+  inline with raw hex values
+
+**The colour tokens:**
+
+| Key | Hex | Usage |
+|---|---|---|
+| `BgDeepestBrush` | `#0f1f4a` | Titlebars, navbars, window chrome |
+| `BgPrimaryBrush` | `#1e3b8a` | Main content areas |
+| `BgRaisedBrush` | `#2c4dba` | Cards, raised surfaces |
+| `BgInputBrush` | `#0f1f4a` | Text inputs |
+| `AccentBlueBrush` | `#3c83f6` | Borders, interactive elements |
+| `GoldPrimaryBrush` | `#fbbd23` | Primary CTA, highlights, the Bing |
+| `GoldBrightBrush` | `#fddf49` | Button gradient tops |
+| `TextPrimaryBrush` | `#f5f5f5` | Headings, main text |
+| `TextMutedBrush` | `#d1d5db` | Body copy, descriptions |
+| `TextDimBrush` | `#a0aec0` | Labels, placeholders, inactive |
+| `SemanticSuccessBrush` | `#3BB273` | Success states |
+| `SemanticWarningBrush` | `#F18F01` | Warning states |
+| `SemanticErrorBrush` | `#E84855` | Error states, danger actions |
+
+**Button styles** — use these, do not create new ones:
+- `PrimaryButton` — gold gradient, main call to action
+- `SecondaryButton` — navy gradient, navigation
+- `GhostButton` — translucent blue, subtle actions
+- `DangerButton` — red tint, destructive actions only
+- `ExitButton` — text only, turns red on hover
+
+**Icon generation** — if you change the icon, regenerate all sizes:
+```powershell
+.\icon.ps1
+.\assets.ps1
+```
+
+---
+
 ## What We Won't Accept
 
 - Code that introduces security vulnerabilities
