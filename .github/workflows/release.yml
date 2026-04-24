@@ -125,7 +125,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.VERSION }}"
-          $content = Get-Content "src\MTGB\changelog.md" -Raw
+          $content = Get-Content "changelog.md" -Raw
 
           $pattern = "## \[$version\].*?(?=## \[|\z)"
           $match   = [regex]::Match(
