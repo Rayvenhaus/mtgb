@@ -10,6 +10,91 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.3] — 2026-04-25
+
+### The one where the Ministry got a makeover.
+
+### Changed
+
+#### Complete UI rebrand — Navy & Gold
+- Retired the Art Deco brass and mahogany aesthetic.
+  The Ministry has modernised. The llamas approved the change.
+  The forms were filed. In triplicate.
+- New colour palette throughout:
+  - Deep navy `#0f1f4a` — window chrome, titlebars, navbars
+  - Primary navy `#1e3b8a` — content areas
+  - Raised navy `#2c4dba` — cards, raised surfaces
+  - Electric blue `#3c83f6` — borders, accents, interactive elements
+  - Gold primary `#fbbd23` — call to action, highlights, the Bing
+  - Gold bright `#fddf49` — button gradients
+  - Text white `#f5f5f5` — primary text
+  - Text muted `#d1d5db` — body copy
+  - Text dim `#a0aec0` — labels, placeholders
+
+#### mtgbTheme.xaml — single source of truth
+- New resource dictionary at `UI/Themes/mtgbTheme.xaml`
+  All colours, brushes, control styles, and button templates
+  live here. Change it once — it changes everywhere.
+  The Ministry now has a style guide. It is very pleased.
+- `App.xaml` merges the theme globally — no per-window
+  resource blocks required
+- All five windows plus context menu updated to reference
+  theme tokens exclusively — zero hardcoded colours
+
+#### 3D button system
+- Five button styles — Primary, Secondary, Ghost, Danger, Exit
+- Gold gradient primary with amber shadow base — pressed state
+  physically depresses the button by 2px
+- Navy gradient secondary — navigation and back buttons
+- Translucent blue ghost — subtle actions and test buttons
+- Red tint danger — destructive actions only
+- Minimal exit — text only, turns red on hover
+
+#### Window redesign — all five windows
+- InductionWindow — 14px rounded corners, blue border ring,
+  navy content areas, card-based layout with rounded borders
+- SettingsWindow — tab underline turns gold on active,
+  section cards with blue borders, group labels in accent blue
+- FlyoutWindow — slides up with navy body and blue border,
+  printer cards in raised navy, gold time remaining
+- HistoryWindow — navy rows with coloured accent bars,
+  stats view updated throughout
+- UpdateWindow — consistent with full theme
+
+#### New icon — techno monitor
+- Retired the Art Deco brass machine illustration
+- New icon — stylised techno monitor in Navy & Gold
+  Navy body, deep navy screen, blue chrome border,
+  gold ECG pulse line, gold Bing dot at the peak
+- Scales correctly from 256px down to 16px systray
+- Generated programmatically via `icon.ps1` —
+  reproducible at any size, no external tools required
+- All sizes regenerated: 16, 32, 48, 128, 256px + .ico
+
+#### MSIX tile assets — regenerated
+- All seven tile sizes regenerated with new icon source
+- Navy `#0f1f4a` tile background
+- Blue `#3c83f6` tile border
+- Gold `#fbbd23` title text
+- Muted `#a1aec0` subtitle text
+- `assets.ps1` updated with new palette
+
+#### Typography
+- Retired Courier New as the primary UI font
+- Segoe UI Variable used throughout — modern, readable,
+  correct weight at all sizes
+- Courier New retained only for the Ministry's
+  flavour text, form numbers, and lore — it earned that
+
+### Technical notes
+- Version bumped to 0.5.3
+- `mtgbTheme.xaml` added to csproj as Resource
+- `icon.ps1` and `assets.ps1` committed to repo root —
+  the Ministry can regenerate its face at any time
+- No llamas were rebranded in the making of this release
+
+---
+
 ## [0.5.2] — 2026-04-22
 
 ### The one where the Ministry started keeping proper records.
@@ -872,6 +957,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+[0.5.3]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.1...v0.5.0
