@@ -1,0 +1,14 @@
+; MTGB Community API — Local Configuration Template
+; Copy this file to config.local and fill in your credentials.
+; config.local is never committed to source control.
+; See server/README.md for full setup instructions.
+
+db_host     = localhost
+db_name     = mtgb_community
+db_user     = YOUR_DB_USER
+db_pass     = YOUR_DB_PASSWORD
+db_charset  = utf8mb4
+
+release_publish_key = YOUR_PUBLISH_KEY_HERE
+
+debug_mode  = false
