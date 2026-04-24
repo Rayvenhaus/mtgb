@@ -1,7 +1,5 @@
 # Changelog
-
-All notable changes to MTGB — The Monitor That Goes Bing will be 
-documented here.
+All notable changes to MTGB — The Monitor That Goes Bing will be documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -12,17 +10,659 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.2.15] — 17/04/2026
-### The one where Cancel earns its place.
+## [0.5.3] — 2026-04-25
+### The one where the Ministry got a makeover.
+
+### Changed
+
+#### Complete UI rebrand — Navy & Gold
+- Retired the Art Deco brass and mahogany aesthetic.
+  The Ministry has modernised. The llamas approved the change.
+  The forms were filed. In triplicate.
+- New colour palette throughout:
+  - Deep navy `#0f1f4a` — window chrome, titlebars, navbars
+  - Primary navy `#1e3b8a` — content areas
+  - Raised navy `#2c4dba` — cards, raised surfaces
+  - Electric blue `#3c83f6` — borders, accents, interactive elements
+  - Gold primary `#fbbd23` — call to action, highlights, the Bing
+  - Gold bright `#fddf49` — button gradients
+  - Text white `#f5f5f5` — primary text
+  - Text muted `#d1d5db` — body copy
+  - Text dim `#a0aec0` — labels, placeholders
+
+#### mtgbTheme.xaml — single source of truth
+- New resource dictionary at `UI/Themes/mtgbTheme.xaml`
+  All colours, brushes, control styles, and button templates
+  live here. Change it once — it changes everywhere.
+  The Ministry now has a style guide. It is very pleased.
+- `App.xaml` merges the theme globally — no per-window
+  resource blocks required
+- All five windows plus context menu updated to reference
+  theme tokens exclusively — zero hardcoded colours
+
+#### 3D button system
+- Five button styles — Primary, Secondary, Ghost, Danger, Exit
+- Gold gradient primary with amber shadow base — pressed state
+  physically depresses the button by 2px
+- Navy gradient secondary — navigation and back buttons
+- Translucent blue ghost — subtle actions and test buttons
+- Red tint danger — destructive actions only
+- Minimal exit — text only, turns red on hover
+
+#### Window redesign — all five windows
+- InductionWindow — 14px rounded corners, blue border ring,
+  navy content areas, card-based layout with rounded borders
+- SettingsWindow — tab underline turns gold on active,
+  section cards with blue borders, group labels in accent blue
+- FlyoutWindow — slides up with navy body and blue border,
+  printer cards in raised navy, gold time remaining
+- HistoryWindow — navy rows with coloured accent bars,
+  stats view updated throughout
+- UpdateWindow — consistent with full theme
+
+#### New icon — techno monitor
+- Retired the Art Deco brass machine illustration
+- New icon — stylised techno monitor in Navy & Gold
+  Navy body, deep navy screen, blue chrome border,
+  gold ECG pulse line, gold Bing dot at the peak
+- Scales correctly from 256px down to 16px systray
+- Generated programmatically via `icon.ps1` —
+  reproducible at any size, no external tools required
+- All sizes regenerated: 16, 32, 48, 128, 256px + .ico
+
+#### MSIX tile assets — regenerated
+- All seven tile sizes regenerated with new icon source
+- Navy `#0f1f4a` tile background
+- Blue `#3c83f6` tile border
+- Gold `#fbbd23` title text
+- Muted `#a1aec0` subtitle text
+- `assets.ps1` updated with new palette
+
+#### Typography
+- Retired Courier New as the primary UI font
+- Segoe UI Variable used throughout — modern, readable,
+  correct weight at all sizes
+- Courier New retained only for the Ministry's
+  flavour text, form numbers, and lore — it earned that
+
+### Technical notes
+- Version bumped to 0.5.3
+- `mtgbTheme.xaml` added to csproj as Resource
+- `icon.ps1` and `assets.ps1` committed to repo root —
+  the Ministry can regenerate its face at any time
+- No llamas were rebranded in the making of this release
+
+---
+
+## [0.5.2] — 2026-04-22
+### The one where the Ministry started keeping proper records.
 
 ### Added
-- Cancel button disabled until changes are made — enables 
-  automatically when any setting is modified, resets after 
-  saving. No changes, no Cancel. The Ministry approves.
-- Unsaved changes warning on window X button — native close
-  intercepted via Closing event. Offers Save/No/Cancel with
-  appropriately stern Ministry messaging. Window hides rather
-  than destroys to preserve reopening capability.
+
+#### Induction — Screen 6 — Summary
+- New screen between The Registry and Induction Complete
+  showing a full summary of what was configured during
+  the induction. The Ministry believes in transparency.
+  Even about itself.
+- Connection — Organisation ID and auth mode
+- Standing Orders — Start with Windows, green if enabled
+- The Scribes — Telemetry status, green if enabled
+- The Registry — Community map status and location
+  if registered
+- Your Identity — Full anonymous install ID displayed
+  with a note explaining what it is and where it lives
+- All settings shown with colour indicators —
+  green for enabled, dim for disabled
+- TotalScreens bumped to 7
+- Seventh brass dot added to progress indicator
+
+#### AppSettings
+- GetOrCreateInstallId() — generates a cryptographically
+  random GUID on first call and stores it. Returns the
+  existing ID on subsequent calls. Called once during
+  Induction when transitioning to the summary screen.
+  The Ministry now assigns your identity at induction,
+  not lazily on first use.
+
+### Fixed
+
+#### InductionWindow — ComboBox styling
+- Country and state dropdowns were rendering white text
+  on white background — completely invisible
+- Fixed with a full custom ControlTemplate for both
+  ComboBox and ComboBoxItem — dark background, brass
+  border, gold chevron, themed highlight and selected
+  states. The Ministry can now see what it is selecting.
+
+#### InductionWindow — Screen 4 telemetry list
+- Bullet point lists were rendering on a single line
+  due to &#x0a; entities not being interpreted correctly
+  in the TextBlock context
+- Replaced with individual TextBlock elements in a
+  StackPanel — each bullet on its own line, TextWrapping
+  works correctly per item. The scribes are legible.
+
+### Technical notes
+- Version bumped to 0.5.2
+- No llamas were harmed in the redesign of Screen 6
+
+---
+
+## [0.5.1] — 2026-04-21
+### The one where MTGB learned to update itself.
+
+### Added
+
+#### Auto-update service
+- UpdateService — checks community.myndworx.com/mtgb/v1/release/latest
+  on startup and every 72 hours during non-quiet hours.
+  Never touches GitHub directly — the community endpoint owns
+  the release data. Scales to any number of installs without
+  rate limit concerns. Silent failure on all network errors.
+  The Ministry handles its own distribution.
+- UpdateWorker — BackgroundService with 2 minute startup delay.
+  Re-checks opt-in status and quiet hours on every cycle.
+  Caches release info so the toast action never makes a
+  redundant network call.
+- UpdateWindow — modal update dialog with Art Deco brass aesthetic
+  matching the rest of the MTGB UI.
+  Shows available version, current version, and release notes.
+  Progress bar updates during MSIX download.
+  OK TO INSTALL button disabled until download completes —
+  the user may read everything or nothing, their choice.
+  LATER button defers without installing.
+  On install — MSIX launches, MTGB exits immediately.
+  The Ministry applies updates without drama.
+
+#### Server — release endpoint
+- release_info table in mtgb_community DB —
+  version, release_date, msix_url, zip_url,
+  release_notes, is_current flag.
+  One active row at a time. Historical rows retained.
+  To ship a new release — insert a new row.
+  The endpoint handles the rest.
+- GET /mtgb/v1/release/latest — returns current release info.
+  Seeded with v0.5.0 placeholder pending first public release.
+
+#### AppSettings
+- UpdateSettings — LastChecked timestamp and
+  LastNotifiedVersion string. Persisted to appsettings.json.
+  Prevents duplicate toasts for the same version across restarts.
+
+#### EventRegistry
+- update.available — System category, not critical,
+  enabled by default. Fires when a newer version is found.
+
+### Technical notes
+- Version bumped to 0.5.1
+- UpdateWindow constructed directly — not registered in DI.
+  ILogger resolved from service provider at construction time.
+- MTGB exits immediately on install confirmation —
+  the MSIX installer handles the rest silently.
+- No llamas were updated in the testing of this feature.
+
+---
+
+## [0.5.0] — 2026-04-21
+### The one where MTGB learned to pack its bags.
+
+### Added
+
+#### MSIX packaging
+- Package.appxmanifest — Windows 10/11 MSIX package manifest
+  - Identity: MyndworxAsylum.MTGB
+  - Minimum Windows version: 10.0.17763.0 (Windows 10 1809)
+  - Full trust application entry point
+  - Startup task extension — integrates with Windows
+    startup apps settings panel
+  - All required tile sizes declared
+- MSIX publish profile — self-contained win-x64 build,
+  ReadyToRun enabled, no trimming
+- Portable publish profile — same build config,
+  flat directory output for ZIP distribution
+
+#### MSIX tile assets
+- Seven tile sizes generated from MTGB_1024.png source
+  - 44×44 — app list
+  - 50×50 — package logo
+  - 71×71 — small tile
+  - 150×150 — medium tile
+  - 310×150 — wide tile — logo left, M·T·G·B title right
+  - 310×310 — large tile
+  - 620×300 — splash screen
+- Art Deco aesthetic throughout — dark #0D0D0F background,
+  brass #C9930E border, logo centred with padding
+- assets.ps1 — PowerShell generation script included
+  in repo root for future asset regeneration
+
+#### Distribution pipeline — package.ps1
+- Single script produces both MSIX and portable ZIP
+- Accepts version, signing, and certificate parameters
+- Cleans dist\ directory before each run
+- Writes versioned manifest into publish output
+- Runs MakeAppx.exe from Windows SDK 10.0.22621
+- Signing step ready — wired when SignPath approves
+- Output naming: MTGB-{version}-x64.msix
+                 MTGB-{version}-x64-portable.zip
+- The Ministry has packaged MTGB.
+  No llamas were harmed in the process.
+
+### Technical notes
+- Version bumped to 0.5.0 — Phase 7 distribution in progress
+- Windows SDK 10.0.22621 required for MakeAppx.exe
+- .NET 8.0.420 SDK installed alongside .NET 10.0.202
+- Both SDKs coexist — MTGB targets net8.0-windows10.0.19041.0
+- SignPath.io open source application submitted —
+  approval pending
+- Auto-update service and GitHub Actions pipeline
+  remaining Phase 7 items
+- First distributable build: 87.8 MB MSIX, 89.4 MB ZIP
+
+---
+
+## [0.4.1] — 2026-04-19
+### The one where the Ministry learned to count.
+
+### Added
+
+#### History window — Stats view
+- Stats tab added to the title bar alongside History tab
+- Toggle between history list and stats view instantly —
+  no loading, no network calls, derived entirely from
+  local notification history and settings
+- Telemetry section
+  - Enabled/disabled status with colour indicator
+  - Anonymous install ID — partially masked for display,
+    full ID never shown in the UI
+- Community map section
+  - Registration status — registered or not
+  - Display name if registered — e.g. "Victoria, Australia"
+- Notification history section
+  - Total events recorded
+  - Notifications delivered
+  - Notifications suppressed
+  - Critical alerts fired
+  - Prints finished
+  - Prints failed — red when non-zero, grey when clean
+- Event breakdown section
+  - Top 10 delivered event types by count
+  - Ordered by frequency — most fired first
+  - Empty state handled gracefully
+- Footer note — history is local only, capped at 1000 entries
+- The Ministry now knows how it is doing.
+  It is cautiously pleased with the numbers.
+
+### Technical notes
+- Version bumped to 0.4.1 — Phase 8 complete
+- Stats view builds on demand when tab is clicked —
+  no background computation, no stale data
+- HistoryWindow now injects IOptions&#x3C;AppSettings&#x3E;
+  for telemetry and community map status display
+- No network calls in the stats view — everything
+  derived from what MTGB already knows locally
+- Phase 8 closed. The scribes have put down their quills.
+  Temporarily.
+
+---
+
+## [0.4.0] — 2026-04-19
+### The one where the scribes got their quills.
+
+### Added
+
+#### Server infrastructure — community.myndworx.com
+- Apache2 VirtualHost with SSL via Let's Encrypt —
+  community.myndworx.com live and serving
+- MariaDB schema — five tables, five views, properly
+  indexed with foreign key constraints and cascade
+  deletes. The scribes have somewhere to write.
+  - installations — one row per anonymous install ID
+  - telemetry_pings — daily ping data per installation
+  - printer_types — fleet composition per ping
+  - enabled_events — enabled event types per ping
+  - install_locations — community map registrations
+  - v_active_installations — active installs last 30 days
+  - v_version_distribution — version adoption breakdown
+  - v_integration_popularity — printer type popularity
+  - v_event_popularity — which events users actually use
+  - v_map_by_country — community map by region
+- ingest.php — telemetry POST receiver with 23-hour
+  rate limiting per install ID. Boring beautiful
+  anonymous numbers, accepted gracefully.
+- register.php — community map POST and DELETE.
+  The dot arrives. The dot departs. The Ministry
+  files the appropriate forms.
+- status.php — community map GET. The dot exists,
+  or it does not. There is no middle ground.
+- config.php + config.local.php — DB connection with
+  local override pattern. Credentials never committed.
+- response.php — shared JSON response helper.
+  All API responses consistent, nothing leaks.
+- .htaccess — clean URL routing, PHP file access
+  blocked, config files blocked, [END] flag prevents
+  rewrite loop through block rules
+
+#### TelemetryService
+- Collects and POSTs the daily anonymous ping
+- Interlocked counters for poll and toast success/failure
+  — thread-safe, reset atomically on each ping
+- Snapshots printer fleet from StateDiffEngine —
+  integration type and model only, no names
+- Silently fails on network errors — never crashes MTGB
+- The scribes will try again tomorrow
+
+#### TelemetryWorker
+- BackgroundService — starts with the app
+- 5-minute startup delay before first ping
+- Hourly check cycle — actual rate limiting enforced
+  server-side at 23 hours
+- Re-checks Telemetry.Enabled on every cycle —
+  opt-out in Settings takes effect immediately
+  without requiring a restart
+
+#### CommunityMapService
+- Register, status and opt-out HTTP calls
+- Loads bundled countries.json for dropdown data
+- Persists registration state locally in AppSettings
+- Generates anonymous install ID on first use
+
+#### countries.json
+- 195 countries — full ISO 3166-1 alpha-2 coverage
+- States and territories for AU, US, CA, GB, DE,
+  IN, BR, AR, MX, JP, RU, ZA, ES, AT
+- Country-only for all others — Fiji, Singapore,
+  New Zealand etc
+- Bundled as Content asset, copied to output directory
+- Works completely offline — no API call required
+
+#### AppSettings
+- InstallId — anonymous GUID generated once on first
+  run, never tied to a person or organisation
+- CommunityMapSettings — registered flag, country code,
+  country name, state name, display name
+
+#### Induction — Screen 5 — The Registry
+- Section D — The Ministry maintains a register of
+  known installations. Participation is entirely
+  voluntary. The map is real. The dots are anonymous.
+  There is nothing to see here. Except tiny little
+  unassuming dots.
+- Country dropdown — 195 countries, alphabetical
+- State/territory dropdown — appears only when
+  country has states, hidden otherwise
+- Live confirmation text — updates as selection
+  changes. "You'll be added to the count of
+  installations in Australia, in Victoria."
+- ADD ME TO THE MAP toggle — default OFF
+- Continue with toggle OFF skips silently —
+  no data sent, no complaint filed
+- TotalScreens bumped from 5 to 6
+- Sixth brass dot added to progress indicator
+- Exit cleanup extended — community map registration
+  cleared on abandoned induction
+
+#### Settings — Privacy tab (Tab 6)
+- Anonymous telemetry toggle — synced to
+  Telemetry.Enabled, persisted on Save
+- Full transparency blurb — what the scribes record,
+  what they never record
+- Link to TELEMETRY.md — full policy in the repo
+- Community map status — live DB poll on tab open
+  - Amber dot while checking
+  - Green dot when registered, shows display name
+  - Grey dot when not registered
+- Opt out button — visible when registered
+  - Processing... state while request fires
+  - Confirms removal, switches to opt-in view
+- Opt in panel — visible when not registered
+  - Inline chained dropdowns — same as Induction
+  - Live confirmation text
+  - Add me to the map button
+- Refresh button — re-polls DB on demand
+
+### Changed
+
+#### PollingWorker
+- Telemetry counters wired up — RecordPollSuccess
+  called after successful poll, RecordPollFailure
+  called in HandleFailure
+
+#### NotificationManager
+- Telemetry counters wired up — RecordToastSuccess
+  called after successful delivery, RecordToastFailure
+  called in catch block
+
+### Technical notes
+- Version bumped to 0.4.0 — telemetry and community
+  map complete
+- community.myndworx.com subdomain live with SSL
+- Server stack: Apache2 / MariaDB / PHP 8.5.5
+- All server endpoints validated with curl
+- Rate limiting enforced server-side — client fires
+  hourly, server accepts once per 23 hours
+- No llamas were harmed in the construction of
+  this telemetry system
+- The scribes are grateful
+
+---
+
+## [0.3.0] — 2026-04-19
+### The one where the Ministry opens its doors for the first time.
+
+### Added
+#### MTGB Induction — Form MwA 621d/7 22
+- Five-screen first run wizard guiding new users through
+  credentials, startup preferences and telemetry consent
+- Screen 1 — Welcome from the Ministry of Perfectly Observed
+  Prints. We are here to help. We have forms.
+- Screen 2 — Credentials. Organisation ID and API key entry
+  with live connection test. Test Connection button disabled
+  until both fields are populated. Continue locked until
+  connection is verified green. The Ministry does not proceed
+  on faith alone.
+- Screen 3 — Standing Orders. Start with Windows toggle,
+  default OFF. The Ministry recommends it. Strongly. It has
+  filed a form about it.
+- Screen 4 — The Scribes. Anonymous telemetry opt-in, default
+  OFF. Full transparency — what is collected, what is never
+  collected, no llamas involved.
+- Screen 5 — Induction Complete. You are now in the system.
+  The system is, for once, on your side.
+- Five brass progress dots — current screen gold, completed
+  brass, pending dim
+- Exit at any point triggers full cleanup — credentials
+  deleted, org ID reset, startup registry entry removed,
+  OAuth tokens cleared, webhook secret deleted, settings
+  not saved. Next launch starts fresh. The Ministry has
+  no memory of you. Technically.
+- Inducted flag in appsettings.json — false until Screen 5
+  is completed. One flag. One truth.
+- Same colour palette as SettingsWindow and HistoryWindow —
+  dark background, brass accents, Courier New for Ministry
+  flavour text, Segoe UI Variable for body copy
+
+#### Notification sound
+- mtgbNotification.wav — the actual Monty Python Bing,
+  as it should be, doing its job
+- Plays on every toast delivery — single and grouped
+- Respects SoundEnabled setting
+- Respects GlobalMuteEnabled — muted means silence
+- Gracefully silent if wav file is missing
+
+#### AppSettings
+- Inducted — first run detection flag, default false
+- TelemetrySettings — Enabled flag, default false,
+  always opt-in never opt-out, the scribes are patient
+
+### Fixed
+
+#### StateDiffEngine — offline/online bounce grace period
+- printer.offline now requires 3 consecutive offline polls
+  before firing — 90 seconds at default interval
+- printer.online now requires 3 consecutive online polls
+  before firing after a confirmed offline
+- Bounce tracking — if printer returns before confirmation,
+  bounce count increments, no offline event fired
+- Instability warning fires at 3 bounces with 30-minute
+  cooldown per printer — one warning, not a flood
+- Post-reconnect diff compares against pre-offline snapshot —
+  filament that was low before going offline does not
+  re-fire on reconnect, only genuine new conditions reported
+- Eliminated the offline/online bounce flood that was
+  generating toasts every 60 seconds for flaky connections
+
+#### NotificationManager — toast line limit crash
+- Windows toast allows maximum 4 text elements — title
+  occupies slot 1, leaving 3 for detail lines
+- Previously crashed with InvalidOperationException when
+  3 or more events arrived simultaneously across multiple
+  printers
+- Now takes 2 detail lines and appends "...and N more"
+  when overflow — never exceeds the Windows limit
+
+#### NotificationManager — grouping flush timer
+- Group buffer previously only flushed when a new poll
+  arrived with events — a 5-second grouping window could
+  wait up to 30 seconds to deliver
+- Independent 1-second timer now owns the flush — completely
+  decoupled from the polling cycle
+- GroupingWindowSeconds now actually respected
+
+#### Settings persistence
+- appsettings.json was saving to the build output directory —
+  silent data loss on every rebuild and on installed builds
+- Now saves to %APPDATA%\MTGB\appsettings.json
+- Program.cs seeds user settings from build defaults on
+  first run — clean initial state, no missing keys
+
+#### TrayIcon
+- BuildContextMenu null reference on startup — context menu
+  was loading from Application.Current.Resources before the
+  resource dictionary was available
+- Rebuilt entirely in code — no resource dictionary
+  dependency, no timing issues, no nulls
+- mtgb.ico crash on toast delivery — icon was embedded as
+  resource but not copied to output directory for runtime
+  file path access — now correctly set as Content with
+  Copy if Newer
+
+#### DiagnosticMode
+- Removed from AppSettings entirely — was shipping as a
+  runtime flag that users could see in appsettings.json
+- Now driven by #if DEBUG compiler directive — visible in
+  Debug builds, completely absent in Release builds
+- appsettings.local.json no longer needed for this purpose
+
+#### csproj
+- Asset wildcard removed — was double-including files that
+  were also explicitly listed, causing RG1000 duplicate
+  key build error
+- NuGet packaging entries removed — MTGB is a WPF
+  application, not a NuGet package
+- Explicit asset entries only — clean, predictable,
+  no surprises
+
+### Technical notes
+- Version bumped to 0.3.0 — Phase 5 UI complete
+- InductionWindow registered as Transient in DI container
+- Induction cleanup is total — no partial state survives
+  an abandoned induction
+- The Ministry of Perfectly Observed Prints name confirmed
+  canonical. Pending update to full title in Phase 6.
+- No llamas were harmed
+
+---
+
+## [0.2.18] — 17/04/2026
+### The one where history is made. And recorded. And filtered.
+
+### Added
+- HistoryWindow — full notification history UI with:
+  - Colour-coded accent bars per event type
+  - Date grouping — Today, Yesterday, full date
+  - Filter buttons — All, Print jobs, Printer, Alerts, Suppressed
+  - Per-printer dropdown filter
+  - Suppressed entries shown dimmed with reason
+  - Footer entry count with Ministry flavour text
+  - Clear history with confirmation dialog
+  - Dark title bar via DwmSetWindowAttribute
+- Flyout button wiring — History, Settings, Dashboard and Exit
+  now correctly wired via SetCallbacks in TrayIcon.OnLeftClick
+- SyncMuteToggle now also syncs MutedBanner visibility on open
+
+### Fixed
+- FlyoutWindow.xaml.cs overwrite recovered — full code restored
+- HistoryWindow null guards on HistoryPanel, FooterCountText
+  and PrinterFilter — controls not yet initialised on first
+  ApplyFilter call
+- Configure method removed — replaced by SetCallbacks
+
+---
+
+## [0.2.17] — 17/04/2026
+### The one where you can actually read the flyout.
+
+### Changed
+- Flyout printer card text sizes increased throughout —
+  state label 9→11px bold in status colour, filename 9→11px,
+  time 9→11px gold bold, printer name 11→13px, status dot 7→9px,
+  progress bar 3→4px
+- State label colour changed from grey to status colour —
+  matches the dot, immediately readable
+- Filename colour lifted from near-invisible #5A5248 to #C8C0B8
+- Time remaining now gold #F0C840 bold — stands out clearly
+- Global TextSecondary #9A9080 → #C8C0B8 across entire app
+- Global TextDim #5A5248 → #8A8078 across entire app
+- FlyoutWindow local colour palette updated to match
+
+### Added
+- Muted banner — amber "NOTIFICATIONS MUTED · BLESSED SILENCE."
+  appears below header when global mute is active
+- Taskbar icon tooltip flavour text now cached per state —
+  picks once and sticks until state changes, no longer
+  cycles through the pool on every 5 second icon update
+
+### Fixed
+- Mute toggle direction — checked=muted=right=amber,
+  unchecked=unmuted=left=brass dim. Previously showed green
+  regardless of state
+- Mute toggle off state — track correctly returns to brass dim
+  via ObjectAnimationUsingKeyFrames on trigger exit. WPF
+  property revert was restoring wrong colour
+- TrayContextMenu.xaml restored — file was empty, rebuilt
+  with updated readable colours throughout
+- Header status text removed — redundant with flyout card states
+
+---
+
+## [0.2.16] — 17/04/2026
+### The one where it actually goes Bing.
+
+### Added
+- Diagnostic logging added to `NotificationManager.ProcessEventsAsync`
+  — event processing and suppression state now logged for debugging
+
+### Fixed
+- Notification grouping flush — grouping disabled for initial testing,
+  confirmed toasts fire correctly without grouping. Grouping flush
+  timer fix deferred to next patch.
+- Printing status indicator colour changed from amber to blue `#378ADD`
+  — amber reserved for warnings, blue for active healthy printing state
+  updated in `GetStatusInfo` and `UpdateBingDot` in `FlyoutWindow.xaml.cs`
+
+### Confirmed working — end to end
+- Toast notifications appearing as banners with audio
+- Flavour text delivering correctly on every event type
+- MTGB icon and "It goes Bing" attribution on every toast
+- Grouped toasts firing correctly across multiple printers
+- Notification centre history populated and persistent
+- Polling worker detecting real printer state changes
+- Diff engine comparing snapshots and firing correct events
+- Rules engine passing events through correctly
+- The machine goes Bing. This is what it does.
+- Never leave a print behind.
+
+---
 
 ## [0.2.14] — Unreleased
 ### The one where the settings window stops bleeding everywhere.
@@ -315,7 +955,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/rayvenhaus/mtgb/compare/v0.2.14...HEAD
+[0.5.3]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.1...v0.5.0
+[0.4.1]: https://github.com/Rayvenhaus/mtgb/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.18...v0.3.0
+[0.2.18]: https://github.com/Rayvenhaus/mtgb/compare/v0.2.17...v0.2.18
 [0.2.14]: https://github.com/rayvenhaus/mtgb/compare/v0.2.13...v0.2.14
 [0.2.13]: https://github.com/rayvenhaus/mtgb/compare/v0.2.12...v0.2.13
 [0.2.12]: https://github.com/rayvenhaus/mtgb/compare/v0.2.11...v0.2.12
@@ -331,4 +978,3 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [0.2.2]: https://github.com/rayvenhaus/mtgb/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/rayvenhaus/mtgb/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rayvenhaus/mtgb/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/rayvenhaus/mtgb/releases/tag/v0.1.0
