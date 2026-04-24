@@ -5,7 +5,7 @@
 # Triggers on version tags: v1.0.0, v1.1.0 etc.
 # Builds, packages, and publishes MTGB to GitHub Releases.
 # Updates the community endpoint DB automatically.
-# Signs the MSIX when SignPath approval arrives.
+# Signs the MSIX when Certum SimplySign is wired in.
 # No llamas were automated in the making of this pipeline.
 # ============================================================
 
@@ -39,11 +39,14 @@ jobs:
         run: |
           $tag = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
-          $versionFull = "$version.0"
-          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          # Strip pre-release suffix e.g. 0.5.3-beta -> 0.5.3
+          $versionClean = $version -replace '-.*$', ''
+          $versionFull  = "$versionClean.0"
+          echo "VERSION=$versionClean"  >> $env:GITHUB_OUTPUT
           echo "VERSION_FULL=$versionFull" >> $env:GITHUB_OUTPUT
-          echo "TAG=$tag" >> $env:GITHUB_OUTPUT
-          Write-Host "Version: $version"
+          echo "TAG=$tag"               >> $env:GITHUB_OUTPUT
+          Write-Host "Tag:          $tag"
+          Write-Host "Version:      $versionClean"
           Write-Host "Version full: $versionFull"
 
       # ── Setup .NET 8 ──────────────────────────────────────────
@@ -52,7 +55,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # ── Find MakeAppx ────────────────────────────────────────
+      # ── Find MakeAppx ─────────────────────────────────────────
       - name: Find MakeAppx
         id: makeappx
         shell: pwsh
@@ -96,11 +99,11 @@ jobs:
             -Version "${{ steps.version.outputs.VERSION_FULL }}"
           Write-Host "Package complete."
 
-      # ── Sign MSIX (placeholder — enable when SignPath approves)
+      # ── Sign MSIX (enable when Certum SimplySign is wired in) ─
       # - name: Sign MSIX
       #   shell: pwsh
       #   run: |
-      #     # SignPath signing step goes here
+      #     # Certum SimplySign signing step goes here
       #     Write-Host "Signing placeholder."
 
       # ── Rename release assets ─────────────────────────────────
@@ -124,9 +127,8 @@ jobs:
           $version = "${{ steps.version.outputs.VERSION }}"
           $content = Get-Content "src\MTGB\changelog.md" -Raw
 
-          # Extract the section for this version
           $pattern = "## \[$version\].*?(?=## \[|\z)"
-          $match = [regex]::Match(
+          $match   = [regex]::Match(
               $content,
               $pattern,
               [System.Text.RegularExpressions.RegexOptions]::Singleline)
@@ -137,9 +139,7 @@ jobs:
               $notes = "Release $version"
           }
 
-          # Write to file to avoid multiline env var issues
-          $notes | Out-File -FilePath "release_notes.txt" `
-              -Encoding UTF8
+          $notes | Out-File -FilePath "release_notes.txt" -Encoding UTF8
           Write-Host "Changelog extracted."
 
       # ── Create GitHub Release ─────────────────────────────────
@@ -148,10 +148,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: "MTGB ${{ steps.version.outputs.TAG }}"
+          name: "MTGB ${{ steps.version.outputs.TAG }} — beta"
           body_path: release_notes.txt
           draft: false
-          prerelease: false
+          prerelease: true
           files: |
             dist/MTGB-${{ steps.version.outputs.TAG }}-x64.msix
             dist/MTGB-${{ steps.version.outputs.TAG }}-x64-portable.zip
@@ -167,7 +167,6 @@ jobs:
           $msixUrl = "$baseUrl/MTGB-$tag-x64.msix"
           $zipUrl  = "$baseUrl/MTGB-$tag-x64-portable.zip"
 
-          # Read release notes
           $notes = Get-Content "release_notes.txt" -Raw
 
           $payload = @{
@@ -202,7 +201,8 @@ jobs:
         run: |
           $v = "${{ steps.version.outputs.TAG }}"
           Write-Host "============================================"
-          Write-Host " MTGB $v released."
-          Write-Host " The Ministry has shipped."
+          Write-Host " MTGB $v beta released."
+          Write-Host " The Ministry has shipped a beta."
+          Write-Host " Unsigned. Adventurous. Going BING."
           Write-Host " No llamas were harmed."
           Write-Host "============================================"
