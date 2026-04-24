@@ -19,6 +19,19 @@ public partial class HistoryWindow : Window
     private IReadOnlyList<NotificationHistoryEntry> _allEntries
         = new List<NotificationHistoryEntry>();
 
+    // ── Navy & Gold palette ───────────────────────────────────────
+    private static readonly Color BgDeepest = Color.FromRgb(0x0f, 0x1f, 0x4a);
+    private static readonly Color BgPrimary = Color.FromRgb(0x1e, 0x3b, 0x8a);
+    private static readonly Color BgRaised = Color.FromRgb(0x2c, 0x4d, 0xba);
+    private static readonly Color GoldPrimary = Color.FromRgb(0xfb, 0xbd, 0x23);
+    private static readonly Color AccentBlue = Color.FromRgb(0x3c, 0x83, 0xf6);
+    private static readonly Color TextPrimary = Color.FromRgb(0xf5, 0xf5, 0xf5);
+    private static readonly Color TextMuted = Color.FromRgb(0xd1, 0xd5, 0xdb);
+    private static readonly Color TextDim = Color.FromRgb(0xa0, 0xae, 0xc0);
+    private static readonly Color Green = Color.FromRgb(0x3B, 0xB2, 0x73);
+    private static readonly Color Red = Color.FromRgb(0xE8, 0x48, 0x55);
+    private static readonly Color Amber = Color.FromRgb(0xF1, 0x8F, 0x01);
+
     public HistoryWindow(
         INotificationManager notificationManager,
         IOptions<AppSettings> settings,
@@ -42,7 +55,6 @@ public partial class HistoryWindow : Window
         DwmSetWindowAttribute(hwnd, 20,
             ref darkMode, sizeof(int));
 
-        // Defer history load until after render
         Dispatcher.BeginInvoke(
             System.Windows.Threading.DispatcherPriority.Loaded,
             new Action(LoadHistory));
@@ -94,26 +106,23 @@ public partial class HistoryWindow : Window
 
         var filtered = _allEntries.AsEnumerable();
 
-        // Printer filter
         if (_activePrinterId > 0)
             filtered = filtered.Where(
                 e => e.PrinterId == _activePrinterId);
 
-        // Event type filter
         filtered = _activeFilter switch
         {
             "jobs" => filtered.Where(e =>
-                e.EventId.StartsWith("job.")),
+                                e.EventId.StartsWith("job.")),
             "printer" => filtered.Where(e =>
-                e.EventId.StartsWith("printer.")),
+                                e.EventId.StartsWith("printer.")),
             "alerts" => filtered.Where(e =>
-                e.EventId is "job.failed" or
-                "printer.offline" or
-                "filament.low" or
-                "temp.nozzle.low" or
-                "temp.bed.low"),
-            "suppressed" => filtered.Where(
-                e => e.WasSuppressed),
+                                e.EventId is "job.failed" or
+                                "printer.offline" or
+                                "filament.low" or
+                                "temp.nozzle.low" or
+                                "temp.bed.low"),
+            "suppressed" => filtered.Where(e => e.WasSuppressed),
             _ => filtered
         };
 
@@ -143,7 +152,6 @@ public partial class HistoryWindow : Window
             return;
         }
 
-        // Group by date
         var grouped = entries
             .GroupBy(e => e.Timestamp.LocalDateTime.Date)
             .OrderByDescending(g => g.Key);
@@ -170,41 +178,35 @@ public partial class HistoryWindow : Window
                 ? "Yesterday"
                 : date.ToString("dddd d MMMM yyyy");
 
-        var border = new Border
+        return new Border
         {
-            Padding = new Thickness(4, 12, 4, 4)
+            Padding = new Thickness(4, 12, 4, 4),
+            Child = new TextBlock
+            {
+                Text = label.ToUpperInvariant(),
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(AccentBlue)
+            }
         };
-
-        border.Child = new TextBlock
-        {
-            Text = label.ToUpperInvariant(),
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
-            FontWeight = FontWeights.Bold,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0x8B, 0x65, 0x08))
-        };
-
-        return border;
     }
 
     private Border BuildHistoryRow(
         NotificationHistoryEntry entry)
     {
-        var (accent, icon) = GetEventAccent(entry);
+        var (accent, _) = GetEventAccent(entry);
 
         var row = new Border
         {
             Background = new SolidColorBrush(
-                entry.WasSuppressed
-                    ? Color.FromRgb(0x14, 0x14, 0x17)
-                    : Color.FromRgb(0x1A, 0x1A, 0x1F)),
+                entry.WasSuppressed ? BgDeepest : BgPrimary),
             BorderBrush = new SolidColorBrush(
                 Color.FromArgb(
                     entry.WasSuppressed ? (byte)0x10 : (byte)0x28,
                     accent.R, accent.G, accent.B)),
             BorderThickness = new Thickness(0, 0, 0, 1),
-            Padding = new Thickness(8, 9, 8, 9),
+            Padding = new Thickness(10, 10, 10, 10),
             Opacity = entry.WasSuppressed ? 0.55 : 1.0
         };
 
@@ -225,7 +227,7 @@ public partial class HistoryWindow : Window
             Width = 3,
             CornerRadius = new CornerRadius(2),
             Background = new SolidColorBrush(accent),
-            Margin = new Thickness(0, 0, 10, 0),
+            Margin = new Thickness(0, 0, 12, 0),
             Opacity = entry.WasSuppressed ? 0.4 : 1.0
         };
         Grid.SetColumn(accentBar, 0);
@@ -242,22 +244,19 @@ public partial class HistoryWindow : Window
         var eventName = new TextBlock
         {
             Text = entry.EventDisplayName,
-            FontFamily = new FontFamily(
-                "Segoe UI Variable, Segoe UI"),
-            FontSize = 12,
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 13,
             FontWeight = FontWeights.SemiBold,
             Foreground = new SolidColorBrush(
-                entry.WasSuppressed
-                    ? Color.FromRgb(0x8A, 0x80, 0x78)
-                    : Color.FromRgb(0xF0, 0xED, 0xE8)),
-            Margin = new Thickness(0, 0, 8, 0)
+                entry.WasSuppressed ? TextDim : TextPrimary),
+            Margin = new Thickness(0, 0, 10, 0)
         };
 
         var printerName = new TextBlock
         {
             Text = entry.PrinterName,
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 10,
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 11,
             Foreground = new SolidColorBrush(accent),
             VerticalAlignment = VerticalAlignment.Center,
             Opacity = entry.WasSuppressed ? 0.6 : 1.0
@@ -265,56 +264,46 @@ public partial class HistoryWindow : Window
 
         titleRow.Children.Add(eventName);
         titleRow.Children.Add(printerName);
-
         content.Children.Add(titleRow);
 
-        // Job filename if present
         if (!string.IsNullOrWhiteSpace(entry.JobFilename))
         {
-            var filename = new TextBlock
+            content.Children.Add(new TextBlock
             {
                 Text = entry.JobFilename
-                    .Replace(".gcode", "")
-                    .Replace(".GCODE", ""),
-                FontFamily = new FontFamily("Courier New"),
-                FontSize = 10,
-                Foreground = new SolidColorBrush(
-                    Color.FromRgb(0xC8, 0xC0, 0xB8)),
+                                   .Replace(".gcode", "")
+                                   .Replace(".GCODE", ""),
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 12,
+                Foreground = new SolidColorBrush(TextMuted),
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Margin = new Thickness(0, 0, 0, 2)
-            };
-            content.Children.Add(filename);
+            });
         }
 
-        // Suppressed reason
         if (entry.WasSuppressed &&
             !string.IsNullOrWhiteSpace(entry.SuppressReason))
         {
-            var reason = new TextBlock
+            content.Children.Add(new TextBlock
             {
                 Text = $"Suppressed — {entry.SuppressReason}",
-                FontFamily = new FontFamily("Courier New"),
-                FontSize = 9,
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 11,
                 FontStyle = FontStyles.Italic,
-                Foreground = new SolidColorBrush(
-                    Color.FromRgb(0x6A, 0x60, 0x58))
-            };
-            content.Children.Add(reason);
+                Foreground = new SolidColorBrush(TextDim)
+            });
         }
 
         Grid.SetColumn(content, 1);
 
-        // Timestamp
         var timestamp = new TextBlock
         {
-            Text = entry.Timestamp.LocalDateTime
-                .ToString("HH:mm:ss"),
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0x8A, 0x80, 0x78)),
+            Text = entry.Timestamp.LocalDateTime.ToString("HH:mm:ss"),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 11,
+            Foreground = new SolidColorBrush(TextDim),
             VerticalAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(8, 2, 0, 0)
+            Margin = new Thickness(10, 2, 0, 0)
         };
         Grid.SetColumn(timestamp, 2);
 
@@ -331,33 +320,21 @@ public partial class HistoryWindow : Window
     {
         return entry.EventId switch
         {
-            "job.finished" =>
-                (Color.FromRgb(0x3B, 0xB2, 0x73), "✓"),
-            "job.failed" =>
-                (Color.FromRgb(0xE8, 0x48, 0x55), "✕"),
-            "job.started" =>
-                (Color.FromRgb(0x37, 0x8A, 0xDD), "▶"),
-            "job.paused" =>
-                (Color.FromRgb(0xF1, 0x8F, 0x01), "⏸"),
-            "job.cancelled" =>
-                (Color.FromRgb(0xE8, 0x48, 0x55), "✕"),
-            "job.resumed" =>
-                (Color.FromRgb(0x37, 0x8A, 0xDD), "▶"),
-            "printer.offline" =>
-                (Color.FromRgb(0xE8, 0x48, 0x55), "⚠"),
-            "printer.online" =>
-                (Color.FromRgb(0x3B, 0xB2, 0x73), "✓"),
-            "filament.low" =>
-                (Color.FromRgb(0xF1, 0x8F, 0x01), "⚠"),
+            "job.finished" => (Color.FromRgb(0x3B, 0xB2, 0x73), "✓"),
+            "job.failed" => (Color.FromRgb(0xE8, 0x48, 0x55), "✕"),
+            "job.started" => (Color.FromRgb(0x3c, 0x83, 0xf6), "▶"),
+            "job.paused" => (Color.FromRgb(0xF1, 0x8F, 0x01), "⏸"),
+            "job.cancelled" => (Color.FromRgb(0xE8, 0x48, 0x55), "✕"),
+            "job.resumed" => (Color.FromRgb(0x3c, 0x83, 0xf6), "▶"),
+            "printer.offline" => (Color.FromRgb(0xE8, 0x48, 0x55), "⚠"),
+            "printer.online" => (Color.FromRgb(0x3B, 0xB2, 0x73), "✓"),
+            "filament.low" => (Color.FromRgb(0xF1, 0x8F, 0x01), "⚠"),
             "progress.25" or
             "progress.50" or
-            "progress.75" =>
-                (Color.FromRgb(0x37, 0x8A, 0xDD), "◉"),
+            "progress.75" => (Color.FromRgb(0x3c, 0x83, 0xf6), "◉"),
             "temp.nozzle.low" or
-            "temp.bed.low" =>
-                (Color.FromRgb(0xF1, 0x8F, 0x01), "⚠"),
-            _ =>
-                (Color.FromRgb(0x8B, 0x65, 0x08), "·")
+            "temp.bed.low" => (Color.FromRgb(0xF1, 0x8F, 0x01), "⚠"),
+            _ => (Color.FromRgb(0xfb, 0xbd, 0x23), "·")
         };
     }
 
@@ -372,23 +349,19 @@ public partial class HistoryWindow : Window
         panel.Children.Add(new TextBlock
         {
             Text = "No notifications recorded.",
-            FontFamily = new FontFamily(
-                "Segoe UI Variable, Segoe UI"),
-            FontSize = 13,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xC8, 0xC0, 0xB8)),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 14,
+            Foreground = new SolidColorBrush(TextMuted),
             HorizontalAlignment = HorizontalAlignment.Center
         });
 
         panel.Children.Add(new TextBlock
         {
-            Text = "The Ministry is at peace. " +
-                   "This is suspicious.",
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 10,
+            Text = "The Ministry is at peace. This is suspicious.",
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 12,
             FontStyle = FontStyles.Italic,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0x8A, 0x80, 0x78)),
+            Foreground = new SolidColorBrush(TextDim),
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 6, 0, 0)
         });
@@ -403,10 +376,8 @@ public partial class HistoryWindow : Window
     {
         HistoryView.Visibility = Visibility.Visible;
         StatsView.Visibility = Visibility.Collapsed;
-        ViewHistoryButton.Style =
-            (Style)FindResource("FilterButtonActive");
-        ViewStatsButton.Style =
-            (Style)FindResource("FilterButton");
+        ViewHistoryButton.Style = (Style)FindResource("FilterButtonActive");
+        ViewStatsButton.Style = (Style)FindResource("FilterButton");
     }
 
     private void OnViewStatsClick(
@@ -414,11 +385,8 @@ public partial class HistoryWindow : Window
     {
         HistoryView.Visibility = Visibility.Collapsed;
         StatsView.Visibility = Visibility.Visible;
-        ViewHistoryButton.Style =
-            (Style)FindResource("FilterButton");
-        ViewStatsButton.Style =
-            (Style)FindResource("FilterButtonActive");
-
+        ViewHistoryButton.Style = (Style)FindResource("FilterButton");
+        ViewStatsButton.Style = (Style)FindResource("FilterButtonActive");
         BuildStatsView();
     }
 
@@ -431,89 +399,54 @@ public partial class HistoryWindow : Window
         var settings = _settings.Value;
         var entries = _allEntries;
 
-        // ── Section: Telemetry status ─────────────────────────────
-        StatsPanel.Children.Add(
-            BuildStatsSectionHeader("TELEMETRY"));
-
+        // Telemetry
+        StatsPanel.Children.Add(BuildStatsSectionHeader("TELEMETRY"));
         StatsPanel.Children.Add(BuildStatsRow(
             "Anonymous telemetry",
-            settings.Telemetry.Enabled
-                ? "Enabled"
-                : "Disabled",
-            settings.Telemetry.Enabled
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : Color.FromRgb(0x8A, 0x80, 0x78)));
-
+            settings.Telemetry.Enabled ? "Enabled" : "Disabled",
+            settings.Telemetry.Enabled ? Green : TextDim));
         StatsPanel.Children.Add(BuildStatsRow(
             "Install ID",
             string.IsNullOrWhiteSpace(settings.InstallId)
                 ? "Not yet generated"
-                : $"{settings.InstallId[..8]}••••••••" +
-                  $"••••••••••••••••••••",
-            Color.FromRgb(0x8A, 0x80, 0x78)));
+                : $"{settings.InstallId[..8]}••••••••••••••••••••",
+            TextDim));
 
-        // ── Section: Community map ────────────────────────────────
-        StatsPanel.Children.Add(
-            BuildStatsSectionHeader("COMMUNITY MAP"));
-
+        // Community map
+        StatsPanel.Children.Add(BuildStatsSectionHeader("COMMUNITY MAP"));
         StatsPanel.Children.Add(BuildStatsRow(
             "Registration status",
             settings.CommunityMap.Registered
-                ? $"Registered — " +
-                  $"{settings.CommunityMap.DisplayName}"
+                ? $"Registered — {settings.CommunityMap.DisplayName}"
                 : "Not registered",
-            settings.CommunityMap.Registered
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : Color.FromRgb(0x8A, 0x80, 0x78)));
+            settings.CommunityMap.Registered ? Green : TextDim));
 
-        // ── Section: Notification history ─────────────────────────
-        StatsPanel.Children.Add(
-            BuildStatsSectionHeader("NOTIFICATION HISTORY"));
+        // Notification history
+        StatsPanel.Children.Add(BuildStatsSectionHeader("NOTIFICATION HISTORY"));
 
         var totalEntries = entries.Count;
         var suppressed = entries.Count(e => e.WasSuppressed);
         var delivered = totalEntries - suppressed;
         var critical = entries.Count(e => e.IsCritical);
-        var failures = entries.Count(e =>
-            e.EventId == "job.failed");
-        var successes = entries.Count(e =>
-            e.EventId == "job.finished");
+        var failures = entries.Count(e => e.EventId == "job.failed");
+        var successes = entries.Count(e => e.EventId == "job.finished");
 
         StatsPanel.Children.Add(BuildStatsRow(
-            "Total events recorded",
-            totalEntries.ToString(),
-            Color.FromRgb(0xF0, 0xC8, 0x40)));
-
+            "Total events recorded", totalEntries.ToString(), GoldPrimary));
         StatsPanel.Children.Add(BuildStatsRow(
-            "Notifications delivered",
-            delivered.ToString(),
-            Color.FromRgb(0x3B, 0xB2, 0x73)));
-
+            "Notifications delivered", delivered.ToString(), Green));
         StatsPanel.Children.Add(BuildStatsRow(
-            "Notifications suppressed",
-            suppressed.ToString(),
-            Color.FromRgb(0x8A, 0x80, 0x78)));
-
+            "Notifications suppressed", suppressed.ToString(), TextDim));
         StatsPanel.Children.Add(BuildStatsRow(
-            "Critical alerts",
-            critical.ToString(),
-            Color.FromRgb(0xE8, 0x48, 0x55)));
-
+            "Critical alerts", critical.ToString(), Red));
         StatsPanel.Children.Add(BuildStatsRow(
-            "Prints finished",
-            successes.ToString(),
-            Color.FromRgb(0x3B, 0xB2, 0x73)));
-
+            "Prints finished", successes.ToString(), Green));
         StatsPanel.Children.Add(BuildStatsRow(
-            "Prints failed",
-            failures.ToString(),
-            failures > 0
-                ? Color.FromRgb(0xE8, 0x48, 0x55)
-                : Color.FromRgb(0x8A, 0x80, 0x78)));
+            "Prints failed", failures.ToString(),
+            failures > 0 ? Red : TextDim));
 
-        // ── Section: Event breakdown ──────────────────────────────
-        StatsPanel.Children.Add(
-            BuildStatsSectionHeader("EVENT BREAKDOWN"));
+        // Event breakdown
+        StatsPanel.Children.Add(BuildStatsSectionHeader("EVENT BREAKDOWN"));
 
         var eventCounts = entries
             .Where(e => !e.WasSuppressed)
@@ -524,37 +457,31 @@ public partial class HistoryWindow : Window
         foreach (var group in eventCounts)
         {
             StatsPanel.Children.Add(BuildStatsRow(
-                group.Key,
-                group.Count().ToString(),
-                Color.FromRgb(0xC9, 0x93, 0x0E)));
+                group.Key, group.Count().ToString(), AccentBlue));
         }
 
         if (!eventCounts.Any())
         {
             StatsPanel.Children.Add(new TextBlock
             {
-                Text = "No events delivered yet. " +
-                       "The Ministry is at peace.",
-                FontFamily = new FontFamily("Courier New"),
-                FontSize = 10,
+                Text = "No events delivered yet. The Ministry is at peace.",
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 12,
                 FontStyle = FontStyles.Italic,
-                Foreground = new SolidColorBrush(
-                    Color.FromRgb(0x8A, 0x80, 0x78)),
+                Foreground = new SolidColorBrush(TextDim),
                 Margin = new Thickness(4, 8, 4, 4)
             });
         }
 
-        // ── Footer note ───────────────────────────────────────────
+        // Footer note
         StatsPanel.Children.Add(new TextBlock
         {
-            Text = "Statistics are derived from local " +
-                   "notification history only.\n" +
-                   "History is capped at 1000 entries.",
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 9,
+            Text = "Statistics are derived from local notification history only.\n" +
+                           "History is capped at 1000 entries.",
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 11,
             FontStyle = FontStyles.Italic,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0x5A, 0x52, 0x48)),
+            Foreground = new SolidColorBrush(TextDim),
             TextWrapping = TextWrapping.Wrap,
             Margin = new Thickness(4, 20, 4, 4)
         });
@@ -568,11 +495,10 @@ public partial class HistoryWindow : Window
             Child = new TextBlock
             {
                 Text = title,
-                FontFamily = new FontFamily("Courier New"),
-                FontSize = 9,
-                FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(
-                    Color.FromRgb(0x8B, 0x65, 0x08))
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(AccentBlue)
             }
         };
     }
@@ -584,12 +510,11 @@ public partial class HistoryWindow : Window
     {
         var row = new Border
         {
-            Background = new SolidColorBrush(
-                Color.FromRgb(0x1A, 0x1A, 0x1F)),
+            Background = new SolidColorBrush(BgPrimary),
             BorderBrush = new SolidColorBrush(
-                Color.FromArgb(0x20, 0xC9, 0x93, 0x0E)),
+                Color.FromArgb(0x28, 0x3c, 0x83, 0xf6)),
             BorderThickness = new Thickness(0, 0, 0, 1),
-            Padding = new Thickness(8, 10, 8, 10)
+            Padding = new Thickness(10, 11, 10, 11)
         };
 
         var grid = new Grid();
@@ -604,20 +529,18 @@ public partial class HistoryWindow : Window
         var labelText = new TextBlock
         {
             Text = label,
-            FontFamily = new FontFamily(
-                "Segoe UI Variable, Segoe UI"),
-            FontSize = 12,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xC8, 0xC0, 0xB8)),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 13,
+            Foreground = new SolidColorBrush(TextMuted),
             VerticalAlignment = VerticalAlignment.Center
         };
 
         var valueText = new TextBlock
         {
             Text = value,
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 12,
-            FontWeight = FontWeights.Bold,
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 13,
+            FontWeight = FontWeights.SemiBold,
             Foreground = new SolidColorBrush(valueColour),
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(16, 0, 0, 0)
@@ -635,8 +558,7 @@ public partial class HistoryWindow : Window
 
     // ── Filter handlers ───────────────────────────────────────────
 
-    private void SetActiveFilter(
-        string filter, Button activeButton)
+    private void SetActiveFilter(string filter, Button activeButton)
     {
         _activeFilter = filter;
 
@@ -649,9 +571,7 @@ public partial class HistoryWindow : Window
         foreach (var btn in filterButtons)
             btn.Style = (Style)FindResource("FilterButton");
 
-        activeButton.Style =
-            (Style)FindResource("FilterButtonActive");
-
+        activeButton.Style = (Style)FindResource("FilterButtonActive");
         ApplyFilter();
     }
 

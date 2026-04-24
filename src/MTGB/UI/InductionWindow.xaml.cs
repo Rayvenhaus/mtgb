@@ -7,7 +7,6 @@ using MTGB.Services;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -36,6 +35,15 @@ public partial class InductionWindow : Window
     private List<CountryData> _countries = new();
     private CountryData? _selectedCountry;
 
+    // ── Navy & Gold palette ───────────────────────────────────────
+    private static readonly Color GoldPrimary = Color.FromRgb(0xfb, 0xbd, 0x23);
+    private static readonly Color AccentBlue = Color.FromRgb(0x3c, 0x83, 0xf6);
+    private static readonly Color TextDim = Color.FromRgb(0xa0, 0xae, 0xc0);
+    private static readonly Color Green = Color.FromRgb(0x3B, 0xB2, 0x73);
+    private static readonly Color Red = Color.FromRgb(0xE8, 0x48, 0x55);
+    private static readonly Color Amber = Color.FromRgb(0xF1, 0x8F, 0x01);
+    private static readonly Color BgDeepest = Color.FromRgb(0x0f, 0x1f, 0x4a);
+
     public InductionWindow(
         IOptions<AppSettings> settings,
         ICredentialManager credentials,
@@ -55,7 +63,7 @@ public partial class InductionWindow : Window
         Loaded += OnLoaded;
     }
 
-    // ── Startup ───────────────────────────────────────────────
+    // ── Startup ───────────────────────────────────────────────────
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -93,16 +101,14 @@ public partial class InductionWindow : Window
 
         TestConnectionButton.IsEnabled = bothFilled;
 
-        TestConnectionButton.Foreground = new SolidColorBrush(bothFilled
-            ? Color.FromRgb(0xC9, 0x93, 0x0E)
-            : Color.FromRgb(0x5A, 0x52, 0x48));
+        TestConnectionButton.Foreground = new SolidColorBrush(
+            bothFilled ? AccentBlue : TextDim);
 
-        TestConnectionButton.BorderBrush = new SolidColorBrush(bothFilled
-            ? Color.FromRgb(0xC9, 0x93, 0x0E)
-            : Color.FromRgb(0x3A, 0x30, 0x28));
+        TestConnectionButton.BorderBrush = new SolidColorBrush(
+            bothFilled ? AccentBlue : Color.FromRgb(0x2c, 0x4d, 0xba));
     }
 
-    // ── Navigation ────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────
 
     private async void OnContinueClick(
         object sender, RoutedEventArgs e)
@@ -137,12 +143,6 @@ public partial class InductionWindow : Window
         if (_currentScreen == 5)
         {
             await HandleRegistryScreenAsync();
-        }
-
-        // Moving to Screen 6 — generate install ID and
-        // populate the summary screen
-        if (_currentScreen == 5)
-        {
             _settings.Value.GetOrCreateInstallId();
             PopulateSummaryScreen();
         }
@@ -203,7 +203,7 @@ public partial class InductionWindow : Window
         Application.Current.Shutdown();
     }
 
-    // ── Screen management ─────────────────────────────────────
+    // ── Screen management ─────────────────────────────────────────
 
     private void UpdateScreen()
     {
@@ -228,7 +228,7 @@ public partial class InductionWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
 
         ContinueButton.Content = _currentScreen == TotalScreens
-            ? "DONE ✓" : "CONTINUE →";
+            ? "Done ✓" : "Continue →";
 
         ContinueButton.IsEnabled =
             _currentScreen != 2 || _connectionVerified;
@@ -248,53 +248,42 @@ public partial class InductionWindow : Window
         {
             dots[i].Fill = new SolidColorBrush(
                 i + 1 == _currentScreen
-                    ? Color.FromRgb(0xF0, 0xC8, 0x40)
+                    ? GoldPrimary
                     : i + 1 < _currentScreen
-                        ? Color.FromRgb(0x8B, 0x65, 0x08)
-                        : Color.FromRgb(0x3A, 0x30, 0x28));
+                        ? AccentBlue
+                        : Color.FromRgb(0x2c, 0x4d, 0xba));
         }
     }
 
-    // ── Summary screen ────────────────────────────────────────
+    // ── Summary screen ────────────────────────────────────────────
 
     private void PopulateSummaryScreen()
     {
         var s = _settings.Value;
 
-        // Connection
         SummaryOrgId.Text = s.OrganisationId.ToString();
         SummaryAuthMode.Text = s.AuthMode.ToString();
 
-        // Standing Orders
-        SummaryStartWithWindows.Text =
-            s.Ui.StartWithWindows ? "Enabled" : "Disabled";
+        SummaryStartWithWindows.Text = s.Ui.StartWithWindows
+            ? "Enabled" : "Disabled";
         SummaryStartWithWindows.Foreground = new SolidColorBrush(
-            s.Ui.StartWithWindows
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : Color.FromRgb(0x8A, 0x80, 0x78));
+            s.Ui.StartWithWindows ? Green : TextDim);
 
-        // Telemetry
-        SummaryTelemetry.Text =
-            s.Telemetry.Enabled ? "Enabled" : "Disabled";
+        SummaryTelemetry.Text = s.Telemetry.Enabled
+            ? "Enabled" : "Disabled";
         SummaryTelemetry.Foreground = new SolidColorBrush(
-            s.Telemetry.Enabled
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : Color.FromRgb(0x8A, 0x80, 0x78));
+            s.Telemetry.Enabled ? Green : TextDim);
 
-        // Community map
         SummaryCommunityMap.Text = s.CommunityMap.Registered
             ? $"Registered — {s.CommunityMap.DisplayName}"
             : "Not registered";
         SummaryCommunityMap.Foreground = new SolidColorBrush(
-            s.CommunityMap.Registered
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : Color.FromRgb(0x8A, 0x80, 0x78));
+            s.CommunityMap.Registered ? Green : TextDim);
 
-        // Install ID
         SummaryInstallId.Text = s.InstallId;
     }
 
-    // ── Connection test ───────────────────────────────────────
+    // ── Connection test ───────────────────────────────────────────
 
     private async void OnTestConnectionClick(
         object sender, RoutedEventArgs e)
@@ -303,8 +292,7 @@ public partial class InductionWindow : Window
         ContinueButton.IsEnabled = false;
         TestConnectionButton.IsEnabled = false;
 
-        SetConnectionStatus(
-            "Contacting the Ministry...",
+        SetConnectionStatus("Contacting the Ministry...",
             isPending: true);
 
         try
@@ -377,27 +365,23 @@ public partial class InductionWindow : Window
     {
         ConnectionStatusPanel.Visibility = Visibility.Visible;
 
-        var colour = isError
-            ? Color.FromRgb(0xE8, 0x48, 0x55)
-            : isSuccess
-                ? Color.FromRgb(0x3B, 0xB2, 0x73)
-                : isPending
-                    ? Color.FromRgb(0xF1, 0x8F, 0x01)
-                    : Color.FromRgb(0x5A, 0x52, 0x48);
+        var colour = isError ? Red
+                   : isSuccess ? Green
+                   : isPending ? Amber
+                   : TextDim;
 
         ConnectionDot.Fill = new SolidColorBrush(colour);
         ConnectionStatusText.Foreground = new SolidColorBrush(colour);
         ConnectionStatusText.Text = message;
 
         TestConnectionButton.Foreground = new SolidColorBrush(colour);
-        TestConnectionButton.BorderBrush = new SolidColorBrush(isSuccess
-            ? Color.FromRgb(0x3B, 0xB2, 0x73)
-            : isError
-                ? Color.FromRgb(0xE8, 0x48, 0x55)
-                : Color.FromRgb(0xC9, 0x93, 0x0E));
+        TestConnectionButton.BorderBrush = new SolidColorBrush(
+            isSuccess ? Green
+            : isError ? Red
+            : AccentBlue);
     }
 
-    // ── Completion ────────────────────────────────────────────
+    // ── Completion ────────────────────────────────────────────────
 
     private void CompleteInduction()
     {
@@ -444,7 +428,7 @@ public partial class InductionWindow : Window
         File.WriteAllText(path, json);
     }
 
-    // ── Startup registry ──────────────────────────────────────
+    // ── Startup registry ──────────────────────────────────────────
 
     private static void SetWindowsStartup(bool enable)
     {
@@ -470,7 +454,7 @@ public partial class InductionWindow : Window
         }
     }
 
-    // ── Registry screen ───────────────────────────────────────
+    // ── Registry screen ───────────────────────────────────────────
 
     private async Task HandleRegistryScreenAsync()
     {
@@ -548,7 +532,7 @@ public partial class InductionWindow : Window
               $"in {_selectedCountry.Name}.";
     }
 
-    // ── Window drag ───────────────────────────────────────────
+    // ── Window drag ───────────────────────────────────────────────
 
     private void OnTitleBarDrag(
         object sender,
@@ -559,7 +543,7 @@ public partial class InductionWindow : Window
             DragMove();
     }
 
-    // ── DWM dark title bar ────────────────────────────────────
+    // ── DWM dark title bar ────────────────────────────────────────
 
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(

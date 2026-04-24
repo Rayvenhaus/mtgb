@@ -17,10 +17,11 @@ namespace MTGB.UI;
 /// MTGB System Tray Icon.
 ///
 /// Left click  → Flyout panel slides up from taskbar.
-/// Right click → Minimal context menu (Mute, Settings, Exit).
+/// Right click → Context menu from TrayContextMenu.xaml.
 ///
 /// Owns the NotifyIcon lifetime, routes toast actions to the API,
 /// and keeps the tray icon state in sync with the printer farm.
+/// Navy and Gold. It goes BING.
 /// </summary>
 public class TrayIcon : IDisposable
 {
@@ -38,14 +39,10 @@ public class TrayIcon : IDisposable
     private string _currentTooltipFlavour = string.Empty;
     private string _lastTooltipState = string.Empty;
 
-    // Icon states — each maps to a different .ico file
-    // reflecting overall farm status at a glance
     private static readonly string IconIdle = "Assets/mtgb.ico";
     private static readonly string IconPrinting = "Assets/mtgb.ico";
     private static readonly string IconAlert = "Assets/mtgb.ico";
 
-    // Cache of flavour text per printer — keyed by printerId
-    // Value is (state when picked, flavour text)
     private readonly Dictionary<int, (string state, string text)>
         _flavourCache = new();
 
@@ -104,7 +101,6 @@ public class TrayIcon : IDisposable
     };
 
     private static readonly Random _random = new();
-
     private static string Pick(string[] pool) =>
         pool[_random.Next(pool.Length)];
 
@@ -137,13 +133,16 @@ public class TrayIcon : IDisposable
             Visibility = Visibility.Visible
         };
 
-        // Left click — open flyout
         _taskbarIcon.TrayLeftMouseDown += OnLeftClick;
 
-        // Right click — minimal context menu
-        _taskbarIcon.ContextMenu = BuildContextMenu();
+        // Context menu from TrayContextMenu.xaml resource dictionary
+        if (Application.Current.Resources["TrayMenu"]
+            is ContextMenu menu)
+        {
+            WireContextMenu(menu);
+            _taskbarIcon.ContextMenu = menu;
+        }
 
-        // Subscribe to toast action buttons
         if (_notificationManager is NotificationManager nm)
             nm.ToastActionRequested += OnToastActionRequested;
 
@@ -151,8 +150,32 @@ public class TrayIcon : IDisposable
             "Tray icon initialised. " +
             "MTGB is watching. Always watching.");
 
-        // Start updating the icon state
         _ = StartIconStateLoopAsync();
+    }
+
+    private void WireContextMenu(ContextMenu menu)
+    {
+        foreach (var item in menu.Items.OfType<MenuItem>())
+        {
+            switch (item.Name)
+            {
+                case "MenuOpenDashboard":
+                    item.Click += (_, _) => OpenSimplyPrintDashboard();
+                    break;
+                case "MenuHistory":
+                    item.Click += (_, _) => OpenHistory();
+                    break;
+                case "MenuSettings":
+                    item.Click += (_, _) => OpenSettings();
+                    break;
+                case "MenuMute":
+                    item.Click += (_, _) => ToggleMute();
+                    break;
+                case "MenuExit":
+                    item.Click += (_, _) => ExitApplication();
+                    break;
+            }
+        }
     }
 
     // ── Icon state loop ───────────────────────────────────────────
@@ -209,7 +232,6 @@ public class TrayIcon : IDisposable
                   GetTooltipFlavour("offline")
                 : $"MTGB — Attention required. " +
                   GetTooltipFlavour("alert");
-
             SetIcon(IconAlert, tooltip);
         }
         else if (hasPrinting)
@@ -219,7 +241,6 @@ public class TrayIcon : IDisposable
                   GetTooltipFlavour("printing")
                 : $"MTGB — {printingCount} printers active. " +
                   GetTooltipFlavour("printing");
-
             SetIcon(IconPrinting, tooltip);
         }
         else
@@ -229,7 +250,6 @@ public class TrayIcon : IDisposable
                 GetTooltipFlavour("idle"));
         }
 
-        // Update flyout if it's open
         _flyout?.RefreshPrinterCards(snapshots);
     }
 
@@ -283,7 +303,6 @@ public class TrayIcon : IDisposable
         if (_flyout is null)
         {
             _flyout = _services.GetRequiredService<FlyoutWindow>();
-
             _flyout.SetCallbacks(
                 onHistory: () => OpenHistory(),
                 onSettings: () => OpenSettings(),
@@ -293,78 +312,6 @@ public class TrayIcon : IDisposable
 
         _flyout.RefreshPrinterCards(_diffEngine.GetAllSnapshots());
         _flyout.SlideUp();
-    }
-
-    // ── Right click — minimal context menu ───────────────────────
-
-    private ContextMenu BuildContextMenu()
-    {
-        var menu = new ContextMenu
-        {
-            Background = new SolidColorBrush(
-                Color.FromRgb(0x14, 0x14, 0x17)),
-            BorderBrush = new SolidColorBrush(
-                Color.FromRgb(0xC9, 0x93, 0x0E)),
-            BorderThickness = new Thickness(1)
-        };
-
-        menu.Items.Add(BuildMenuItem(
-            "MTGB — The Ministry", null, isHeader: true));
-        menu.Items.Add(new Separator());
-        menu.Items.Add(BuildMenuItem(
-            "Open Dashboard", () => OpenSimplyPrintDashboard()));
-        menu.Items.Add(BuildMenuItem(
-            "Notification History", () => OpenHistory()));
-        menu.Items.Add(BuildMenuItem(
-            "Settings", () => OpenSettings()));
-        menu.Items.Add(new Separator());
-        menu.Items.Add(BuildMenuItem(
-            "Toggle Mute", () => ToggleMute()));
-        menu.Items.Add(new Separator());
-        menu.Items.Add(BuildMenuItem(
-            "Exit", () => ExitApplication(), isDanger: true));
-
-        return menu;
-    }
-
-    private static void WireMenuItemClick(
-        ContextMenu menu,
-        string itemName,
-        Action action)
-    {
-        var item = menu.Items
-            .OfType<MenuItem>()
-            .FirstOrDefault(i => i.Name == itemName);
-
-        if (item is not null)
-            item.Click += (_, _) => action();
-    }
-
-    private MenuItem BuildMenuItem(
-        string header,
-        Action? action,
-        bool isHeader = false,
-        bool isDanger = false)
-    {
-        var item = new MenuItem
-        {
-            Header = header,
-            IsEnabled = !isHeader,
-            Foreground = isHeader
-                ? new SolidColorBrush(Color.FromRgb(0xF0, 0xC8, 0x40))
-                : isDanger
-                    ? new SolidColorBrush(Color.FromRgb(0xE8, 0x48, 0x55))
-                    : new SolidColorBrush(Color.FromRgb(0xF0, 0xED, 0xE8)),
-            Background = new SolidColorBrush(
-                Color.FromRgb(0x14, 0x14, 0x17)),
-            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
-            FontSize = 12
-        };
-
-        if (action is not null)
-            item.Click += (_, _) => action();
-
-        return item;
     }
 
     // ── Menu actions ──────────────────────────────────────────────
@@ -406,9 +353,7 @@ public class TrayIcon : IDisposable
         var state = !current ? "enabled" : "disabled";
         _taskbarIcon!.ToolTipText =
             $"MTGB — Mute {state}. " +
-            (!current
-                ? "Blessed silence."
-                : "And so it goes Bing again.");
+            (!current ? "Blessed silence." : "And so it goes Bing again.");
 
         _logger.LogInformation(
             "Global mute {State} via tray menu.", state);
@@ -438,9 +383,7 @@ public class TrayIcon : IDisposable
                 });
 
             System.IO.File.WriteAllText(path, json);
-
-            _logger.LogDebug(
-                "Settings persisted after mute toggle.");
+            _logger.LogDebug("Settings persisted after mute toggle.");
         }
         catch (Exception ex)
         {
@@ -458,7 +401,6 @@ public class TrayIcon : IDisposable
 
         _flyout?.Close();
         _taskbarIcon?.Dispose();
-
         Application.Current.Shutdown();
     }
 
@@ -554,15 +496,12 @@ public class TrayIcon : IDisposable
             "printing" or "printing_completing" =>
                 snapshot.JobPercentage switch
                 {
-                    >= 75 =>
-                        "Nearly there. Do not jinx it. " +
-                        "Step away from the printer.",
-                    >= 50 =>
-                        "Halfway. Either going brilliantly " +
-                        "or you haven't looked yet.",
-                    >= 25 =>
-                        "One quarter done. " +
-                        "Three quarters of the anxiety remains.",
+                    >= 75 => "Nearly there. Do not jinx it. " +
+                             "Step away from the printer.",
+                    >= 50 => "Halfway. Either going brilliantly " +
+                             "or you haven't looked yet.",
+                    >= 25 => "One quarter done. " +
+                             "Three quarters of the anxiety remains.",
                     _ => Pick(PrintingFlavour)
                 },
             "paused" or "pausing" => Pick(PausedFlavour),

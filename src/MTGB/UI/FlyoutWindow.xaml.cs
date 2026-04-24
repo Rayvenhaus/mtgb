@@ -14,7 +14,7 @@ namespace MTGB.UI;
 /// MTGB Flyout Panel.
 /// Slides up from the taskbar on left-click of the tray icon.
 /// Shows live printer status cards with hover flavour text.
-/// Art Deco dark brass aesthetic. Web 6.0 smooth.
+/// Navy and Gold. It goes BING.
 /// </summary>
 public partial class FlyoutWindow : Window
 {
@@ -25,6 +25,16 @@ public partial class FlyoutWindow : Window
     private Action? _onSettingsClick;
     private Action? _onDashboardClick;
     private Action? _onExitClick;
+
+    // ── Navy & Gold palette ───────────────────────────────────────
+    private static readonly Color BgDeepest = Color.FromRgb(0x0f, 0x1f, 0x4a);
+    private static readonly Color BgPrimary = Color.FromRgb(0x1e, 0x3b, 0x8a);
+    private static readonly Color BgRaised = Color.FromRgb(0x2c, 0x4d, 0xba);
+    private static readonly Color GoldPrimary = Color.FromRgb(0xfb, 0xbd, 0x23);
+    private static readonly Color AccentBlue = Color.FromRgb(0x3c, 0x83, 0xf6);
+    private static readonly Color TextPrimary = Color.FromRgb(0xf5, 0xf5, 0xf5);
+    private static readonly Color TextMuted = Color.FromRgb(0xd1, 0xd5, 0xdb);
+    private static readonly Color TextDim = Color.FromRgb(0xa0, 0xae, 0xc0);
 
     public FlyoutWindow(
         IOptions<AppSettings> settings,
@@ -42,8 +52,7 @@ public partial class FlyoutWindow : Window
                 hwnd, NativeMethods.GWL_EXSTYLE);
             NativeMethods.SetWindowLong(hwnd,
                 NativeMethods.GWL_EXSTYLE,
-                extendedStyle |
-                NativeMethods.WS_EX_TOOLWINDOW);
+                extendedStyle | NativeMethods.WS_EX_TOOLWINDOW);
         };
 
         Deactivated += (_, _) => SlideDown();
@@ -107,13 +116,10 @@ public partial class FlyoutWindow : Window
     private void UpdateBingDot(int printing, int alerts)
     {
         BingDot.Fill = alerts > 0
-            ? new SolidColorBrush(
-                Color.FromRgb(0xE8, 0x48, 0x55))
+            ? new SolidColorBrush(Color.FromRgb(0xE8, 0x48, 0x55))
             : printing > 0
-                ? new SolidColorBrush(
-                    Color.FromRgb(0x37, 0x8A, 0xDD))
-                : new SolidColorBrush(
-                    Color.FromRgb(0x3B, 0xB2, 0x73));
+                ? new SolidColorBrush(GoldPrimary)
+                : new SolidColorBrush(Color.FromRgb(0x3B, 0xB2, 0x73));
     }
 
     private Border BuildPrinterCard(PrinterSnapshot snapshot)
@@ -129,16 +135,14 @@ public partial class FlyoutWindow : Window
         };
 
         card.MouseEnter += (_, _) =>
-            card.Background = new SolidColorBrush(
-                Color.FromRgb(0x22, 0x22, 0x2A));
+            card.Background = new SolidColorBrush(BgDeepest);
         card.MouseLeave += (_, _) =>
-            card.Background = new SolidColorBrush(
-                Color.FromRgb(0x1A, 0x1A, 0x1F));
+            card.Background = new SolidColorBrush(BgRaised);
 
         var stack = new StackPanel();
 
         // ── Top row — status dot + name + state ──────────────────
-        var topRow = new Grid();
+        var topRow = new Grid { Margin = new Thickness(0, 0, 0, 6) };
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition { Width = GridLength.Auto });
         topRow.ColumnDefinitions.Add(
@@ -148,7 +152,6 @@ public partial class FlyoutWindow : Window
             });
         topRow.ColumnDefinitions.Add(
             new ColumnDefinition { Width = GridLength.Auto });
-        topRow.Margin = new Thickness(0, 0, 0, 6);
 
         var dot = new Ellipse
         {
@@ -163,12 +166,10 @@ public partial class FlyoutWindow : Window
         var nameText = new TextBlock
         {
             Text = snapshot.PrinterName,
-            FontFamily = new FontFamily(
-                "Segoe UI Variable, Segoe UI"),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
             FontSize = 13,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xF0, 0xED, 0xE8)),
+            Foreground = new SolidColorBrush(TextPrimary),
             VerticalAlignment = VerticalAlignment.Center
         };
         Grid.SetColumn(nameText, 1);
@@ -176,9 +177,9 @@ public partial class FlyoutWindow : Window
         var stateText = new TextBlock
         {
             Text = stateLabel.ToUpperInvariant(),
-            FontFamily = new FontFamily("Courier New"),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
             FontSize = 11,
-            FontWeight = FontWeights.Bold,
+            FontWeight = FontWeights.SemiBold,
             Foreground = new SolidColorBrush(statusColor),
             VerticalAlignment = VerticalAlignment.Center
         };
@@ -195,27 +196,29 @@ public partial class FlyoutWindow : Window
         {
             var progressBg = new Border
             {
-                Height = 4,
+                Height = 5,
                 Background = new SolidColorBrush(
-                    Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF)),
-                CornerRadius = new CornerRadius(2),
+                    Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF)),
+                CornerRadius = new CornerRadius(3),
                 Margin = new Thickness(0, 0, 0, 5)
             };
 
             var progressFill = new Border
             {
-                Height = 4,
+                Height = 5,
                 Background = new SolidColorBrush(statusColor),
-                CornerRadius = new CornerRadius(2),
+                CornerRadius = new CornerRadius(3),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Width = (snapshot.JobPercentage.Value / 100.0) *
-                        (280 - 20)
+                Width = (snapshot.JobPercentage.Value / 100.0)
+                                      * (300 - 24)
             };
 
-            var progressGrid = new Grid();
+            var progressGrid = new Grid
+            {
+                Margin = new Thickness(0, 0, 0, 5)
+            };
             progressGrid.Children.Add(progressBg);
             progressGrid.Children.Add(progressFill);
-            progressGrid.Margin = new Thickness(0, 0, 0, 5);
             stack.Children.Add(progressGrid);
         }
 
@@ -232,25 +235,21 @@ public partial class FlyoutWindow : Window
         var filenameText = new TextBlock
         {
             Text = TruncateFilename(
-                snapshot.ActiveJobFilename ??
-                GetIdleText(snapshot)),
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 11,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xC8, 0xC0, 0xB8)),
+                snapshot.ActiveJobFilename ?? GetIdleText(snapshot)),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 12,
+            Foreground = new SolidColorBrush(TextMuted),
             TextTrimming = TextTrimming.CharacterEllipsis
         };
         Grid.SetColumn(filenameText, 0);
 
         var timeText = new TextBlock
         {
-            Text = FormatTimeRemaining(
-                snapshot.JobTimeRemaining),
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 11,
-            FontWeight = FontWeights.Bold,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xF0, 0xC8, 0x40))
+            Text = FormatTimeRemaining(snapshot.JobTimeRemaining),
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 12,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = new SolidColorBrush(GoldPrimary)
         };
         Grid.SetColumn(timeText, 1);
 
@@ -267,15 +266,13 @@ public partial class FlyoutWindow : Window
         return new ToolTip
         {
             Content = flavourText,
-            Background = new SolidColorBrush(
-                Color.FromRgb(0x0D, 0x0D, 0x0F)),
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(0xF0, 0xC8, 0x40)),
+            Background = new SolidColorBrush(BgDeepest),
+            Foreground = new SolidColorBrush(GoldPrimary),
             BorderBrush = new SolidColorBrush(
-                Color.FromArgb(0x59, 0xC9, 0x93, 0x0E)),
+                Color.FromArgb(0x59, 0x3c, 0x83, 0xf6)),
             BorderThickness = new Thickness(1),
-            FontFamily = new FontFamily("Courier New"),
-            FontSize = 10,
+            FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+            FontSize = 12,
             FontStyle = FontStyles.Italic,
             Padding = new Thickness(10, 6, 10, 6)
         };
@@ -287,12 +284,12 @@ public partial class FlyoutWindow : Window
         GetStatusInfo(PrinterSnapshot snapshot)
     {
         if (!snapshot.Online)
-            return (Color.FromRgb(0x5A, 0x52, 0x48), "Offline");
+            return (Color.FromRgb(0xa0, 0xae, 0xc0), "Offline");
 
         return snapshot.State.ToLowerInvariant() switch
         {
             "printing" or "printing_completing" =>
-                (Color.FromRgb(0x37, 0x8A, 0xDD), "Printing"),
+                (Color.FromRgb(0x3c, 0x83, 0xf6), "Printing"),
             "paused" or "pausing" =>
                 (Color.FromRgb(0xF1, 0x8F, 0x01), "Paused"),
             "error" or "printer_error" =>
@@ -300,8 +297,7 @@ public partial class FlyoutWindow : Window
             "idle" or "operational" =>
                 (Color.FromRgb(0x3B, 0xB2, 0x73), "Ready"),
             _ =>
-                (Color.FromRgb(0x9A, 0x90, 0x80),
-                    snapshot.State)
+                (Color.FromRgb(0xa0, 0xae, 0xc0), snapshot.State)
         };
     }
 
@@ -342,8 +338,7 @@ public partial class FlyoutWindow : Window
 
     private void UpdateLastPolled()
     {
-        LastPolledText.Text =
-            $"Updated {DateTime.Now:HH:mm:ss}";
+        LastPolledText.Text = $"Updated {DateTime.Now:HH:mm:ss}";
     }
 
     private void UpdateWebhookStatus()

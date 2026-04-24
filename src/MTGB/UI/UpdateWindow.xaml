@@ -13,89 +13,17 @@
         ShowInTaskbar="True">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="BgDeep"       Color="#0D0D0F"/>
-        <SolidColorBrush x:Key="BgRaised"     Color="#141417"/>
-        <SolidColorBrush x:Key="BgCard"       Color="#1A1A1F"/>
-        <SolidColorBrush x:Key="Brass"        Color="#C9930E"/>
-        <SolidColorBrush x:Key="BrassDim"     Color="#8B6508"/>
-        <SolidColorBrush x:Key="GoldText"     Color="#F0C840"/>
-        <SolidColorBrush x:Key="TextPrimary"  Color="#F0EDE8"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#C8C0B8"/>
-        <SolidColorBrush x:Key="TextDim"      Color="#8A8078"/>
-        <SolidColorBrush x:Key="Green"        Color="#3BB273"/>
-        <SolidColorBrush x:Key="Red"          Color="#E84855"/>
-
-        <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#C9930E"/>
-            <Setter Property="Foreground" Value="#0D0D0F"/>
-            <Setter Property="FontFamily" Value="Courier New"/>
-            <Setter Property="FontSize"   Value="12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding"    Value="24,10"/>
-            <Setter Property="Cursor"     Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F0C840"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#3A3028"/>
-                                <Setter Property="Foreground" Value="#5A5248"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="GhostButton" TargetType="Button">
-            <Setter Property="Background"   Value="Transparent"/>
-            <Setter Property="Foreground"   Value="#8A8078"/>
-            <Setter Property="FontFamily"   Value="Courier New"/>
-            <Setter Property="FontSize"     Value="12"/>
-            <Setter Property="Padding"      Value="24,10"/>
-            <Setter Property="Cursor"       Value="Hand"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush"  Value="#3A3028"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground"   Value="#C8C0B8"/>
-                                <Setter Property="BorderBrush"  Value="#8A8078"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/UI/Themes/mtgbTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
-    <Border Background="#0D0D0F"
-            BorderBrush="#C9930E"
-            BorderThickness="1"
-            CornerRadius="8">
+    <Border Background="{StaticResource BgDeepestBrush}"
+            BorderBrush="{StaticResource AccentBlueBrush}"
+            BorderThickness="2"
+            CornerRadius="14">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -107,29 +35,27 @@
 
             <!-- ── Title bar ──────────────────────────────────── -->
             <Border Grid.Row="0"
-                    Background="#0D0D0F"
-                    BorderBrush="#C9930E"
+                    Background="{StaticResource BgDeepestBrush}"
+                    BorderBrush="{StaticResource BorderBlueBrush}"
                     BorderThickness="0,0,0,1"
-                    CornerRadius="8,8,0,0"
+                    CornerRadius="14,14,0,0"
                     Padding="24,16"
                     MouseLeftButtonDown="OnTitleBarDrag">
                 <StackPanel>
                     <TextBlock Text="MTGB UPDATE"
-                               FontFamily="Courier New"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="#C9930E"/>
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="11" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentBlueBrush}"/>
                     <TextBlock x:Name="VersionHeader"
                                Text="Version 0.0.0 is available"
-                               FontFamily="Georgia"
-                               FontSize="18"
-                               FontStyle="Italic"
-                               Foreground="#F0C840"
-                               Margin="0,4,0,0"/>
+                               FontFamily="Georgia, Times New Roman"
+                               FontSize="20" FontStyle="Italic"
+                               Foreground="{StaticResource GoldPrimaryBrush}"
+                               Margin="0,6,0,0"/>
                     <TextBlock x:Name="CurrentVersionText"
-                               FontFamily="Courier New"
-                               FontSize="9"
-                               Foreground="#5A5248"
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="11"
+                               Foreground="{StaticResource TextDimBrush}"
                                Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
@@ -137,18 +63,18 @@
             <!-- ── Release notes ──────────────────────────────── -->
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
-                          Padding="24,20">
+                          Padding="24,20"
+                          Background="{StaticResource BgPrimaryBrush}">
                 <StackPanel>
                     <TextBlock Text="WHAT'S NEW"
-                               FontFamily="Courier New"
-                               FontSize="9"
-                               FontWeight="Bold"
-                               Foreground="#8B6508"
-                               Margin="0,0,0,10"/>
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="10" FontWeight="SemiBold"
+                               Foreground="{StaticResource GoldPrimaryBrush}"
+                               Margin="0,0,0,12"/>
                     <TextBlock x:Name="ReleaseNotesText"
                                FontFamily="Segoe UI Variable, Segoe UI"
-                               FontSize="12"
-                               Foreground="#C8C0B8"
+                               FontSize="13"
+                               Foreground="{StaticResource TextMutedBrush}"
                                TextWrapping="Wrap"
                                LineHeight="22"/>
                 </StackPanel>
@@ -156,23 +82,24 @@
 
             <!-- ── Progress bar ───────────────────────────────── -->
             <Border Grid.Row="2"
+                    Background="{StaticResource BgPrimaryBrush}"
                     Padding="24,0,24,16">
                 <StackPanel x:Name="ProgressPanel"
                             Visibility="Collapsed">
                     <TextBlock x:Name="ProgressText"
                                Text="Downloading..."
-                               FontFamily="Courier New"
-                               FontSize="10"
-                               Foreground="#8A8078"
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="12"
+                               Foreground="{StaticResource TextDimBrush}"
                                Margin="0,0,0,8"/>
-                    <Border Background="#141417"
-                            BorderBrush="#3A3028"
+                    <Border Background="{StaticResource BgRaisedBrush}"
+                            BorderBrush="{StaticResource BorderBlueBrush}"
                             BorderThickness="1"
-                            CornerRadius="4"
+                            CornerRadius="6"
                             Height="8">
                         <Border x:Name="ProgressFill"
-                                Background="#C9930E"
-                                CornerRadius="4"
+                                Background="{StaticResource AccentBlueBrush}"
+                                CornerRadius="6"
                                 HorizontalAlignment="Left"
                                 Width="0"/>
                     </Border>
@@ -181,8 +108,10 @@
 
             <!-- ── Navigation ─────────────────────────────────── -->
             <Border Grid.Row="3"
-                    BorderBrush="#C9930E"
+                    Background="{StaticResource BgDeepestBrush}"
+                    BorderBrush="{StaticResource BorderBlueBrush}"
                     BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,14,14"
                     Padding="24,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -194,22 +123,21 @@
 
                     <TextBlock x:Name="StatusText"
                                Grid.Column="0"
-                               FontFamily="Courier New"
-                               FontSize="10"
-                               Foreground="#5A5248"
-                               FontStyle="Italic"
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="12" FontStyle="Italic"
+                               Foreground="{StaticResource TextDimBrush}"
                                VerticalAlignment="Center"
                                Text="The Ministry recommends updating."/>
 
                     <Button x:Name="CancelButton"
                             Grid.Column="1"
-                            Content="LATER"
-                            Style="{StaticResource GhostButton}"
+                            Content="Later"
+                            Style="{StaticResource SecondaryButton}"
                             Click="OnCancelClick"/>
 
                     <Button x:Name="InstallButton"
                             Grid.Column="3"
-                            Content="OK TO INSTALL"
+                            Content="OK to Install"
                             Style="{StaticResource PrimaryButton}"
                             IsEnabled="False"
                             Click="OnInstallClick"/>

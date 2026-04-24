@@ -4,7 +4,7 @@
         Title="MTGB Induction — Form MwA 621d/7 22"
         Width="560" Height="680"
         MinWidth="560" MinHeight="680"
-        MaxWidth="560" MaxHeight="620"
+        MaxWidth="560" MaxHeight="680"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -13,357 +13,18 @@
         ShowInTaskbar="True">
 
     <Window.Resources>
-
-        <!-- ── Colours ───────────────────────────────────────── -->
-        <SolidColorBrush x:Key="BgDeep"        Color="#0D0D0F"/>
-        <SolidColorBrush x:Key="BgRaised"      Color="#141417"/>
-        <SolidColorBrush x:Key="BgCard"        Color="#1A1A1F"/>
-        <SolidColorBrush x:Key="BgHover"       Color="#22222A"/>
-        <SolidColorBrush x:Key="Brass"         Color="#C9930E"/>
-        <SolidColorBrush x:Key="BrassDim"      Color="#8B6508"/>
-        <SolidColorBrush x:Key="GoldText"      Color="#F0C840"/>
-        <SolidColorBrush x:Key="TextPrimary"   Color="#F0EDE8"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#C8C0B8"/>
-        <SolidColorBrush x:Key="TextDim"       Color="#8A8078"/>
-        <SolidColorBrush x:Key="Green"         Color="#3BB273"/>
-        <SolidColorBrush x:Key="Red"           Color="#E84855"/>
-        <SolidColorBrush x:Key="Amber"         Color="#F18F01"/>
-        <SolidColorBrush x:Key="Blue"          Color="#378ADD"/>
-
-        <!-- ── ComboBox full template ─────────────────────────── -->
-        <Style TargetType="ComboBox">
-            <Setter Property="Background"      Value="#141417"/>
-            <Setter Property="Foreground"      Value="#F0EDE8"/>
-            <Setter Property="BorderBrush"     Value="#3A3028"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="10,8"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <ToggleButton
-                                x:Name="ToggleButton"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}"
-                                IsChecked="{Binding IsDropDownOpen,
-                                    Mode=TwoWay,
-                                    RelativeSource={RelativeSource TemplatedParent}}"
-                                Focusable="False">
-                                <ToggleButton.Template>
-                                    <ControlTemplate TargetType="ToggleButton">
-                                        <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="4">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="20"/>
-                                                </Grid.ColumnDefinitions>
-                                                <ContentPresenter Grid.Column="0"
-                                                    Margin="{TemplateBinding Padding}"
-                                                    VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1"
-                                                    Text="▾"
-                                                    Foreground="#C9930E"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center"
-                                                    FontSize="10"/>
-                                            </Grid>
-                                        </Border>
-                                    </ControlTemplate>
-                                </ToggleButton.Template>
-                            </ToggleButton>
-
-                            <ContentPresenter
-                                x:Name="ContentSite"
-                                IsHitTestVisible="False"
-                                Content="{TemplateBinding SelectionBoxItem}"
-                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                Margin="10,8,30,8"
-                                VerticalAlignment="Center"/>
-
-                            <Popup x:Name="Popup"
-                                   Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   AllowsTransparency="True"
-                                   Focusable="False"
-                                   PopupAnimation="Slide">
-                                <Grid x:Name="DropDown"
-                                      SnapsToDevicePixels="True"
-                                      MinWidth="{TemplateBinding ActualWidth}"
-                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border x:Name="DropDownBorder"
-                                            Background="#141417"
-                                            BorderBrush="#C9930E"
-                                            BorderThickness="1"
-                                            CornerRadius="0,0,4,4"/>
-                                    <ScrollViewer Margin="1"
-                                                  SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True"
-                                            KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                    </ScrollViewer>
-                                </Grid>
-                            </Popup>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#141417"/>
-            <Setter Property="Foreground" Value="#F0EDE8"/>
-            <Setter Property="Padding"    Value="10,6"/>
-            <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI"/>
-            <Setter Property="FontSize"   Value="12"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBoxItem">
-                        <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsHighlighted" Value="True">
-                                <Setter Property="Background" Value="#C9930E"/>
-                                <Setter Property="Foreground" Value="#0D0D0F"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#8B6508"/>
-                                <Setter Property="Foreground" Value="#F0EDE8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Toggle style ──────────────────────────────────── -->
-        <Style x:Key="MtgbToggle" TargetType="ToggleButton">
-            <Setter Property="Width"  Value="44"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Border x:Name="Track"
-                                    Width="44" Height="24"
-                                    CornerRadius="12"
-                                    Background="#22222A"
-                                    BorderBrush="#C9930E"
-                                    BorderThickness="1"/>
-                            <Ellipse x:Name="Thumb"
-                                     Width="18" Height="18"
-                                     Fill="#8B6508"
-                                     HorizontalAlignment="Left"
-                                     Margin="3,0,0,0"
-                                     VerticalAlignment="Center">
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform
-                                        x:Name="ThumbTranslate" X="0"/>
-                                </Ellipse.RenderTransform>
-                            </Ellipse>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Track"
-                                        Property="Background" Value="#C9930E"/>
-                                <Setter TargetName="Thumb"
-                                        Property="Fill"       Value="#F0C840"/>
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="ThumbTranslate"
-                                                Storyboard.TargetProperty="X"
-                                                To="20" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="ThumbTranslate"
-                                                Storyboard.TargetProperty="X"
-                                                To="0" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Primary button ────────────────────────────────── -->
-        <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background"      Value="#C9930E"/>
-            <Setter Property="Foreground"      Value="#0D0D0F"/>
-            <Setter Property="FontFamily"      Value="Courier New"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="FontWeight"      Value="Bold"/>
-            <Setter Property="Padding"         Value="24,10"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F0C840"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#3A3028"/>
-                                <Setter Property="Foreground" Value="#5A5248"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Ghost button ───────────────────────────────────── -->
-        <Style x:Key="GhostButton" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="Foreground"      Value="#8A8078"/>
-            <Setter Property="FontFamily"      Value="Courier New"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Padding"         Value="24,10"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush"     Value="#3A3028"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground"  Value="#C8C0B8"/>
-                                <Setter Property="BorderBrush" Value="#8A8078"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Exit button ────────────────────────────────────── -->
-        <Style x:Key="ExitButton" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="Foreground"      Value="#5A5248"/>
-            <Setter Property="FontFamily"      Value="Courier New"/>
-            <Setter Property="FontSize"        Value="11"/>
-            <Setter Property="Padding"         Value="16,8"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#E84855"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Text input ─────────────────────────────────────── -->
-        <Style x:Key="MtgbInput" TargetType="TextBox">
-            <Setter Property="Background"      Value="#141417"/>
-            <Setter Property="Foreground"      Value="#F0EDE8"/>
-            <Setter Property="CaretBrush"      Value="#C9930E"/>
-            <Setter Property="BorderBrush"     Value="#3A3028"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Courier New"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Padding"         Value="10,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#C9930E"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Password input ─────────────────────────────────── -->
-        <Style x:Key="MtgbPasswordInput" TargetType="PasswordBox">
-            <Setter Property="Background"      Value="#141417"/>
-            <Setter Property="Foreground"      Value="#F0EDE8"/>
-            <Setter Property="CaretBrush"      Value="#C9930E"/>
-            <Setter Property="BorderBrush"     Value="#3A3028"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Courier New"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Padding"         Value="10,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="PasswordBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#C9930E"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/UI/Themes/mtgbTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
-    <!-- ── Outer border — the window chrome ──────────────────── -->
-    <Border Background="#0D0D0F"
-            BorderBrush="#C9930E"
-            BorderThickness="1"
-            CornerRadius="8">
+    <!-- ── Outer border — window chrome ──────────────────────── -->
+    <Border Background="{StaticResource BgDeepestBrush}"
+            BorderBrush="{StaticResource AccentBlueBrush}"
+            BorderThickness="2"
+            CornerRadius="14">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -375,35 +36,37 @@
 
             <!-- ── Title bar ──────────────────────────────────── -->
             <Border Grid.Row="0"
-                    Background="#0D0D0F"
-                    BorderBrush="#C9930E"
+                    Background="{StaticResource BgDeepestBrush}"
+                    BorderBrush="{StaticResource BorderBlueBrush}"
                     BorderThickness="0,0,0,1"
-                    CornerRadius="8,8,0,0"
+                    CornerRadius="14,14,0,0"
                     Padding="24,16"
                     MouseLeftButtonDown="OnTitleBarDrag">
                 <Grid>
                     <StackPanel HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
                         <TextBlock Text="MTGB INDUCTION"
-                                   FontFamily="Courier New"
-                                   FontSize="11" FontWeight="Bold"
-                                   Foreground="#C9930E"/>
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"/>
                         <TextBlock Text="Form MwA 621d/7 22"
-                                   FontFamily="Courier New"
-                                   FontSize="10" Foreground="#5A5248"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextDimBrush}"
                                    Margin="0,2,0,0"/>
                     </StackPanel>
                     <TextBlock x:Name="ScreenIndicatorText"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               FontFamily="Courier New"
-                               FontSize="9" Foreground="#5A5248"
+                               FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="11"
+                               Foreground="{StaticResource AccentBlueBrush}"
                                Text="1 of 7"/>
                 </Grid>
             </Border>
 
             <!-- ── Screen container ───────────────────────────── -->
-            <Grid Grid.Row="1" Margin="0">
+            <Grid Grid.Row="1" Background="{StaticResource BgPrimaryBrush}">
 
                 <!-- Screen 1 — Welcome -->
                 <ScrollViewer x:Name="Screen1"
@@ -411,56 +74,65 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="THE MINISTRY OF PRINTER OBSERVATION"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    HorizontalAlignment="Center"/>
                         <TextBlock Text="&amp; VOID CONTAINMENT"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    HorizontalAlignment="Center"
                                    Margin="0,2,0,0"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,16,0,24"/>
+
                         <TextBlock Text="We are from the Ministry."
                                    FontFamily="Georgia, Times New Roman"
-                                   FontSize="20" FontStyle="Italic"
-                                   Foreground="#F0C840"
+                                   FontSize="22" FontStyle="Italic"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"
                                    HorizontalAlignment="Center"
                                    TextWrapping="Wrap" TextAlignment="Center"/>
-                        <TextBlock Text="You can trust us, We're here to help."
+                        <TextBlock Text="You can trust us. We're here to help."
                                    FontFamily="Georgia, Times New Roman"
-                                   FontSize="20" FontStyle="Italic"
-                                   Foreground="#F0C840"
+                                   FontSize="22" FontStyle="Italic"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"
                                    HorizontalAlignment="Center"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    Margin="0,4,0,0"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,24,0,24"/>
+
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#F0EDE8"
+                                   FontSize="14" Foreground="{StaticResource TextPrimaryBrush}"
                                    TextWrapping="Wrap" TextAlignment="Center"
-                                   LineHeight="22">
-                            Welcome to <Run Foreground="#F0C840"
+                                   LineHeight="24">
+                            Welcome to <Run Foreground="{StaticResource GoldPrimaryBrush}"
                                 FontWeight="SemiBold">The Monitor That Goes Bing</Run> —
                             the app that watches your SimplyPrint printers so you don't have to.
                         </TextBlock>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    LineHeight="22" Margin="0,16,0,0">
                             Somewhere, right now, one of your printers is doing something.
                             We intend to tell you about it. Loudly. With feeling. Possibly at 3am.
                         </TextBlock>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    LineHeight="22" Margin="0,16,0,0">
                             You don't have to watch the printer anymore. That's our job now.
                         </TextBlock>
-                        <TextBlock FontFamily="Courier New"
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
                                    FontSize="12" FontStyle="Italic"
-                                   Foreground="#5A5248" TextWrapping="Wrap"
-                                   TextAlignment="Center" Margin="0,24,0,0">
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   TextWrapping="Wrap" TextAlignment="Center"
+                                   Margin="0,24,0,0">
                             We have forms. And we here at the Ministry are experts at those forms.
                             Just answer a few simple questions and we'll file everything with the
                             Redundant Department of Redundancy. Twice. In triplicate.
@@ -475,12 +147,14 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="SECTION A — IDENTIFICATION"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,12,0,20"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,24">
                             The Ministry requires two pieces of information before it can begin
@@ -488,25 +162,29 @@
                             Credential Manager. Not a filing cabinet. Not a spreadsheet.
                             Windows Credential Manager. We are, after all, professionals.
                         </TextBlock>
+
                         <TextBlock Text="ORGANISATION ID"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"
                                    Margin="0,0,0,6"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="11" Foreground="#8A8078"
+                                   FontSize="12" Foreground="{StaticResource TextDimBrush}"
                                    Margin="0,0,0,8" TextWrapping="Wrap">
                             Found in your SimplyPrint URL —
-                            simplyprint.io/panel/[<Run Foreground="#C9930E">your-id-here</Run>]/dashboard
+                            simplyprint.io/panel/[<Run Foreground="{StaticResource AccentBlueBrush}">your-id-here</Run>]/dashboard
                         </TextBlock>
                         <TextBox x:Name="OrgIdInput"
                                  Style="{StaticResource MtgbInput}"
                                  Margin="0,0,0,20"/>
+
                         <TextBlock Text="API KEY"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"
                                    Margin="0,0,0,6"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="11" Foreground="#8A8078"
+                                   FontSize="12" Foreground="{StaticResource TextDimBrush}"
                                    Margin="0,0,0,8" TextWrapping="Wrap">
                             Generated at SimplyPrint → Settings → API.
                             Guard it with your life. Or at least a password manager.
@@ -514,27 +192,31 @@
                         <PasswordBox x:Name="ApiKeyInput"
                                      Style="{StaticResource MtgbPasswordInput}"
                                      Margin="0,0,0,20"/>
+
                         <Button x:Name="TestConnectionButton"
                                 Content="TEST CONNECTION"
                                 Style="{StaticResource GhostButton}"
                                 HorizontalAlignment="Left"
                                 Click="OnTestConnectionClick"
                                 Margin="0,0,0,16"/>
+
                         <Border x:Name="ConnectionStatusPanel"
                                 Visibility="Collapsed"
-                                Background="#141417"
-                                BorderBrush="#3A3028"
+                                Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
                                 BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="12,10">
+                                CornerRadius="7"
+                                Padding="14,10">
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse x:Name="ConnectionDot"
-                                         Width="8" Height="8" Fill="#5A5248"
+                                         Width="8" Height="8"
+                                         Fill="{StaticResource TextDimBrush}"
                                          VerticalAlignment="Center"
                                          Margin="0,0,10,0"/>
                                 <TextBlock x:Name="ConnectionStatusText"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextDimBrush}"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
@@ -548,12 +230,14 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="SECTION B — STANDING ORDERS"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,12,0,20"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,32">
                             The Ministry works best when it is already watching before you arrive.
@@ -561,8 +245,12 @@
                             it is watching. And everybody knows when something goes wrong — but you
                             won't if you forget to start MTGB. The Ministry highly recommends you say yes.
                         </TextBlock>
-                        <Border Background="#141417" BorderBrush="#C9930E"
-                                BorderThickness="0,0,0,1" Padding="0,16">
+
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="16,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -570,11 +258,13 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,16,0">
                                     <TextBlock Text="START WITH WINDOWS"
-                                               FontFamily="Courier New" FontSize="11"
-                                               FontWeight="Bold" Foreground="#F0EDE8"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                               FontSize="11" Foreground="#8A8078"
-                                               TextWrapping="Wrap" Margin="0,4,0,0">
+                                               FontSize="12" Foreground="{StaticResource TextDimBrush}"
+                                               TextWrapping="Wrap" Margin="0,6,0,0"
+                                               LineHeight="20">
                                         Launch MTGB automatically when Windows starts.
                                         The Ministry recommends this. Strongly.
                                         It has filed a form about it.
@@ -587,10 +277,12 @@
                                               VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
-                        <TextBlock FontFamily="Courier New"
-                                   FontSize="11" FontStyle="Italic"
-                                   Foreground="#5A5248" TextWrapping="Wrap"
-                                   Margin="0,24,0,0" TextAlignment="Center">
+
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="12" FontStyle="Italic"
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   TextWrapping="Wrap" Margin="0,24,0,0"
+                                   TextAlignment="Center">
                             This setting and all others can be changed at any time via the Settings window.
                         </TextBlock>
                     </StackPanel>
@@ -603,12 +295,14 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="SECTION C — THE SCRIBES"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,12,0,20"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,16">
                             The Ministry employs scribes. Tireless, watchful, completely anonymous
@@ -616,68 +310,89 @@
                             used on your system — purely to help improve it for the community.
                         </TextBlock>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,24">
                             No llamas were harmed in the design of this telemetry system.
                             No names, no API keys, no printer names, no job files.
                             Just numbers. Boring, beautiful, anonymous numbers.
                         </TextBlock>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+
+                        <!-- What the scribes record -->
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="10"
                                 Padding="16,14" Margin="0,0,0,24">
                             <StackPanel>
                                 <TextBlock Text="WHAT THE SCRIBES RECORD"
-                                           FontFamily="Courier New" FontSize="10"
-                                           FontWeight="Bold" Foreground="#C9930E"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource GoldPrimaryBrush}"
                                            Margin="0,0,0,10"/>
                                 <StackPanel>
                                     <TextBlock Text="✓  MTGB version"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✓  Windows version"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✓  Printer integration type (Bambu, Prusa etc)"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" TextWrapping="Wrap"
-                                               Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               TextWrapping="Wrap" Margin="0,0,0,3"/>
                                     <TextBlock Text="✓  Number of printers — no names"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✓  Which event types fired — counts only"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✓  A random anonymous install ID"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <Rectangle Height="1" Fill="#3A3028" Margin="0,12,0,12"/>
+
+                                <Rectangle Height="1"
+                                           Fill="{StaticResource BorderBlueBrush}"
+                                           Margin="0,12,0,12"/>
+
                                 <TextBlock Text="WHAT THE SCRIBES NEVER RECORD"
-                                           FontFamily="Courier New" FontSize="10"
-                                           FontWeight="Bold" Foreground="#E84855"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource SemanticErrorBrush}"
                                            Margin="0,0,0,10"/>
                                 <StackPanel>
                                     <TextBlock Text="✗  API keys or credentials"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✗  Organisation IDs"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✗  Printer names or job filenames"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✗  IP addresses"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078" Margin="0,0,0,2"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,3"/>
                                     <TextBlock Text="✗  Anything that could identify you"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                        <Border Background="#141417" BorderBrush="#C9930E"
-                                BorderThickness="0,0,0,1" Padding="0,16">
+
+                        <!-- Telemetry toggle -->
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="10"
+                                Padding="16,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -685,11 +400,13 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,16,0">
                                     <TextBlock Text="ALLOW ANONYMOUS TELEMETRY"
-                                               FontFamily="Courier New" FontSize="11"
-                                               FontWeight="Bold" Foreground="#F0EDE8"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                               FontSize="11" Foreground="#8A8078"
-                                               TextWrapping="Wrap" Margin="0,4,0,0">
+                                               FontSize="12" Foreground="{StaticResource TextDimBrush}"
+                                               TextWrapping="Wrap" Margin="0,6,0,0"
+                                               LineHeight="20">
                                         Help improve MTGB for the community.
                                         Default off. Your choice entirely.
                                         The scribes will wait. They might even catch a cat nap.
@@ -702,10 +419,12 @@
                                               VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
-                        <TextBlock FontFamily="Courier New"
-                                   FontSize="10" FontStyle="Italic"
-                                   Foreground="#5A5248" TextWrapping="Wrap"
-                                   Margin="0,16,0,0" TextAlignment="Center">
+
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="11" FontStyle="Italic"
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   TextWrapping="Wrap" Margin="0,16,0,0"
+                                   TextAlignment="Center">
                             Full transparency policy at TELEMETRY.md in the repo.
                             The scribes are working tirelessly. No llamas involved.
                         </TextBlock>
@@ -719,12 +438,14 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="SECTION D — THE REGISTRY"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,12,0,20"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,16">
                             The Ministry maintains a register of known installations.
@@ -733,7 +454,7 @@
                             Except tiny little unassuming dots.
                         </TextBlock>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,24">
                             If you choose to participate, your installation will be counted
@@ -741,9 +462,12 @@
                             system exists. No city. No street. No postcode. Just a dot on a
                             map that says someone here uses MTGB.
                         </TextBlock>
-                        <Border Background="#141417" BorderBrush="#C9930E"
-                                BorderThickness="0,0,0,1" Padding="0,16"
-                                Margin="0,0,0,20">
+
+                        <!-- Map toggle -->
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="10"
+                                Padding="16,16" Margin="0,0,0,20">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -751,11 +475,12 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,16,0">
                                     <TextBlock Text="ADD ME TO THE MAP"
-                                               FontFamily="Courier New" FontSize="11"
-                                               FontWeight="Bold" Foreground="#F0EDE8"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                               FontSize="11" Foreground="#8A8078"
-                                               TextWrapping="Wrap" Margin="0,4,0,0">
+                                               FontSize="12" Foreground="{StaticResource TextDimBrush}"
+                                               TextWrapping="Wrap" Margin="0,6,0,0">
                                         Default off. Your dot. Your choice.
                                         The Ministry will not sulk if you decline.
                                     </TextBlock>
@@ -768,44 +493,46 @@
                                               Click="OnMapToggleChanged"/>
                             </Grid>
                         </Border>
+
+                        <!-- Selection panel -->
                         <StackPanel x:Name="MapSelectionPanel" Visibility="Collapsed">
                             <TextBlock Text="COUNTRY"
-                                       FontFamily="Courier New" FontSize="10"
-                                       FontWeight="Bold" Foreground="#C9930E"
+                                       FontFamily="Segoe UI Variable, Segoe UI"
+                                       FontSize="10" FontWeight="SemiBold"
+                                       Foreground="{StaticResource GoldPrimaryBrush}"
                                        Margin="0,0,0,6"/>
                             <ComboBox x:Name="CountrySelector"
-                                      Background="#141417" Foreground="#F0EDE8"
-                                      BorderBrush="#3A3028"
-                                      FontFamily="Segoe UI Variable, Segoe UI"
-                                      FontSize="12" Padding="10,8"
                                       Margin="0,0,0,16"
                                       SelectionChanged="OnCountryChanged"/>
+
                             <StackPanel x:Name="StateSelectorPanel"
                                         Visibility="Collapsed" Margin="0,0,0,16">
                                 <TextBlock Text="STATE / TERRITORY"
-                                           FontFamily="Courier New" FontSize="10"
-                                           FontWeight="Bold" Foreground="#C9930E"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource GoldPrimaryBrush}"
                                            Margin="0,0,0,6"/>
                                 <ComboBox x:Name="StateSelector"
-                                          Background="#141417" Foreground="#F0EDE8"
-                                          BorderBrush="#3A3028"
-                                          FontFamily="Segoe UI Variable, Segoe UI"
-                                          FontSize="12" Padding="10,8"
                                           SelectionChanged="OnStateChanged"/>
                             </StackPanel>
-                            <Border Background="#141417" BorderBrush="#3A3028"
-                                    BorderThickness="1" CornerRadius="4"
+
+                            <Border Background="{StaticResource BgRaisedBrush}"
+                                    BorderBrush="{StaticResource BorderBlueBrush}"
+                                    BorderThickness="1" CornerRadius="7"
                                     Padding="14,12">
                                 <TextBlock x:Name="RegistrationConfirmText"
                                            FontFamily="Segoe UI Variable, Segoe UI"
-                                           FontSize="12" Foreground="#F0C840"
+                                           FontSize="13"
+                                           Foreground="{StaticResource GoldPrimaryBrush}"
                                            TextWrapping="Wrap" LineHeight="20"/>
                             </Border>
                         </StackPanel>
-                        <TextBlock FontFamily="Courier New"
-                                   FontSize="10" FontStyle="Italic"
-                                   Foreground="#5A5248" TextWrapping="Wrap"
-                                   Margin="0,24,0,0" TextAlignment="Center">
+
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="11" FontStyle="Italic"
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   TextWrapping="Wrap" Margin="0,24,0,0"
+                                   TextAlignment="Center">
                             You can opt out at any time via Settings → Privacy.
                             The Ministry will file the departure form without complaint.
                         </TextBlock>
@@ -819,12 +546,14 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="SECTION E — YOUR INDUCTION SUMMARY"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,12,0,20"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" LineHeight="22"
                                    Margin="0,0,0,20">
                             The Ministry has recorded the following.
@@ -834,11 +563,13 @@
 
                         <!-- Connection -->
                         <TextBlock Text="CONNECTION"
-                                   FontFamily="Courier New" FontSize="9"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    Margin="0,0,0,6"/>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="14,12" Margin="0,0,0,16">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
@@ -847,12 +578,11 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Organisation ID"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078"/>
-                                    <TextBlock x:Name="SummaryOrgId"
-                                               Grid.Column="1"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#F0C840"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextDimBrush}"/>
+                                    <TextBlock x:Name="SummaryOrgId" Grid.Column="1"
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource GoldPrimaryBrush}"/>
                                 </Grid>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -860,23 +590,24 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Auth mode"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#8A8078"/>
-                                    <TextBlock x:Name="SummaryAuthMode"
-                                               Grid.Column="1"
-                                               FontFamily="Courier New" FontSize="11"
-                                               Foreground="#F0C840"/>
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource TextDimBrush}"/>
+                                    <TextBlock x:Name="SummaryAuthMode" Grid.Column="1"
+                                               FontFamily="Segoe UI Variable, Segoe UI"
+                                               FontSize="12" Foreground="{StaticResource GoldPrimaryBrush}"/>
                                 </Grid>
                             </StackPanel>
                         </Border>
 
                         <!-- Standing Orders -->
                         <TextBlock Text="STANDING ORDERS"
-                                   FontFamily="Courier New" FontSize="9"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    Margin="0,0,0,6"/>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="14,12" Margin="0,0,0,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -884,22 +615,23 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Start with Windows"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"/>
-                                <TextBlock x:Name="SummaryStartWithWindows"
-                                           Grid.Column="1"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"/>
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextDimBrush}"/>
+                                <TextBlock x:Name="SummaryStartWithWindows" Grid.Column="1"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextMutedBrush}"/>
                             </Grid>
                         </Border>
 
                         <!-- The Scribes -->
                         <TextBlock Text="THE SCRIBES"
-                                   FontFamily="Courier New" FontSize="9"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    Margin="0,0,0,6"/>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="14,12" Margin="0,0,0,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -907,22 +639,23 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Anonymous telemetry"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"/>
-                                <TextBlock x:Name="SummaryTelemetry"
-                                           Grid.Column="1"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"/>
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextDimBrush}"/>
+                                <TextBlock x:Name="SummaryTelemetry" Grid.Column="1"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextMutedBrush}"/>
                             </Grid>
                         </Border>
 
                         <!-- The Registry -->
                         <TextBlock Text="THE REGISTRY"
-                                   FontFamily="Courier New" FontSize="9"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    Margin="0,0,0,6"/>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="14,12" Margin="0,0,0,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -930,37 +663,40 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Community map"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"/>
-                                <TextBlock x:Name="SummaryCommunityMap"
-                                           Grid.Column="1"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextDimBrush}"/>
+                                <TextBlock x:Name="SummaryCommunityMap" Grid.Column="1"
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextMutedBrush}"
                                            TextWrapping="Wrap"/>
                             </Grid>
                         </Border>
 
                         <!-- Identity -->
                         <TextBlock Text="YOUR IDENTITY"
-                                   FontFamily="Courier New" FontSize="9"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    Margin="0,0,0,6"/>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="14,12" Margin="0,0,0,8">
                             <StackPanel>
                                 <TextBlock Text="Anonymous install ID"
-                                           FontFamily="Courier New" FontSize="11"
-                                           Foreground="#8A8078" Margin="0,0,0,6"/>
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource TextDimBrush}"
+                                           Margin="0,0,0,6"/>
                                 <TextBlock x:Name="SummaryInstallId"
-                                           FontFamily="Courier New" FontSize="10"
-                                           Foreground="#F0C840" TextWrapping="Wrap"/>
+                                           FontFamily="Segoe UI Variable, Segoe UI"
+                                           FontSize="12" Foreground="{StaticResource GoldPrimaryBrush}"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
-                        <TextBlock FontFamily="Courier New"
-                                   FontSize="9" FontStyle="Italic"
-                                   Foreground="#5A5248" TextWrapping="Wrap"
-                                   Margin="0,0,0,8">
+                        <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="11" FontStyle="Italic"
+                                   Foreground="{StaticResource TextDimBrush}"
+                                   TextWrapping="Wrap" Margin="0,0,0,8">
                             This is your anonymous identifier. The Ministry knows only this.
                             Nothing more. It lives in %APPDATA%\MTGB\appsettings.json.
                         </TextBlock>
@@ -974,28 +710,31 @@
                               Padding="32,28,32,16">
                     <StackPanel>
                         <TextBlock Text="INDUCTION COMPLETE"
-                                   FontFamily="Courier New" FontSize="10"
-                                   FontWeight="Bold" Foreground="#8B6508"
+                                   FontFamily="Segoe UI Variable, Segoe UI"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    HorizontalAlignment="Center"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,16,0,24"/>
                         <TextBlock Text="You are now in the system."
                                    FontFamily="Georgia, Times New Roman"
-                                   FontSize="20" FontStyle="Italic"
-                                   Foreground="#F0C840"
+                                   FontSize="22" FontStyle="Italic"
+                                   Foreground="{StaticResource GoldPrimaryBrush}"
                                    HorizontalAlignment="Center"
                                    TextWrapping="Wrap" TextAlignment="Center"/>
                         <TextBlock Text="The system is, for once, on your side."
                                    FontFamily="Georgia, Times New Roman"
-                                   FontSize="16" FontStyle="Italic"
-                                   Foreground="#C9930E"
+                                   FontSize="17" FontStyle="Italic"
+                                   Foreground="{StaticResource AccentBlueBrush}"
                                    HorizontalAlignment="Center"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    Margin="0,8,0,0"/>
-                        <Rectangle Height="1" Fill="#C9930E"
+                        <Rectangle Height="1"
+                                   Fill="{StaticResource AccentBlueBrush}"
                                    Opacity="0.3" Margin="0,24,0,24"/>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    LineHeight="22" Margin="0,0,0,16">
                             MTGB is now watching your printers.
@@ -1003,30 +742,31 @@
                             We will handle the rest.
                         </TextBlock>
                         <TextBlock FontFamily="Segoe UI Variable, Segoe UI"
-                                   FontSize="13" Foreground="#C8C0B8"
+                                   FontSize="13" Foreground="{StaticResource TextMutedBrush}"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    LineHeight="22" Margin="0,0,0,24">
                             When something happens — and something always happens —
                             the machine will go Bing.
                         </TextBlock>
-                        <Border Background="#141417" BorderBrush="#3A3028"
-                                BorderThickness="1" CornerRadius="4"
+                        <Border Background="{StaticResource BgRaisedBrush}"
+                                BorderBrush="{StaticResource BorderBlueBrush}"
+                                BorderThickness="1" CornerRadius="7"
                                 Padding="16,14">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock
                                     Text="Form MwA 621d/7 22 — Ministry of Printer Observation &amp; Void Containment"
-                                    FontFamily="Courier New" FontSize="12"
-                                    Foreground="#5A5248" TextWrapping="Wrap"
-                                    TextAlignment="Center" LineHeight="20"/>
+                                    FontFamily="Segoe UI Variable, Segoe UI" FontSize="12"
+                                    Foreground="{StaticResource TextDimBrush}"
+                                    TextWrapping="Wrap" TextAlignment="Center" LineHeight="20"/>
                                 <TextBlock Text="Filed. Stamped. Acknowledged."
-                                    FontFamily="Courier New" FontSize="12"
-                                    Foreground="#5A5248" TextAlignment="Center"
-                                    LineHeight="20"/>
+                                    FontFamily="Segoe UI Variable, Segoe UI" FontSize="12"
+                                    Foreground="{StaticResource TextDimBrush}"
+                                    TextAlignment="Center" LineHeight="20"/>
                                 <TextBlock
                                     Text="The scribe in the third row has already made four copies."
-                                    FontFamily="Courier New" FontSize="12"
-                                    Foreground="#5A5248" TextAlignment="Center"
-                                    LineHeight="20"/>
+                                    FontFamily="Segoe UI Variable, Segoe UI" FontSize="12"
+                                    Foreground="{StaticResource TextDimBrush}"
+                                    TextAlignment="Center" LineHeight="20"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -1038,27 +778,30 @@
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"
-                        Margin="0,16,0,16">
+                        Background="{StaticResource BgPrimaryBrush}"
+                        Margin="0,12,0,12">
                 <Ellipse x:Name="Dot1" Width="8" Height="8"
-                         Fill="#F0C840" Margin="4,0"/>
+                         Fill="{StaticResource GoldPrimaryBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot2" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot3" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot4" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot5" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot6" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
                 <Ellipse x:Name="Dot7" Width="8" Height="8"
-                         Fill="#3A3028" Margin="4,0"/>
+                         Fill="{StaticResource BgRaisedBrush}" Margin="4,0"/>
             </StackPanel>
 
             <!-- ── Navigation ─────────────────────────────────── -->
             <Border Grid.Row="3"
-                    BorderBrush="#C9930E"
+                    Background="{StaticResource BgDeepestBrush}"
+                    BorderBrush="{StaticResource BorderBlueBrush}"
                     BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,14,14"
                     Padding="24,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -1069,16 +812,16 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button x:Name="ExitButton"
-                            Grid.Column="0" Content="EXIT"
+                            Grid.Column="0" Content="Exit"
                             Style="{StaticResource ExitButton}"
                             Click="OnExitClick"/>
                     <Button x:Name="BackButton"
-                            Grid.Column="2" Content="← BACK"
-                            Style="{StaticResource GhostButton}"
+                            Grid.Column="2" Content="← Back"
+                            Style="{StaticResource SecondaryButton}"
                             Visibility="Collapsed"
                             Click="OnBackClick"/>
                     <Button x:Name="ContinueButton"
-                            Grid.Column="4" Content="CONTINUE →"
+                            Grid.Column="4" Content="Continue →"
                             Style="{StaticResource PrimaryButton}"
                             Click="OnContinueClick"/>
                 </Grid>
