@@ -6,7 +6,7 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.5.3</Version>
+    <Version>0.5.4</Version>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
