@@ -1,6 +1,7 @@
 # ============================================================
 # MTGB — MSIX Packaging Script
-# Produces a signed or unsigned MSIX from the publish output
+# Produces a signed or unsigned MSIX and a single-file
+# portable ZIP from the publish output.
 # Ministry of Printer Observation & Void Containment
 # ============================================================
 
@@ -13,15 +14,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# ── Resolve paths relative to script location ─────────────────
-$repoRoot   = $PSScriptRoot
-$projectDir = Join-Path $repoRoot "src\MTGB"
-$publishDir = Join-Path $projectDir "bin\Publish\MSIX"
-$outputDir  = Join-Path $repoRoot "dist"
-$msixPath   = Join-Path $outputDir "MTGB-$Version-x64.msix"
-$zipPath    = Join-Path $outputDir "MTGB-$Version-x64-portable.zip"
+# ── Resolve paths ─────────────────────────────────────────────
+$repoRoot      = $PSScriptRoot
+$projectDir    = Join-Path $repoRoot "src\MTGB"
+$publishMsix   = Join-Path $projectDir "bin\Publish\MSIX"
+$publishPortable = Join-Path $projectDir "bin\Publish\Portable"
+$outputDir     = Join-Path $repoRoot "dist"
+$msixPath      = Join-Path $outputDir "MTGB-$Version-x64.msix"
+$zipPath       = Join-Path $outputDir "MTGB-$Version-x64-portable.zip"
 
-# ── Locate MakeAppx — search common SDK locations ─────────────
+# ── Locate MakeAppx ───────────────────────────────────────────
 $makeAppx = $null
 $signTool = $null
 
@@ -50,13 +52,13 @@ Write-Host "============================================"
 Write-Host " MTGB Packaging — v$Version"
 Write-Host " The Ministry is preparing the distribution"
 Write-Host "============================================"
-Write-Host " Repo:    $repoRoot"
-Write-Host " Project: $projectDir"
+Write-Host " Repo:     $repoRoot"
+Write-Host " Project:  $projectDir"
 Write-Host " MakeAppx: $makeAppx"
 Write-Host ""
 
 # ── Step 1 — Clean output directory ──────────────────────────
-Write-Host "[1/6] Cleaning output directory..."
+Write-Host "[1/7] Cleaning output directory..."
 if (Test-Path $outputDir) {
     Remove-Item "$outputDir\*" -Recurse -Force
 } else {
@@ -64,26 +66,56 @@ if (Test-Path $outputDir) {
 }
 Write-Host "      Done."
 
-# ── Step 2 — Publish ─────────────────────────────────────────
-Write-Host "[2/6] Publishing MTGB..."
+# ── Step 2 — Publish MSIX ────────────────────────────────────
+Write-Host "[2/7] Publishing MSIX build..."
 Push-Location $projectDir
 dotnet publish -p:PublishProfile=MSIX --nologo -v quiet
 if ($LASTEXITCODE -ne 0) {
     Pop-Location
-    Write-Error "dotnet publish failed."
+    Write-Error "dotnet publish (MSIX) failed."
     exit 1
 }
 Pop-Location
 Write-Host "      Done."
 
-# ── Step 3 — Prepare package layout ──────────────────────────
-Write-Host "[3/6] Preparing package layout..."
+# ── Step 3 — Publish portable single-file ────────────────────
+Write-Host "[3/7] Publishing portable single-file build..."
+Push-Location $projectDir
+
+if (Test-Path $publishPortable) {
+    Remove-Item "$publishPortable\*" -Recurse -Force
+} else {
+    New-Item -ItemType Directory -Path $publishPortable | Out-Null
+}
+
+dotnet publish `
+    -c Release `
+    -r win-x64 `
+    --self-contained true `
+    -p:PublishSingleFile=true `
+    -p:IncludeNativeLibrariesForSelfExtract=true `
+    -p:EnableCompressionInSingleFile=true `
+    -p:DebugType=none `
+    -p:DebugSymbols=false `
+    -o $publishPortable `
+    --nologo -v quiet
+
+if ($LASTEXITCODE -ne 0) {
+    Pop-Location
+    Write-Error "dotnet publish (portable) failed."
+    exit 1
+}
+Pop-Location
+Write-Host "      Done."
+
+# ── Step 4 — Prepare MSIX manifest ───────────────────────────
+Write-Host "[4/7] Preparing package layout..."
 
 $manifestSrc  = Join-Path $projectDir "Package.appxmanifest"
-$manifestDest = Join-Path $publishDir "AppxManifest.xml"
+$manifestDest = Join-Path $publishMsix "AppxManifest.xml"
 
-$manifest  = Get-Content $manifestSrc -Raw
-$manifest  = $manifest -replace 'Version="[\d.]+"', `
+$manifest = Get-Content $manifestSrc -Raw
+$manifest = $manifest -replace 'Version="[\d.]+"', `
     "Version=`"$Version`""
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
@@ -92,18 +124,18 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
 Write-Host "      Manifest written — v$Version"
 
-# ── Step 4 — Build MSIX ───────────────────────────────────────
-Write-Host "[4/6] Building MSIX package..."
-& $makeAppx pack /d $publishDir /p $msixPath /overwrite /nv
+# ── Step 5 — Build MSIX ───────────────────────────────────────
+Write-Host "[5/7] Building MSIX package..."
+& $makeAppx pack /d $publishMsix /p $msixPath /overwrite /nv
 if ($LASTEXITCODE -ne 0) {
     Write-Error "MakeAppx failed with exit code $LASTEXITCODE"
     exit 1
 }
 Write-Host "      MSIX created — $msixPath"
 
-# ── Step 5 — Sign (optional) ──────────────────────────────────
+# ── Step 6 — Sign (optional) ──────────────────────────────────
 if ($Sign) {
-    Write-Host "[5/6] Signing MSIX..."
+    Write-Host "[6/7] Signing MSIX..."
     if ([string]::IsNullOrEmpty($CertPath)) {
         Write-Error "CertPath is required when -Sign is specified."
         exit 1
@@ -120,16 +152,45 @@ if ($Sign) {
     }
     Write-Host "      Signed."
 } else {
-    Write-Host "[5/6] Signing skipped — unsigned build."
+    Write-Host "[6/7] Signing skipped — unsigned build."
     Write-Host "      Note: Users will need to enable sideloading"
     Write-Host "      or trust the certificate to install."
 }
 
-# ── Step 6 — Build portable ZIP ──────────────────────────────
-Write-Host "[6/6] Building portable ZIP..."
-Compress-Archive -Path "$publishDir\*" `
+# ── Step 7 — Build portable ZIP ──────────────────────────────
+Write-Host "[7/7] Building portable ZIP..."
+
+# Include only the essential files — single exe + required extras
+$includePatterns = @("*.exe", "*.ico", "appsettings.json")
+$filesToZip = Get-ChildItem $publishPortable -File |
+    Where-Object {
+        $name = $_.Name
+        $includePatterns | Where-Object { $name -like $_ }
+    }
+
+# Also include the Assets folder for countries.json and ico
+$assetsSource = Join-Path $publishPortable "Assets"
+$tempZipDir   = Join-Path $outputDir "portable_temp"
+
+if (Test-Path $tempZipDir) {
+    Remove-Item $tempZipDir -Recurse -Force
+}
+New-Item -ItemType Directory -Path $tempZipDir | Out-Null
+
+foreach ($file in $filesToZip) {
+    Copy-Item $file.FullName $tempZipDir
+}
+
+if (Test-Path $assetsSource) {
+    Copy-Item $assetsSource $tempZipDir -Recurse
+}
+
+Compress-Archive -Path "$tempZipDir\*" `
     -DestinationPath $zipPath `
     -Force
+
+Remove-Item $tempZipDir -Recurse -Force
+
 Write-Host "      ZIP created — $zipPath"
 
 # ── Done ──────────────────────────────────────────────────────
