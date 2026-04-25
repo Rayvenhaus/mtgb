@@ -10,6 +10,46 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.4] — 2026-04-25
+### The one where the Ministry fixed its own face.
+
+### Fixed
+
+#### Portable ZIP — clean single-file distribution
+- Portable ZIP now contains three items: `MTGB.exe`, `appsettings.json`,
+  and an `Assets\` folder with `countries.json`, `mtgbNotification.wav`,
+  and `mtgb.ico`
+- Previous release contained 301 files. The Ministry is embarrassed.
+  The Redundant Department has filed a strongly worded internal memo.
+- `package.ps1` updated — separate single-file publish for portable,
+  explicit asset inclusion, language satellite folders excluded
+- `MTGB.exe` is self-contained — no .NET runtime required
+
+#### Button text colour
+- Primary button text was rendering white on gold — now correctly
+  renders dark navy `#0f1f4a` on gold at all states
+- `ContentPresenter` in `PrimaryButton` and `GhostButton` templates
+  now correctly binds to `TemplateBinding Foreground`
+
+#### Test Connection button — colour states
+- Test Connection button now turns green on successful connection
+  and red on failure
+- `GhostButton` template `BorderBrush` was hardcoded — now binds
+  to `TemplateBinding BorderBrush` so code-behind colour changes
+  are correctly applied
+
+#### Single-file publish warnings
+- Replaced `Assembly.GetExecutingAssembly().Location` with
+  `AppContext.BaseDirectory` in `InductionWindow.xaml.cs` and
+  `SettingsWindow.xaml.cs` — eliminates IL3000 warning in
+  single-file publish mode
+
+### Technical notes
+- Version bumped to 0.5.4
+- No llamas were incorrectly coloured in the making of this release
+
+---
+
 ## [0.5.3] — 2026-04-25
 ### The one where the Ministry got a makeover.
 

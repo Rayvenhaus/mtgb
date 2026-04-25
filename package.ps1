@@ -160,30 +160,27 @@ if ($Sign) {
 # ── Step 7 — Build portable ZIP ──────────────────────────────
 Write-Host "[7/7] Building portable ZIP..."
 
-# Include only the essential files — single exe + required extras
-$includePatterns = @("*.exe", "*.ico", "appsettings.json")
-$filesToZip = Get-ChildItem $publishPortable -File |
-    Where-Object {
-        $name = $_.Name
-        $includePatterns | Where-Object { $name -like $_ }
-    }
-
-# Also include the Assets folder for countries.json and ico
-$assetsSource = Join-Path $publishPortable "Assets"
-$tempZipDir   = Join-Path $outputDir "portable_temp"
+$tempZipDir = Join-Path $outputDir "portable_temp"
 
 if (Test-Path $tempZipDir) {
     Remove-Item $tempZipDir -Recurse -Force
 }
 New-Item -ItemType Directory -Path $tempZipDir | Out-Null
+New-Item -ItemType Directory -Path "$tempZipDir\Assets" | Out-Null
 
-foreach ($file in $filesToZip) {
-    Copy-Item $file.FullName $tempZipDir
-}
+# MTGB.exe
+Copy-Item "$publishPortable\MTGB.exe" $tempZipDir
 
-if (Test-Path $assetsSource) {
-    Copy-Item $assetsSource $tempZipDir -Recurse
-}
+# appsettings.json
+Copy-Item "$publishPortable\appsettings.json" $tempZipDir
+
+# Assets — from publish output
+Copy-Item "$publishPortable\Assets\countries.json" "$tempZipDir\Assets\"
+Copy-Item "$publishPortable\Assets\mtgbNotification.wav" "$tempZipDir\Assets\"
+
+# mtgb.ico — copy directly from source since publish doesn't include it
+$icoSource = Join-Path $projectDir "Assets\mtgb.ico"
+Copy-Item $icoSource "$tempZipDir\Assets\"
 
 Compress-Archive -Path "$tempZipDir\*" `
     -DestinationPath $zipPath `
