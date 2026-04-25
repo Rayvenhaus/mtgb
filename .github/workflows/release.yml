@@ -151,7 +151,9 @@ jobs:
           name: "MTGB ${{ steps.version.outputs.TAG }} — beta"
           body_path: release_notes.txt
           draft: false
-          prerelease: true
+          prerelease: false
+          make_latest: true
+          fail_on_unmatched_files: false
           files: |
             dist/MTGB-${{ steps.version.outputs.TAG }}-x64.msix
             dist/MTGB-${{ steps.version.outputs.TAG }}-x64-portable.zip
