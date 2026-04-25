@@ -443,9 +443,8 @@ public partial class InductionWindow : Window
 
         if (enable)
         {
-            var exePath = Environment.ProcessPath ??
-                System.Reflection.Assembly
-                    .GetExecutingAssembly().Location;
+            var exePath = Environment.ProcessPath
+                ?? Path.Combine(AppContext.BaseDirectory, "MTGB.exe");
             key.SetValue(appName, $"\"{exePath}\"");
         }
         else

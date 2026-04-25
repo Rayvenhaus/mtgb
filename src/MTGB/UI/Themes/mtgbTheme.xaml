@@ -447,7 +447,8 @@
                                 </LinearGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
                         </Border>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -522,6 +523,7 @@
         <Setter Property="FontSize"        Value="13"/>
         <Setter Property="FontWeight"      Value="SemiBold"/>
         <Setter Property="Foreground"      Value="{StaticResource AccentBlueBrush}"/>
+        <Setter Property="BorderBrush"     Value="{StaticResource AccentBlueBrush}"/>
         <Setter Property="Padding"         Value="24,10"/>
         <Setter Property="Cursor"          Value="Hand"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -531,7 +533,7 @@
                     <Border x:Name="Outer"
                             CornerRadius="7"
                             BorderThickness="0,1,0,3"
-                            BorderBrush="{StaticResource AccentBlueBrush}">
+                            BorderBrush="{TemplateBinding BorderBrush}">
                         <Border x:Name="Inner"
                                 CornerRadius="7"
                                 Padding="{TemplateBinding Padding}">
@@ -542,7 +544,8 @@
                                 </LinearGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
                         </Border>
                     </Border>
                     <ControlTemplate.Triggers>

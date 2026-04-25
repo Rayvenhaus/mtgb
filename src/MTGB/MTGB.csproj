@@ -63,17 +63,17 @@
 	<Resource Include="Assets\MTGB_620x300.png" />
 	<Resource Include="Assets\MTGB_1024.png" />
     <Content Include="Assets\countries.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\mtgb.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <!-- ── Copy to output ─────────────────────────────────────── -->
   <ItemGroup>
     <Content Include="Assets\mtgbNotification.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
