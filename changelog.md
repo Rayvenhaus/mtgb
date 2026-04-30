@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.0] — 2026-05-01
+### The one where the Ministry decided to convert before the Inquisition
+
+### Fixed
+
+#### UI Cosmetic Fixes
+- Minor cosmetic issues with several dialogues concerning the new theming
+- Fixed alignments and positioning in SettingsWindow
+
+### Changed
+
+#### Major Installation Overhaul
+- MTGB has grown to the point that the minimalistic MSIX installation
+  routine is insufficient and we are switching to using WiX to create a
+  complete MSI solution.
+  
+---
+
 ## [0.5.4] — 2026-04-25
 ### The one where the Ministry fixed its own face.
 

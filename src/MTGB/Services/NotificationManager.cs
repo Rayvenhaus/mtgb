@@ -101,10 +101,8 @@ public class NotificationManager : INotificationManager, IDisposable
     private readonly object _groupLock = new();
     private readonly System.Threading.Timer _groupFlushTimer;
 
-    // History file location
-    private static readonly string HistoryFilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "MTGB", "history.json");
+    // History file location — centralised in DataPaths
+    private static readonly string HistoryFilePath = DataPaths.HistoryFile;
 
     // Notification sound
     private static readonly string SoundFilePath = Path.Combine(
@@ -138,9 +136,8 @@ public class NotificationManager : INotificationManager, IDisposable
         // Load existing history from disk
         LoadHistory();
 
-        // Ensure history directory exists
-        Directory.CreateDirectory(Path.GetDirectoryName(
-            HistoryFilePath)!);
+        // Directory creation handled by DataPaths.EnsureDirectoriesExist()
+        // in Program.cs at startup
     }
 
     // ── Public API ────────────────────────────────────────────────

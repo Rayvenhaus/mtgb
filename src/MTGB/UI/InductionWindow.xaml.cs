@@ -412,20 +412,14 @@ public partial class InductionWindow : Window
 
     private void SaveSettings()
     {
-        var appDataDir = Path.Combine(
-            Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData),
-            "MTGB");
-
-        Directory.CreateDirectory(appDataDir);
-
-        var path = Path.Combine(appDataDir, "appsettings.json");
+        // Ensure Data directory exists
+        DataPaths.EnsureDirectoriesExist();
 
         var json = JsonSerializer.Serialize(
             _settings.Value,
             new JsonSerializerOptions { WriteIndented = true });
 
-        File.WriteAllText(path, json);
+        File.WriteAllText(DataPaths.SettingsFile, json);
     }
 
     // ── Startup registry ──────────────────────────────────────────

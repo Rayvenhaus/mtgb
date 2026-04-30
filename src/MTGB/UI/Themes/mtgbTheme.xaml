@@ -438,7 +438,8 @@
                             Margin="0,0,0,0">
                         <Border x:Name="Inner"
                                 CornerRadius="7"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                TextElement.Foreground="#0f1f4a">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                     <GradientStop Color="{StaticResource GoldBrightColor}" Offset="0"/>
@@ -447,8 +448,7 @@
                                 </LinearGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                              VerticalAlignment="Center"/>
                         </Border>
                     </Border>
                     <ControlTemplate.Triggers>

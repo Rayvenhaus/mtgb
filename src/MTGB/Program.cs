@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -34,7 +34,8 @@ internal class Program
         {
             MessageBox.Show(
                 $"MTGB failed to start.\n\n{ex.Message}\n\n" +
-                $"Please check the logs in %APPDATA%\\MTGB\\logs\\",
+                $"Please check the logs in the 'Data\\logs' folder " +
+                "next to the application.",
                 "MTGB — It does not go Bing",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -50,30 +51,16 @@ internal class Program
     Host.CreateDefaultBuilder(args)
         .ConfigureAppConfiguration((context, config) =>
         {
-            var appDataDir = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "MTGB");
-
-            Directory.CreateDirectory(appDataDir);
-
-            var appDataSettings = Path.Combine(
-                appDataDir, "appsettings.json");
-            var builtInSettings = Path.Combine(
-                AppContext.BaseDirectory, "appsettings.json");
-
-            if (!File.Exists(appDataSettings) &&
-                File.Exists(builtInSettings))
-            {
-                File.Copy(builtInSettings, appDataSettings);
-            }
+            // Ensure Data directory exists
+            DataPaths.EnsureDirectoriesExist();
+            DataPaths.InitialiseSettingsFile();
 
             config
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json",
                     optional: false,
                     reloadOnChange: false)
-                .AddJsonFile(appDataSettings,
+                .AddJsonFile(DataPaths.SettingsFile,
                     optional: true,
                     reloadOnChange: true)
                 .AddJsonFile("appsettings.local.json",
@@ -87,23 +74,20 @@ internal class Program
             logging.ClearProviders();
             logging.AddConsole();
             logging.AddDebug();
-            logging.AddFile(Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "MTGB", "logs", "mtgb-.log"));
+            logging.AddFile(DataPaths.LogFilePattern);
         })
         .ConfigureServices((context, services) =>
         {
-            // ── Configuration ─────────────────────────────
+            // ── Configuration ─────────────────────────────────────────────
             services.Configure<AppSettings>(
                 context.Configuration);
 
-            // ── Security ──────────────────────────────────
+            // ── Security ────────────────────────────────────────────────────────
             services.AddSingleton<ICredentialManager,
                 WindowsCredentialManager>();
             services.AddSingleton<WebhookSecretManager>();
 
-            // ── HTTP client ───────────────────────────────
+            // ── HTTP client ─────────────────────────────────────────────────────
             services.AddHttpClient<ISimplyPrintApiClient,
                 SimplyPrintApiClient>((provider, client) =>
                 {
@@ -114,20 +98,20 @@ internal class Program
                         "User-Agent", "MTGB/0.1.0");
                 });
 
-            // ── Auth ──────────────────────────────────────
+            // ── Auth ─────────────────────────────────────────────────────────────────────
             services.AddSingleton<IAuthService, AuthService>();
 
-            // ── Core services ─────────────────────────────
+            // ── Core services ────────────────────────────────────────────────────────
             services.AddSingleton<IStateDiffEngine,
                 StateDiffEngine>();
             services.AddSingleton<INotificationManager,
                 NotificationManager>();
 
-            // ── Background workers ────────────────────────
+            // ── Background workers ─────────────────────────────────────────────────
             services.AddHostedService<PollingWorker>();
             services.AddHostedService<WebhookWorker>();
 
-            // ── UI ────────────────────────────────────────
+            // ── UI ─────────────────────────────────────────────────────────────────────
             services.AddTransient<InductionWindow>();
             services.AddTransient<FlyoutWindow>();
             services.AddTransient<SettingsWindow>();
@@ -135,7 +119,7 @@ internal class Program
             services.AddTransient<UpdateWindow>();
             services.AddSingleton<TrayIcon>();
 
-            // ── Community Map ─────────────────────────────
+            // ── Community Map ──────────────────────────────────────────────────────
             services.AddHttpClient<ICommunityMapService,
                 CommunityMapService>((provider, client) =>
                 {
@@ -147,7 +131,7 @@ internal class Program
                         $"MTGB/{typeof(App).Assembly.GetName().Version?.ToString(3)}");
                 });
 
-            // ── Telemetry ─────────────────────────────────
+            // ── Telemetry ────────────────────────────────────────────────────────────
             services.AddHttpClient<ITelemetryService, TelemetryService>(
                 (provider, client) =>
                 {
@@ -162,7 +146,7 @@ internal class Program
 
             services.AddHostedService<TelemetryWorker>();
 
-            // ── Update Service ────────────────────────────
+            // ── Update Service ──────────────────────────────────────────────────────
             services.AddHttpClient<IUpdateService, UpdateService>(
                 (provider, client) =>
                 {

@@ -154,17 +154,37 @@ This will be fixed in a future release.
 
 ### Portable
 
-Delete the folder you extracted MTGB into.
-Delete `%APPDATA%\MTGB\` if you want to remove settings and history.
+**Important — do this before deleting the app:**
 
-If you enabled Start with Windows, remove the registry entry:
+If you enabled Start with Windows, disable it first:
+- Open MTGB → Settings → Advanced → turn off **Start with Windows**
 
+This removes the registry entry automatically. If you skip this step
+and delete the app folder first, Windows will have a startup entry
+pointing to a path that no longer exists. The next portable install
+will also inherit your old settings and skip the Induction wizard
+entirely, as if it were already configured.
+
+**Then:**
+
+1. Delete the folder you extracted MTGB into
+2. Delete `%APPDATA%\MTGB\` — this removes all settings, history and logs
+
+**If you already deleted the app without disabling startup first:**
+
+Remove the registry entry manually via PowerShell:
+
+```powershell
+Remove-ItemProperty `
+    -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" `
+    -Name "MTGB" `
+    -ErrorAction SilentlyContinue
 ```
-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\MTGB
-```
 
-Or launch MTGB, go to Settings → Advanced, and disable
-**Start with Windows** before deleting the folder.
+**If the next portable install skipped the Induction wizard:**
+
+Delete `%APPDATA%\MTGB\` and relaunch. MTGB will run the
+Induction again and configure itself correctly for the new location.
 
 ---
 
@@ -181,12 +201,14 @@ You can also check manually via the tray icon right-click menu.
 
 ## Known issues — beta
 
-| Issue | Workaround |
-|---|---|
-| SmartScreen warning on MSIX install | Click More info → Run anyway, or use the portable ZIP |
-| Windows 10 requires sideloading enabled | Settings → Update & Security → For developers → Sideload apps |
-| Uninstaller does not remove `%APPDATA%\MTGB\` | Delete manually after uninstalling |
-| OAuth2 login not yet available | Use API key authentication |
+| Issue                                                                                            | Workaround                                                                |
+|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| SmartScreen warning on MSIX install                                                              | Click More info → Run anyway, or use the portable ZIP                     |
+| Windows 10 requires sideloading enabled                                                          | Settings → Update & Security → For developers → Sideload apps             |
+| Uninstaller does not remove `%APPDATA%\MTGB\`                                                    | Delete manually after uninstalling                                        |
+| OAuth2 login not yet available                                                                   | Use API key authentication                                                |
+| Portable — startup registry entry not removed if app deleted before disabling Start with Windows | Disable Start with Windows in Settings → Advanced before deleting the app |
+| Portable reinstall — Induction skipped if `%APPDATA%\MTGB\` not deleted first                    | Delete `%APPDATA%\MTGB\` before installing a new portable version         |
 
 ---
 

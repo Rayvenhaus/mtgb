@@ -1147,19 +1147,10 @@ public partial class SettingsWindow : Window
                     WriteIndented = true
                 });
 
-            // Save to %APPDATA%\MTGB\ — not the build output directory.
-            // AppContext.BaseDirectory breaks on installed builds.
-            var appDataDir = System.IO.Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "MTGB");
-
-            Directory.CreateDirectory(appDataDir);
-
-            var path = System.IO.Path.Combine(
-                appDataDir, "appsettings.json");
-
-            System.IO.File.WriteAllText(path, json);
+            // Save to the Data folder alongside the executable.
+            // DataPaths handles directory creation.
+            DataPaths.EnsureDirectoriesExist();
+            System.IO.File.WriteAllText(DataPaths.SettingsFile, json);
 
             _isDirty = false;
             if (CancelButton is not null)
@@ -1280,11 +1271,7 @@ public partial class SettingsWindow : Window
 
         try
         {
-            var dumpDir = System.IO.Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "MTGB");
-
+            var dumpDir = DataPaths.DumpsDirectory;
             Directory.CreateDirectory(dumpDir);
 
             var orgId = _settings.Value.OrganisationId;

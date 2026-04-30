@@ -1,0 +1,277 @@
+diff --git a/src/MTGB/MTGB.csproj b/src/MTGB/MTGB.csproj
+index 7be0831..182a173 100644
+--- a/src/MTGB/MTGB.csproj
++++ b/src/MTGB/MTGB.csproj
+@@ -6,7 +6,8 @@
+     <AssemblyName>MTGB</AssemblyName>
+     <RootNamespace>MTGB</RootNamespace>
+     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
+-    <Version>0.5.4</Version>
++    <Version>0.6.0</Version>
++      <VersionSuffix>beta</VersionSuffix>
+     <Authors>Steven Sheeley</Authors>
+     <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
+     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
+diff --git a/src/MTGB/Program.cs b/src/MTGB/Program.cs
+index 804472a..4d3a3f1 100644
+--- a/src/MTGB/Program.cs
++++ b/src/MTGB/Program.cs
+@@ -1,4 +1,4 @@
+-﻿using Microsoft.Extensions.Configuration;
++using Microsoft.Extensions.Configuration;
+ using Microsoft.Extensions.DependencyInjection;
+ using Microsoft.Extensions.Hosting;
+ using Microsoft.Extensions.Logging;
+@@ -34,7 +34,8 @@ internal class Program
+         {
+             MessageBox.Show(
+                 $"MTGB failed to start.\n\n{ex.Message}\n\n" +
+-                $"Please check the logs in %APPDATA%\\MTGB\\logs\\",
++                $"Please check the logs in the 'Data\\logs' folder " +
++                "next to the application.",
+                 "MTGB — It does not go Bing",
+                 MessageBoxButton.OK,
+                 MessageBoxImage.Error);
+@@ -50,30 +51,16 @@ internal class Program
+     Host.CreateDefaultBuilder(args)
+         .ConfigureAppConfiguration((context, config) =>
+         {
+-            var appDataDir = Path.Combine(
+-                Environment.GetFolderPath(
+-                    Environment.SpecialFolder.ApplicationData),
+-                "MTGB");
+-
+-            Directory.CreateDirectory(appDataDir);
+-
+-            var appDataSettings = Path.Combine(
+-                appDataDir, "appsettings.json");
+-            var builtInSettings = Path.Combine(
+-                AppContext.BaseDirectory, "appsettings.json");
+-
+-            if (!File.Exists(appDataSettings) &&
+-                File.Exists(builtInSettings))
+-            {
+-                File.Copy(builtInSettings, appDataSettings);
+-            }
++            // Ensure Data directory exists
++            DataPaths.EnsureDirectoriesExist();
++            DataPaths.InitialiseSettingsFile();
+ 
+             config
+                 .SetBasePath(AppContext.BaseDirectory)
+                 .AddJsonFile("appsettings.json",
+                     optional: false,
+                     reloadOnChange: false)
+-                .AddJsonFile(appDataSettings,
++                .AddJsonFile(DataPaths.SettingsFile,
+                     optional: true,
+                     reloadOnChange: true)
+                 .AddJsonFile("appsettings.local.json",
+@@ -87,23 +74,20 @@ internal class Program
+             logging.ClearProviders();
+             logging.AddConsole();
+             logging.AddDebug();
+-            logging.AddFile(Path.Combine(
+-                Environment.GetFolderPath(
+-                    Environment.SpecialFolder.ApplicationData),
+-                "MTGB", "logs", "mtgb-.log"));
++            logging.AddFile(DataPaths.LogFilePattern);
+         })
+         .ConfigureServices((context, services) =>
+         {
+-            // ── Configuration ─────────────────────────────
++            // ── Configuration ─────────────────────────────────────────────
+             services.Configure<AppSettings>(
+                 context.Configuration);
+ 
+-            // ── Security ──────────────────────────────────
++            // ── Security ────────────────────────────────────────────────────────
+             services.AddSingleton<ICredentialManager,
+                 WindowsCredentialManager>();
+             services.AddSingleton<WebhookSecretManager>();
+ 
+-            // ── HTTP client ───────────────────────────────
++            // ── HTTP client ─────────────────────────────────────────────────────
+             services.AddHttpClient<ISimplyPrintApiClient,
+                 SimplyPrintApiClient>((provider, client) =>
+                 {
+@@ -114,20 +98,20 @@ internal class Program
+                         "User-Agent", "MTGB/0.1.0");
+                 });
+ 
+-            // ── Auth ──────────────────────────────────────
++            // ── Auth ─────────────────────────────────────────────────────────────────────
+             services.AddSingleton<IAuthService, AuthService>();
+ 
+-            // ── Core services ─────────────────────────────
++            // ── Core services ────────────────────────────────────────────────────────
+             services.AddSingleton<IStateDiffEngine,
+                 StateDiffEngine>();
+             services.AddSingleton<INotificationManager,
+                 NotificationManager>();
+ 
+-            // ── Background workers ────────────────────────
++            // ── Background workers ─────────────────────────────────────────────────
+             services.AddHostedService<PollingWorker>();
+             services.AddHostedService<WebhookWorker>();
+ 
+-            // ── UI ────────────────────────────────────────
++            // ── UI ─────────────────────────────────────────────────────────────────────
+             services.AddTransient<InductionWindow>();
+             services.AddTransient<FlyoutWindow>();
+             services.AddTransient<SettingsWindow>();
+@@ -135,7 +119,7 @@ internal class Program
+             services.AddTransient<UpdateWindow>();
+             services.AddSingleton<TrayIcon>();
+ 
+-            // ── Community Map ─────────────────────────────
++            // ── Community Map ──────────────────────────────────────────────────────
+             services.AddHttpClient<ICommunityMapService,
+                 CommunityMapService>((provider, client) =>
+                 {
+@@ -147,7 +131,7 @@ internal class Program
+                         $"MTGB/{typeof(App).Assembly.GetName().Version?.ToString(3)}");
+                 });
+ 
+-            // ── Telemetry ─────────────────────────────────
++            // ── Telemetry ────────────────────────────────────────────────────────────
+             services.AddHttpClient<ITelemetryService, TelemetryService>(
+                 (provider, client) =>
+                 {
+@@ -162,7 +146,7 @@ internal class Program
+ 
+             services.AddHostedService<TelemetryWorker>();
+ 
+-            // ── Update Service ────────────────────────────
++            // ── Update Service ──────────────────────────────────────────────────────
+             services.AddHttpClient<IUpdateService, UpdateService>(
+                 (provider, client) =>
+                 {
+diff --git a/src/MTGB/Services/NotificationManager.cs b/src/MTGB/Services/NotificationManager.cs
+index ad91034..9d6495e 100644
+--- a/src/MTGB/Services/NotificationManager.cs
++++ b/src/MTGB/Services/NotificationManager.cs
+@@ -101,10 +101,8 @@ public class NotificationManager : INotificationManager, IDisposable
+     private readonly object _groupLock = new();
+     private readonly System.Threading.Timer _groupFlushTimer;
+ 
+-    // History file location
+-    private static readonly string HistoryFilePath = Path.Combine(
+-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+-        "MTGB", "history.json");
++    // History file location — centralised in DataPaths
++    private static readonly string HistoryFilePath = DataPaths.HistoryFile;
+ 
+     // Notification sound
+     private static readonly string SoundFilePath = Path.Combine(
+@@ -138,9 +136,8 @@ public class NotificationManager : INotificationManager, IDisposable
+         // Load existing history from disk
+         LoadHistory();
+ 
+-        // Ensure history directory exists
+-        Directory.CreateDirectory(Path.GetDirectoryName(
+-            HistoryFilePath)!);
++        // Directory creation handled by DataPaths.EnsureDirectoriesExist()
++        // in Program.cs at startup
+     }
+ 
+     // ── Public API ────────────────────────────────────────────────
+diff --git a/src/MTGB/UI/InductionWindow.xaml.cs b/src/MTGB/UI/InductionWindow.xaml.cs
+index fe282a0..1383083 100644
+--- a/src/MTGB/UI/InductionWindow.xaml.cs
++++ b/src/MTGB/UI/InductionWindow.xaml.cs
+@@ -412,20 +412,14 @@ public partial class InductionWindow : Window
+ 
+     private void SaveSettings()
+     {
+-        var appDataDir = Path.Combine(
+-            Environment.GetFolderPath(
+-                Environment.SpecialFolder.ApplicationData),
+-            "MTGB");
+-
+-        Directory.CreateDirectory(appDataDir);
+-
+-        var path = Path.Combine(appDataDir, "appsettings.json");
++        // Ensure Data directory exists
++        DataPaths.EnsureDirectoriesExist();
+ 
+         var json = JsonSerializer.Serialize(
+             _settings.Value,
+             new JsonSerializerOptions { WriteIndented = true });
+ 
+-        File.WriteAllText(path, json);
++        File.WriteAllText(DataPaths.SettingsFile, json);
+     }
+ 
+     // ── Startup registry ──────────────────────────────────────────
+diff --git a/src/MTGB/UI/SettingsWindow.xaml.cs b/src/MTGB/UI/SettingsWindow.xaml.cs
+index e08258e..ddcdb21 100644
+--- a/src/MTGB/UI/SettingsWindow.xaml.cs
++++ b/src/MTGB/UI/SettingsWindow.xaml.cs
+@@ -1147,19 +1147,10 @@ public partial class SettingsWindow : Window
+                     WriteIndented = true
+                 });
+ 
+-            // Save to %APPDATA%\MTGB\ — not the build output directory.
+-            // AppContext.BaseDirectory breaks on installed builds.
+-            var appDataDir = System.IO.Path.Combine(
+-                Environment.GetFolderPath(
+-                    Environment.SpecialFolder.ApplicationData),
+-                "MTGB");
+-
+-            Directory.CreateDirectory(appDataDir);
+-
+-            var path = System.IO.Path.Combine(
+-                appDataDir, "appsettings.json");
+-
+-            System.IO.File.WriteAllText(path, json);
++            // Save to the Data folder alongside the executable.
++            // DataPaths handles directory creation.
++            DataPaths.EnsureDirectoriesExist();
++            System.IO.File.WriteAllText(DataPaths.SettingsFile, json);
+ 
+             _isDirty = false;
+             if (CancelButton is not null)
+@@ -1280,11 +1271,7 @@ public partial class SettingsWindow : Window
+ 
+         try
+         {
+-            var dumpDir = System.IO.Path.Combine(
+-                Environment.GetFolderPath(
+-                    Environment.SpecialFolder.ApplicationData),
+-                "MTGB");
+-
++            var dumpDir = DataPaths.DumpsDirectory;
+             Directory.CreateDirectory(dumpDir);
+ 
+             var orgId = _settings.Value.OrganisationId;
+diff --git a/src/MTGB/UI/TrayIcon.cs b/src/MTGB/UI/TrayIcon.cs
+index 80236a4..275558a 100644
+--- a/src/MTGB/UI/TrayIcon.cs
++++ b/src/MTGB/UI/TrayIcon.cs
+@@ -365,15 +365,7 @@ public class TrayIcon : IDisposable
+     {
+         try
+         {
+-            var appDataDir = System.IO.Path.Combine(
+-                Environment.GetFolderPath(
+-                    Environment.SpecialFolder.ApplicationData),
+-                "MTGB");
+-
+-            System.IO.Directory.CreateDirectory(appDataDir);
+-
+-            var path = System.IO.Path.Combine(
+-                appDataDir, "appsettings.json");
++            DataPaths.EnsureDirectoriesExist();
+ 
+             var json = System.Text.Json.JsonSerializer.Serialize(
+                 _settings.Value,
+@@ -382,7 +374,7 @@ public class TrayIcon : IDisposable
+                     WriteIndented = true
+                 });
+ 
+-            System.IO.File.WriteAllText(path, json);
++            System.IO.File.WriteAllText(DataPaths.SettingsFile, json);
+             _logger.LogDebug("Settings persisted after mute toggle.");
+         }
+         catch (Exception ex)

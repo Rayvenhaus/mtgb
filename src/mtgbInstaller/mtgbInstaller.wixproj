@@ -1,0 +1,45 @@
+﻿<Project Sdk="WixToolset.Sdk/7.0.0">
+
+  <PropertyGroup>
+	<AcceptEula>wix7</AcceptEula>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Product metadata -->
+    <Name>MTGB</Name>
+    <ProductCode>auto</ProductCode>
+    <UpgradeCode>a8d5e2f1-9b3c-4d7e-8a6f-5c4b3a2d1e0f</UpgradeCode>
+    <Manufacturer>Myndworx Asylum</Manufacturer>
+    <Version>0.6.0</Version>
+
+    <!-- Output configuration -->
+    <OutputName>MTGB-0.6.0-beta-setup</OutputName>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+
+    <!-- Suppress ICE validation warnings for development -->
+    <SuppressSpecificWarnings>1079;1083</SuppressSpecificWarnings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>bin\Release\</OutputPath>
+    <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <IntermediateOutputPath>obj\Debug\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <!-- WiX UI extension for installer dialogs -->
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="7.0.0" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- Link to the MTGB application project for build dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="..\MTGB\MTGB.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

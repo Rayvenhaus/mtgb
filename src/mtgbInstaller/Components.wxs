@@ -1,0 +1,104 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!-- Application files component group -->
+  <Fragment>
+    <ComponentGroup Id="ApplicationFiles" Directory="INSTALLFOLDER">
+
+      <!-- Main executable -->
+      <Component Id="MTGB_exe_comp" Guid="E1F2A3B4-C5D6-4E7F-8A9B-0C1D2E3F4A5B">
+        <File Id="MTGB_exe" Source="$(var.MTGB.TargetDir)MTGB.exe" KeyPath="yes" />
+      </Component>
+
+      <!-- Main assembly -->
+      <Component Id="MTGB_dll_comp" Guid="A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D">
+        <File Id="MTGB_dll" Source="$(var.MTGB.TargetDir)MTGB.dll" />
+      </Component>
+
+      <!-- Runtime config -->
+      <Component Id="MTGB_runtimeconfig_comp" Guid="B2C3D4E5-F6A7-4B8C-9D0E-1F2A3B4C5D6E">
+        <File Id="MTGB_runtimeconfig" Source="$(var.MTGB.TargetDir)MTGB.runtimeconfig.json" />
+      </Component>
+
+      <!-- Configuration template (copied to Data\ on first run by DataPaths) -->
+      <Component Id="appsettings_json_comp" Guid="D5E6F7A8-B9C0-4D1E-2F3A-4B5C6D7E8F9A">
+        <File Id="appsettings_json" Source="$(var.MTGB.ProjectDir)appsettings.json" />
+      </Component>
+
+      <!-- Start Menu shortcut with HKCU registry KeyPath -->
+      <Component Id="MTGB_shortcut_comp" Guid="E2F3A4B5-C6D7-4E8F-9A0B-1C2D3E4F5A6B">
+        <RegistryValue Root="HKCU"
+                       Key="Software\Myndworx Asylum\MTGB"
+                       Name="StartMenuShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <Shortcut Id="StartMenuShortcut"
+                  Directory="ApplicationProgramsFolder"
+                  Name="MTGB"
+                  Description="The Monitor That Goes Bing"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Target="[INSTALLFOLDER]MTGB.exe"
+                  Icon="MTGBIcon.exe" />
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- Assets folder: icon, sound, countries data -->
+  <Fragment>
+    <ComponentGroup Id="AssetsFiles" Directory="AssetsFolder">
+
+      <!-- Application icon -->
+      <Component Id="mtgb_ico_comp" Guid="A2B3C4D5-E6F7-4A8B-9C0D-1E2F3A4B5C6D">
+        <File Id="mtgb_ico" Source="$(var.MTGB.ProjectDir)Assets\mtgb.ico" />
+      </Component>
+
+      <!-- Notification sound -->
+      <Component Id="mtgbNotification_wav_comp" Guid="B3C4D5E6-F7A8-4B9C-0D1E-2F3A4B5C6D7E">
+        <File Id="mtgbNotification_wav" Source="$(var.MTGB.ProjectDir)Assets\mtgbNotification.wav" />
+      </Component>
+
+      <!-- Countries data -->
+      <Component Id="countries_json_comp" Guid="C4D5E6F7-A8B9-4C0D-1E2F-3A4B5C6D7E8F">
+        <File Id="countries_json" Source="$(var.MTGB.ProjectDir)Assets\countries.json" />
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- Shortcuts component group -->
+  <Fragment>
+    <ComponentGroup Id="ApplicationShortcuts" Directory="ApplicationProgramsFolder">
+
+      <!-- Start menu folder cleanup on uninstall -->
+      <Component Id="StartMenuFolder_comp" Guid="F7A8B9C0-D1E2-4F3A-4B5C-6D7E8F9A0B1C">
+        <RegistryValue Root="HKCU"
+                       Key="Software\Myndworx Asylum\MTGB"
+                       Name="StartMenuFolder"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <RemoveFolder Id="RemoveStartMenuFolder"
+                      Directory="ApplicationProgramsFolder"
+                      On="uninstall" />
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- Data folder with write permissions for all users -->
+  <Fragment>
+    <ComponentGroup Id="DataFolderPermissions" Directory="DataFolder">
+
+      <Component Id="DataFolderPermissions_comp" Guid="0A1B2C3D-4E5F-4A6B-7C8D-9E0F1A2B3C4D">
+        <CreateFolder>
+          <util:PermissionEx User="Users" GenericAll="yes" />
+        </CreateFolder>
+        <RemoveFolder Id="RemoveDataFolder" On="uninstall" />
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

@@ -1,0 +1,91 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <?define ProductName = "MTGB - The Monitor That Goes Bing" ?>
+  <?define Manufacturer = "Myndworx Asylum" ?>
+  <?define ProductVersion = "0.6.0" ?>
+  <?define UpgradeCode = "A8D5E2F1-9B3C-4D7E-8A6F-5C4B3A2D1E0F" ?>
+
+  <Package Id="MTGB_Package"
+           Name="$(var.ProductName)"
+           Version="$(var.ProductVersion)"
+           Manufacturer="$(var.Manufacturer)"
+           UpgradeCode="$(var.UpgradeCode)"
+           Language="1033"
+           Scope="perMachine">
+
+    <!-- Application icon for shortcuts -->
+    <Icon Id="MTGBIcon.exe" SourceFile="$(var.MTGB.TargetDir)MTGB.exe" />
+
+    <!-- Summary information -->
+    <SummaryInformation Manufacturer="$(var.Manufacturer)"
+                        Description="$(var.ProductName) Installer"
+                        Keywords="Installer,MTGB,SimplyPrint,3D Printing,Notification"
+                        Codepage="1252" />
+
+    <!-- Allow major upgrades -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of MTGB is already installed. Please uninstall it first." />
+
+    <!-- Installer UI with directory selection, custom welcome/exit dialogs -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER">
+      <ui:DialogRef Id="WelcomeDlg" />
+      <ui:DialogRef Id="ExitDlg" />
+      <ui:Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Order="2" />
+      <ui:Publish Dialog="ExitDlg" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
+    </ui:WixUI>
+
+    <!-- Branding graphics -->
+    <WixVariable Id="WixUILicenseRtf"    Value="Assets\License.rtf" />
+    <WixVariable Id="WixUIBannerBmp"     Value="Assets\banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp"     Value="Assets\dialog.bmp" />
+
+    <!-- Directories -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="MTGB">
+        <Directory Id="DataFolder" Name="Data" />
+        <Directory Id="AssetsFolder" Name="Assets" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="MTGB" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Application feature -->
+    <Feature Id="MainFeature"
+             Title="MTGB Application"
+             Description="Installs MTGB - The Monitor That Goes Bing and all required components."
+             Level="1"
+             AllowAdvertise="no"
+             Display="expand"
+             ConfigurableDirectory="INSTALLFOLDER">
+
+      <ComponentGroupRef Id="ApplicationFiles" />
+      <ComponentGroupRef Id="AssetsFiles" />
+      <ComponentGroupRef Id="ApplicationShortcuts" />
+      <ComponentGroupRef Id="DataFolderPermissions" />
+
+    </Feature>
+
+    <!-- Launch checkbox property - checked by default -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch MTGB now" />
+
+    <!-- Auto-launch MTGB after install if checkbox was ticked -->
+    <CustomAction Id="LaunchApp"
+                  FileRef="MTGB_exe"
+                  ExeCommand=""
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="asyncNoWait" />
+
+    <InstallExecuteSequence>
+      <Custom Action="LaunchApp" After="InstallFinalize" Condition="NOT Installed AND NOT REMOVE AND WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1" />
+    </InstallExecuteSequence>
+
+  </Package>
+
+</Wix>

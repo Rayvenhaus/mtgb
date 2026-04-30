@@ -365,15 +365,7 @@ public class TrayIcon : IDisposable
     {
         try
         {
-            var appDataDir = System.IO.Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "MTGB");
-
-            System.IO.Directory.CreateDirectory(appDataDir);
-
-            var path = System.IO.Path.Combine(
-                appDataDir, "appsettings.json");
+            DataPaths.EnsureDirectoriesExist();
 
             var json = System.Text.Json.JsonSerializer.Serialize(
                 _settings.Value,
@@ -382,7 +374,7 @@ public class TrayIcon : IDisposable
                     WriteIndented = true
                 });
 
-            System.IO.File.WriteAllText(path, json);
+            System.IO.File.WriteAllText(DataPaths.SettingsFile, json);
             _logger.LogDebug("Settings persisted after mute toggle.");
         }
         catch (Exception ex)

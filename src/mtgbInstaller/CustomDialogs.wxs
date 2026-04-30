@@ -1,0 +1,64 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+	<!--
+    Custom WelcomeDlg and ExitDlg — removes default title/body text
+    so WixUIDialogBmp shows cleanly without text overlay.
+  -->
+	<Fragment>
+		<UI>
+
+			<!-- Welcome dialog: bitmap only, no overlaid text -->
+			<Dialog Id="WelcomeDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
+
+				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="yes"
+						 Text="!(loc.WelcomeDlgBitmap)" />
+
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+				<Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17"
+						 Disabled="yes" Text="!(loc.WixUIBack)" />
+
+				<Control Id="Next" Type="PushButton" X="212" Y="243" Width="56" Height="17"
+						 Default="yes" Text="!(loc.WixUINext)">
+					<Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+				</Control>
+
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17"
+						 Cancel="yes" Text="!(loc.WixUICancel)">
+					<Publish Event="SpawnDialog" Value="CancelDlg" />
+				</Control>
+
+			</Dialog>
+
+			<!-- Exit dialog: bitmap only, no overlaid text, with launch checkbox -->
+			<Dialog Id="ExitDlg" Width="370" Height="270" Title="!(loc.ExitDlg_Title)">
+
+				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="yes"
+						 Text="!(loc.WelcomeDlgBitmap)" />
+
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+				<!-- Launch checkbox - shown when WIXUI_EXITDIALOGOPTIONALCHECKBOX_TEXT is set -->
+				<Control Id="OptionalCheckBox" Type="CheckBox" X="10" Y="237" Width="200" Height="12"
+						 Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX"
+						 CheckBoxValue="1"
+						 Text="!(loc.WixUIOptionalCheckBox)" />
+
+				<Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17"
+						 Disabled="yes" Text="!(loc.WixUIBack)" />
+
+				<Control Id="Finish" Type="PushButton" X="212" Y="243" Width="56" Height="17"
+						 Default="yes" Text="!(loc.WixUIFinish)">
+					<Publish Event="EndDialog" Value="Return" />
+				</Control>
+
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17"
+						 Cancel="yes" Disabled="yes" Text="!(loc.WixUICancel)" />
+
+			</Dialog>
+
+		</UI>
+	</Fragment>
+
+</Wix>
