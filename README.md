@@ -8,7 +8,7 @@ because nobody expects a notification app. Or a Spanish Inquisition.
 [![Release](https://img.shields.io/github/v/release/Rayvenhaus/mtgb?include_prereleases&label=release)](https://github.com/Rayvenhaus/mtgb/releases)
 [![License](https://img.shields.io/github/license/Rayvenhaus/mtgb)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](https://github.com/Rayvenhaus/mtgb/releases)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Rayvenhaus/mtgb/total?style=social&logoSize=auto)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Rayvenhaus/mtgb/total?style=plastic)
 
 
 ---
