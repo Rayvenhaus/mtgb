@@ -5,11 +5,13 @@
 A Windows 10/11 system tray notification app for [SimplyPrint](https://simplyprint.io) —
 because nobody expects a notification app. Or a Spanish Inquisition.
 
-[![Release](https://img.shields.io/github/v/release/Rayvenhaus/mtgb?include_prereleases&label=release)](https://github.com/Rayvenhaus/mtgb/releases)
-[![License](https://img.shields.io/github/license/Rayvenhaus/mtgb)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](https://github.com/Rayvenhaus/mtgb/releases)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Rayvenhaus/mtgb/total?style=plastic)
-
+[![Build](https://img.shields.io/github/actions/workflow/status/Rayvenhaus/mtgb/release.yml?branch=main&label=build&style=flat-square)](https://github.com/Rayvenhaus/mtgb/actions/workflows/release.yml)
+[![Release](https://img.shields.io/github/v/release/Rayvenhaus/mtgb?include_prereleases&label=release&style=flat-square)](https://github.com/Rayvenhaus/mtgb/releases)
+[![Status](https://img.shields.io/badge/status-beta-fbbd23?style=flat-square)](https://github.com/Rayvenhaus/mtgb/releases)
+[![Downloads](https://img.shields.io/github/downloads/Rayvenhaus/mtgb/total?label=downloads&style=flat-square)](https://github.com/Rayvenhaus/mtgb/releases)
+[![License](https://img.shields.io/github/license/Rayvenhaus/mtgb?label=license&style=flat-square)](https://github.com/Rayvenhaus/mtgb/blob/main/LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-1e3b8a?style=flat-square)](https://github.com/Rayvenhaus/mtgb/releases)
+[![Issues](https://img.shields.io/github/issues/Rayvenhaus/mtgb?label=issues&style=flat-square)](https://github.com/Rayvenhaus/mtgb/issues)
 
 ---
 
