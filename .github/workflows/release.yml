@@ -14,6 +14,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: release-${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
   cancel-in-progress: false
@@ -102,3 +105,53 @@ jobs:
           files: |
             dist/MTGB-v${{ steps.version.outputs.VERSION }}-x64-Setup.exe
             dist/MTGB-v${{ steps.version.outputs.VERSION }}-x64.msi
+
+      - name: Publish community release metadata
+        shell: pwsh
+        env:
+          RELEASE_PUBLISH_URL: ${{ secrets.RELEASE_PUBLISH_URL }}
+          COMMUNITY_PUBLISH_KEY: ${{ secrets.COMMUNITY_PUBLISH_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:RELEASE_PUBLISH_URL) -or
+              [string]::IsNullOrWhiteSpace($env:COMMUNITY_PUBLISH_KEY)) {
+              Write-Host "Release publish secrets not configured. Skipping community publish step."
+              exit 0
+          }
+
+          $tag = "${{ steps.version.outputs.TAG }}"
+          $displayVersion = "${{ steps.version.outputs.VERSION }}"
+          $installerVersion = "${{ steps.version.outputs.INSTALLER_VERSION }}"
+          $isPrerelease = "${{ steps.version.outputs.IS_PRERELEASE }}" -eq "true"
+          $repoUrl = "${{ github.server_url }}/${{ github.repository }}"
+
+          $setupUrl = "$repoUrl/releases/download/$tag/MTGB-v$displayVersion-x64-Setup.exe"
+          $releasePageUrl = "$repoUrl/releases/tag/$tag"
+          $releaseNotes = Get-Content "release_notes.txt" -Raw
+
+          $body = @{
+              version = $installerVersion
+              release_date = [DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
+              setup_url = $setupUrl
+              release_page_url = $releasePageUrl
+              release_notes = $releaseNotes
+              is_beta = $isPrerelease
+          } | ConvertTo-Json -Depth 4
+
+          Write-Host "Publishing release metadata to $env:RELEASE_PUBLISH_URL"
+          Write-Host "Version:      $installerVersion"
+          Write-Host "Setup URL:    $setupUrl"
+          Write-Host "Release page: $releasePageUrl"
+          Write-Host "Prerelease:   $isPrerelease"
+
+          $response = Invoke-RestMethod `
+              -Uri $env:RELEASE_PUBLISH_URL `
+              -Method Post `
+              -Headers @{ "X-Publish-Key" = $env:COMMUNITY_PUBLISH_KEY } `
+              -ContentType "application/json" `
+              -Body $body
+
+          if (-not $response.status) {
+              throw "Community publish endpoint returned status=false."
+          }
+
+          Write-Host "Community release metadata published successfully."

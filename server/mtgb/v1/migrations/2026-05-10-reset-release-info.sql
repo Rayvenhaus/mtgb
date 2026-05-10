@@ -3,7 +3,8 @@
 --
 -- This keeps historical rows for reference, but only v0.6.2 is current.
 -- Historical rows intentionally have blank setup_url values because those
--- releases were not setup-EXE releases. Clients only read is_current = 1.
+-- releases were not setup-EXE releases. release_page_url is left blank
+-- for them as well. Clients only read is_current = 1.
 -- v0.6.2 is marked is_beta = 1 while keeping version numeric for update
 -- comparison.
 --
@@ -263,5 +264,11 @@ VALUES
         1,
         1
     );
+
+UPDATE `release_info`
+SET `release_page_url` =
+    'https://github.com/Rayvenhaus/mtgb/releases/tag/v0.6.2-beta'
+WHERE `version` = '0.6.2'
+  AND `is_current` = 1;
 
 COMMIT;

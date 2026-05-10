@@ -119,6 +119,8 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="12"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock x:Name="StatusText"
@@ -129,14 +131,21 @@
                                VerticalAlignment="Center"
                                Text="The Ministry recommends updating."/>
 
-                    <Button x:Name="CancelButton"
+                    <Button x:Name="ReleasePageButton"
                             Grid.Column="1"
+                            Content="View Release Page"
+                            Style="{StaticResource GhostButton}"
+                            Visibility="Collapsed"
+                            Click="OnReleasePageClick"/>
+
+                    <Button x:Name="CancelButton"
+                            Grid.Column="3"
                             Content="Later"
                             Style="{StaticResource SecondaryButton}"
                             Click="OnCancelClick"/>
 
                     <Button x:Name="InstallButton"
-                            Grid.Column="3"
+                            Grid.Column="5"
                             Content="OK to Install"
                             Style="{StaticResource PrimaryButton}"
                             IsEnabled="False"

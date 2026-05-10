@@ -21,6 +21,9 @@ public record ReleaseInfo
     [JsonPropertyName("setup_url")]
     public string SetupUrl { get; init; } = string.Empty;
 
+    [JsonPropertyName("release_page_url")]
+    public string ReleasePageUrl { get; init; } = string.Empty;
+
     [JsonPropertyName("msix_url")]
     public string LegacyMsixUrl { get; init; } = string.Empty;
 
@@ -77,7 +80,10 @@ public interface IUpdateService
 /// </summary>
 public class UpdateService : IUpdateService
 {
+    private const long MinimumInstallerBytes = 1_000_000;
+
     private readonly IOptions<AppSettings> _settings;
+    private readonly ISettingsStore _settingsStore;
     private readonly ILogger<UpdateService> _logger;
     private readonly HttpClient _httpClient;
 
@@ -92,10 +98,12 @@ public class UpdateService : IUpdateService
 
     public UpdateService(
         IOptions<AppSettings> settings,
+        ISettingsStore settingsStore,
         ILogger<UpdateService> logger,
         HttpClient httpClient)
     {
         _settings = settings;
+        _settingsStore = settingsStore;
         _logger = logger;
         _httpClient = httpClient;
     }
@@ -108,10 +116,13 @@ public class UpdateService : IUpdateService
         try
         {
             _logger.LogDebug(
-                "Checking for updates at {Url}.", UpdateUrl);
+                "Checking for updates at {Url}. " +
+                "Include beta: {IncludeBeta}",
+                GetUpdateUrl(),
+                _settings.Value.Update.IncludeBeta);
 
             var response = await _httpClient
-                .GetAsync(UpdateUrl, ct);
+                .GetAsync(GetUpdateUrl(), ct);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -137,14 +148,18 @@ public class UpdateService : IUpdateService
                     JsonOptions);
 
             if (release is null) return null;
-            if (string.IsNullOrWhiteSpace(
-                    GetDownloadUrl(release)))
+
+            if (!TryGetDownloadUri(release, out _))
             {
                 _logger.LogDebug(
-                    "Update payload for v{Version} had no setup URL.",
+                    "Update payload for v{Version} had no usable setup URL.",
                     release.DisplayVersion);
                 return null;
             }
+
+            _settings.Value.Update.LastChecked =
+                DateTimeOffset.Now;
+            _settingsStore.Save();
 
             // Compare versions
             var current = GetCurrentVersion();
@@ -176,10 +191,6 @@ public class UpdateService : IUpdateService
             // Cache the release for the toast action handler
             _cachedRelease = release;
 
-            // Record check time
-            _settings.Value.Update.LastChecked =
-                DateTimeOffset.Now;
-
             return release;
         }
         catch (Exception ex)
@@ -208,13 +219,12 @@ public class UpdateService : IUpdateService
                 "Downloading MTGB v{Version} to {Path}.",
                 release.DisplayVersion, tempPath);
 
-            var downloadUrl = GetDownloadUrl(release);
-            if (string.IsNullOrWhiteSpace(downloadUrl))
+            if (!TryGetDownloadUri(release, out var downloadUri))
                 return null;
 
             using var response = await _httpClient
                 .GetAsync(
-                    downloadUrl,
+                    downloadUri,
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
 
@@ -222,6 +232,22 @@ public class UpdateService : IUpdateService
 
             var totalBytes = response.Content.Headers
                 .ContentLength ?? -1L;
+            var contentType = response.Content.Headers
+                .ContentType
+                ?.MediaType;
+
+            if (IsHtmlResponse(contentType) ||
+                totalBytes is > 0 and < MinimumInstallerBytes)
+            {
+                _logger.LogWarning(
+                    "Refusing update download for v{Version}. " +
+                    "Response looked wrong: content type {ContentType}, " +
+                    "length {Length}.",
+                    release.DisplayVersion,
+                    contentType ?? "unknown",
+                    totalBytes);
+                return null;
+            }
 
             await using var stream = await response.Content
                 .ReadAsStreamAsync(ct);
@@ -309,6 +335,40 @@ public class UpdateService : IUpdateService
         !string.IsNullOrWhiteSpace(release.SetupUrl)
             ? release.SetupUrl
             : release.LegacyMsixUrl;
+
+    private string GetUpdateUrl() =>
+        $"{UpdateUrl}?include_beta=" +
+        $"{(_settings.Value.Update.IncludeBeta ? "1" : "0")}";
+
+    private static bool TryGetDownloadUri(
+        ReleaseInfo release,
+        out Uri downloadUri)
+    {
+        downloadUri = null!;
+
+        var url = GetDownloadUrl(release);
+        if (!Uri.TryCreate(
+                url,
+                UriKind.Absolute,
+                out var candidate))
+            return false;
+
+        if (candidate.Scheme is not "https" and not "http")
+            return false;
+
+        if (!candidate.AbsolutePath.EndsWith(
+                ".exe",
+                StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        downloadUri = candidate;
+        return true;
+    }
+
+    private static bool IsHtmlResponse(string? contentType) =>
+        contentType?.Contains(
+            "html",
+            StringComparison.OrdinalIgnoreCase) == true;
 
     // ── API envelope ──────────────────────────────────────────
 

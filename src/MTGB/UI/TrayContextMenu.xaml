@@ -100,7 +100,7 @@
         <Separator/>
 
         <MenuItem x:Name="MenuSettings"
-                  Header="Settings"
+                  Header="System Info"
                   Foreground="#fbbd23"/>
 
         <MenuItem x:Name="MenuMute"

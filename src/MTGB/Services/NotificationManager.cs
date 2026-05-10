@@ -106,7 +106,7 @@ public class NotificationManager : INotificationManager, IDisposable
 
     // Notification sound
     private static readonly string SoundFilePath = Path.Combine(
-        AppContext.BaseDirectory,
+        DataPaths.AssetsPath,
         "mtgbNotification.wav");
 
     public NotificationManager(
@@ -189,7 +189,7 @@ public class NotificationManager : INotificationManager, IDisposable
     public IReadOnlyList<NotificationHistoryEntry> GetHistory()
     {
         lock (_historyLock)
-            return _history.AsReadOnly();
+            return _history.ToList();
     }
 
     /// <inheritdoc/>

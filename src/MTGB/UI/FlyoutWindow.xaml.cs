@@ -191,10 +191,11 @@ public partial class FlyoutWindow : Window
         stack.Children.Add(topRow);
 
         // ── Progress bar ──────────────────────────────────────────
-        if (snapshot.JobPercentage.HasValue)
+        var displayProgress = GetDisplayProgress(snapshot);
+        if (displayProgress.HasValue)
         {
             var percentage = Math.Clamp(
-                snapshot.JobPercentage.Value,
+                displayProgress.Value,
                 0,
                 100);
 
@@ -212,14 +213,21 @@ public partial class FlyoutWindow : Window
                 Height = 5,
                 Background = new SolidColorBrush(statusColor),
                 CornerRadius = new CornerRadius(3),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Width = (percentage / 100.0) * (300 - 24)
+                HorizontalAlignment = HorizontalAlignment.Left
             };
 
             var progressGrid = new Grid
             {
                 Margin = new Thickness(0, 0, 0, 5)
             };
+            void UpdateProgressWidth() =>
+                progressFill.Width = Math.Max(
+                    0,
+                    progressGrid.ActualWidth * percentage / 100.0);
+
+            progressGrid.Loaded += (_, _) => UpdateProgressWidth();
+            progressGrid.SizeChanged += (_, _) => UpdateProgressWidth();
+
             progressGrid.Children.Add(progressBg);
             progressGrid.Children.Add(progressFill);
             stack.Children.Add(progressGrid);
@@ -324,6 +332,24 @@ public partial class FlyoutWindow : Window
             "error" or "printer_error" => "Attention required",
             _ => snapshot.State
         };
+    }
+
+    private static double? GetDisplayProgress(
+        PrinterSnapshot snapshot)
+    {
+        if (snapshot.JobPercentage.HasValue)
+            return snapshot.JobPercentage.Value;
+
+        if (snapshot.CurrentLayer is > 0 &&
+            snapshot.MaxLayer is > 0 &&
+            snapshot.CurrentLayer <= snapshot.MaxLayer)
+        {
+            return (double)snapshot.CurrentLayer.Value
+                / snapshot.MaxLayer.Value
+                * 100.0;
+        }
+
+        return null;
     }
 
     private static string TruncateFilename(string? filename)

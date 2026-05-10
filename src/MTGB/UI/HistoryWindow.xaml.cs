@@ -11,6 +11,7 @@ namespace MTGB.UI;
 public partial class HistoryWindow : Window
 {
     private readonly INotificationManager _notificationManager;
+    private readonly IStateDiffEngine _diffEngine;
     private readonly IOptions<AppSettings> _settings;
     private readonly ILogger<HistoryWindow> _logger;
 
@@ -34,10 +35,12 @@ public partial class HistoryWindow : Window
 
     public HistoryWindow(
         INotificationManager notificationManager,
+        IStateDiffEngine diffEngine,
         IOptions<AppSettings> settings,
         ILogger<HistoryWindow> logger)
     {
         _notificationManager = notificationManager;
+        _diffEngine = diffEngine;
         _settings = settings;
         _logger = logger;
 
@@ -82,9 +85,22 @@ public partial class HistoryWindow : Window
                 IsSelected = true
             });
 
-        var printers = _allEntries
-            .Select(e => new { e.PrinterId, e.PrinterName })
-            .DistinctBy(p => p.PrinterId)
+        var printers = _diffEngine.GetAllSnapshots().Values
+            .Select(s => new
+            {
+                s.PrinterId,
+                s.PrinterName
+            })
+            .Concat(_allEntries.Select(e => new
+            {
+                e.PrinterId,
+                e.PrinterName
+            }))
+            .Where(p =>
+                p.PrinterId > 0 &&
+                !string.IsNullOrWhiteSpace(p.PrinterName))
+            .GroupBy(p => p.PrinterId)
+            .Select(g => g.First())
             .OrderBy(p => p.PrinterName);
 
         foreach (var printer in printers)

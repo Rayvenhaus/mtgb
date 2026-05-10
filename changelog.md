@@ -9,6 +9,56 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### The one where the Ministry sharpens a pencil ominously
 
+### Changed
+- Opted the GitHub release workflow into Node.js 24 JavaScript actions
+  ahead of GitHub's Node.js 20 deprecation schedule.
+- Wired the GitHub release workflow to publish release metadata to
+  `publish.php` automatically when `RELEASE_PUBLISH_URL` and
+  `COMMUNITY_PUBLISH_KEY` secrets are configured, using the setup EXE
+  download URL plus the human-facing release page URL.
+- Replaced the Settings -> About placeholder dot with the existing
+  `MTGB_128.png` application asset.
+- Tray icon right-click context menu now labels the settings action
+  as `System Info`.
+- Update checks now persist their last-check and last-notified metadata
+  through the shared settings store instead of changing only in memory.
+- Split release metadata so `setup_url` remains the updater download
+  target while `release_page_url` can point humans at the GitHub release
+  page without confusing the client.
+- Added an update-channel preference so users can choose `Stable only`
+  or `Include beta`, with the client requesting the matching release
+  feed from the community endpoint.
+
+### Fixed
+- Notification sound playback now looks in `data\assets`, matching the
+  installed payload layout.
+- Update downloads now require an absolute HTTP(S) `.exe` installer URL
+  and reject HTML or suspiciously tiny responses before launching
+  anything.
+- History printer filtering now includes currently discovered printers
+  from live snapshots as well as printers already present in history.
+- Flyout progress rendering now resizes with the card and can fall back
+  to current/max layer progress when SimplyPrint does not provide a
+  direct job percentage.
+- Settings Save button now wraps the label in explicit dark text so the
+  gold button stays readable in installed builds.
+- Update dialog can open the human-facing release page directly when the
+  server provides one.
+- Switching update channels now clears the last-notified version marker
+  so a newly eligible stable or beta release can be offered properly.
+
+### Todo For 0.6.003
+- Replace the bundled .NET Desktop Runtime redistributable with a Burn
+  online prerequisite download flow, including clear missing-runtime
+  messaging and a clean abort path when the user declines.
+- Define and document the migration path from early MTGB installs and
+  beta packaging experiments to the current WiX/Burn installer layout,
+  including what data is preserved, moved, ignored, or intentionally
+  removed.
+- Deep-dive the SimplyPrint API and webhook payloads for reliable print
+  progress data, including whether a custom webhook path can provide
+  better completion tracking than polling alone.
+
 ---
 
 ## [0.6.2-beta] — 2026-05-10

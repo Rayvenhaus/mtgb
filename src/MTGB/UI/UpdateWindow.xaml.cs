@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MTGB.Services;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,6 +56,10 @@ public partial class UpdateWindow : Window
         CurrentVersionText.Text =
             $"You are running v{current}";
         ReleaseNotesText.Text = _release.ReleaseNotes;
+        ReleasePageButton.Visibility =
+            HasReleasePageUrl()
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
         // Cache progress bar max width after render
         Dispatcher.BeginInvoke(
@@ -155,6 +160,24 @@ public partial class UpdateWindow : Window
         Close();
     }
 
+    private void OnReleasePageClick(
+        object sender, RoutedEventArgs e)
+    {
+        if (!TryGetReleasePageUri(out var releasePageUri))
+            return;
+
+        _logger.LogInformation(
+            "Opening release page for v{Version}: {Url}",
+            _release.DisplayVersion,
+            releasePageUri);
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = releasePageUri.AbsoluteUri,
+            UseShellExecute = true
+        });
+    }
+
     private void OnTitleBarDrag(
         object sender,
         System.Windows.Input.MouseButtonEventArgs e)
@@ -162,6 +185,26 @@ public partial class UpdateWindow : Window
         if (e.LeftButton ==
             System.Windows.Input.MouseButtonState.Pressed)
             DragMove();
+    }
+
+    private bool HasReleasePageUrl() =>
+        TryGetReleasePageUri(out _);
+
+    private bool TryGetReleasePageUri(out Uri releasePageUri)
+    {
+        releasePageUri = null!;
+
+        if (!Uri.TryCreate(
+                _release.ReleasePageUrl,
+                UriKind.Absolute,
+                out var candidate))
+            return false;
+
+        if (candidate.Scheme is not "https" and not "http")
+            return false;
+
+        releasePageUri = candidate;
+        return true;
     }
 
     // ── DWM dark title bar ────────────────────────────────────────

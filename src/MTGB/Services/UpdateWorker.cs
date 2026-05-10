@@ -17,6 +17,7 @@ public class UpdateWorker : BackgroundService
     private readonly IUpdateService _updateService;
     private readonly INotificationManager _notifications;
     private readonly IOptions<AppSettings> _settings;
+    private readonly ISettingsStore _settingsStore;
     private readonly ILogger<UpdateWorker> _logger;
 
     // 72 hours between checks
@@ -31,11 +32,13 @@ public class UpdateWorker : BackgroundService
         IUpdateService updateService,
         INotificationManager notifications,
         IOptions<AppSettings> settings,
+        ISettingsStore settingsStore,
         ILogger<UpdateWorker> logger)
     {
         _updateService = updateService;
         _notifications = notifications;
         _settings = settings;
+        _settingsStore = settingsStore;
         _logger = logger;
     }
 
@@ -120,6 +123,7 @@ public class UpdateWorker : BackgroundService
         // Record that we notified for this version
         _settings.Value.Update.LastNotifiedVersion =
             release.DisplayVersion;
+        _settingsStore.Save();
     }
 
     private bool IsQuietHours()

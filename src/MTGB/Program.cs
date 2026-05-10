@@ -108,6 +108,8 @@ internal class Program
             // ── Configuration ─────────────────────────────────────────────
             services.Configure<AppSettings>(
                 context.Configuration);
+            services.AddSingleton<ISettingsStore,
+                SettingsStore>();
 
             // ── Security ────────────────────────────────────────────────────────
             services.AddSingleton<ICredentialManager,

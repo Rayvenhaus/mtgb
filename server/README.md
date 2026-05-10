@@ -187,6 +187,12 @@ This entry is already present in the MTGB repo `.gitignore`.
 - The publish endpoint (`publish.php`) is protected by an
   API key passed in the `X-Publish-Key` header. This key
   is stored as a GitHub Actions secret and never committed.
+- The release workflow expects two GitHub secrets for automatic
+  community publishing: `RELEASE_PUBLISH_URL` and
+  `COMMUNITY_PUBLISH_KEY`.
+- Release records now keep `setup_url` for the updater's direct
+  installer download and `release_page_url` for the human-facing
+  GitHub release page.
 - All inputs are validated and sanitised before touching
   the database. Prepared statements throughout. No raw
   query interpolation.

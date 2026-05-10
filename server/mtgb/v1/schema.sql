@@ -168,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `release_info` (
     `version`       varchar(20)   COLLATE utf8mb4_unicode_ci NOT NULL,
     `release_date`  datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `setup_url`     varchar(500)  COLLATE utf8mb4_unicode_ci NOT NULL,
+    `release_page_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     `release_notes` text          COLLATE utf8mb4_unicode_ci NOT NULL,
     `is_beta`       tinyint(1)    NOT NULL DEFAULT 0,
     `is_current`    tinyint(1)    NOT NULL DEFAULT 0,

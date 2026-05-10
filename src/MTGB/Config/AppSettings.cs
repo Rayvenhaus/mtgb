@@ -227,6 +227,12 @@ public class CommunityMapSettings
 public class UpdateSettings
 {
     /// <summary>
+    /// Whether beta/prerelease builds should be offered by the updater.
+    /// False means stable releases only.
+    /// </summary>
+    public bool IncludeBeta { get; set; } = true;
+
+    /// <summary>
     /// When the last update check was performed.
     /// Null if never checked.
     /// </summary>

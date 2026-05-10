@@ -1004,6 +1004,31 @@
                                                       Click="OnStartupToggleChanged"/>
                                     </Grid>
                                 </Border>
+                                <Border Style="{StaticResource SettingRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Update channel" Style="{StaticResource SettingLabel}"/>
+                                            <TextBlock Text="Choose whether MTGB accepts stable releases only or beta updates as well." Style="{StaticResource SettingSubLabel}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <RadioButton x:Name="UpdateStableOnlyRadio"
+                                                         Content="Stable only"
+                                                         GroupName="UpdateChannel"
+                                                         Margin="0,0,14,0"
+                                                         Checked="OnUpdateChannelChanged"/>
+                                            <RadioButton x:Name="UpdateIncludeBetaRadio"
+                                                         Content="Include beta"
+                                                         GroupName="UpdateChannel"
+                                                         Checked="OnUpdateChannelChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                                 <Border Style="{StaticResource SettingRow}" BorderThickness="0">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -1308,18 +1333,11 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,20">
                     <StackPanel>
                         <StackPanel HorizontalAlignment="Center" Margin="0,10,0,20">
-                            <Border Width="64" Height="64"
-                                    Background="{StaticResource BgRaisedBrush}"
-                                    BorderBrush="{StaticResource AccentBlueBrush}"
-                                    BorderThickness="2" CornerRadius="16"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,0,0,14">
-                                <Ellipse x:Name="AboutBingDot"
-                                         Width="22" Height="22"
-                                         Fill="{StaticResource SemanticSuccessBrush}"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"/>
-                            </Border>
+                            <Image Source="/Assets/MTGB_128.png"
+                                   Width="96" Height="96"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,14"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
                             <TextBlock Text="MTGB"
                                        FontFamily="Segoe UI Variable, Segoe UI"
                                        FontSize="22" FontWeight="Bold"
@@ -1426,11 +1444,14 @@
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             VerticalAlignment="Center">
-                    <Button Content="Save"
-                            Style="{StaticResource PrimaryButton}"
+                    <Button Style="{StaticResource PrimaryButton}"
                             Foreground="{StaticResource BgDeepestBrush}"
                             Margin="0,0,8,0"
-                            Click="OnSaveClick"/>
+                            Click="OnSaveClick">
+                        <TextBlock Text="Save"
+                                   Foreground="{StaticResource BgDeepestBrush}"
+                                   FontWeight="SemiBold"/>
+                    </Button>
                     <Button x:Name="CancelButton"
                             Content="Cancel"
                             Style="{StaticResource GhostButton}"

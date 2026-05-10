@@ -51,6 +51,12 @@ if (empty($setupUrl) || !filter_var(
     send_error('Invalid or missing setup_url.', 400);
 }
 
+$releasePageUrl = trim($body['release_page_url'] ?? '');
+if (!empty($releasePageUrl) && !filter_var(
+    $releasePageUrl, FILTER_VALIDATE_URL)) {
+    send_error('Invalid release_page_url.', 400);
+}
+
 $releaseNotes = trim($body['release_notes'] ?? '');
 if (empty($releaseNotes)) {
     send_error('Missing release_notes.', 400);
@@ -75,10 +81,10 @@ try {
     // Insert new release
     $stmt = $db->prepare('
         INSERT INTO release_info
-            (version, release_date, setup_url,
+            (version, release_date, setup_url, release_page_url,
              release_notes, is_beta, is_current)
         VALUES
-            (:version, :release_date, :setup_url,
+            (:version, :release_date, :setup_url, :release_page_url,
              :release_notes, :is_beta, 1)
     ');
 
@@ -87,6 +93,7 @@ try {
                                 $version, MAX_VERSION_LENGTH),
         ':release_date'  => $releaseDate,
         ':setup_url'     => $setupUrl,
+        ':release_page_url' => $releasePageUrl,
         ':release_notes' => $releaseNotes,
         ':is_beta'       => $isBeta ? 1 : 0,
     ]);

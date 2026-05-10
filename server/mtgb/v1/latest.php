@@ -15,7 +15,7 @@
 // every 72 hours during non-quiet hours.
 // [USAGE] GET /mtgb/v1/release/latest
 // [RETURNS] JSON — { status, message, data: { version, release_date,
-//           setup_url, release_notes, is_beta } }
+//           setup_url, release_page_url, release_notes, is_beta } }
 // ============================================================
 
 require_once __DIR__ . '/config.php';
@@ -26,19 +26,44 @@ require_method('GET');
 require_mtgb_client();
 
 $db = get_db();
+$includeBeta = filter_var(
+    $_GET['include_beta'] ?? true,
+    FILTER_VALIDATE_BOOLEAN,
+    FILTER_NULL_ON_FAILURE);
 
-$stmt = $db->prepare('
-    SELECT
-        version,
-        release_date,
-        setup_url,
-        release_notes,
-        is_beta
-    FROM release_info
-    WHERE is_current = 1
-    ORDER BY release_date DESC
-    LIMIT 1
-');
+if ($includeBeta === null) {
+    $includeBeta = true;
+}
+
+$sql = $includeBeta
+    ? '
+        SELECT
+            version,
+            release_date,
+            setup_url,
+            release_page_url,
+            release_notes,
+            is_beta
+        FROM release_info
+        WHERE is_current = 1
+        ORDER BY release_date DESC, id DESC
+        LIMIT 1
+    '
+    : '
+        SELECT
+            version,
+            release_date,
+            setup_url,
+            release_page_url,
+            release_notes,
+            is_beta
+        FROM release_info
+        WHERE is_beta = 0
+        ORDER BY release_date DESC, id DESC
+        LIMIT 1
+    ';
+
+$stmt = $db->prepare($sql);
 
 $stmt->execute();
 $release = $stmt->fetch();
@@ -58,6 +83,7 @@ send_success(
         'version'       => $release['version'],
         'release_date'  => $release['release_date'],
         'setup_url'     => $release['setup_url'],
+        'release_page_url' => $release['release_page_url'],
         'release_notes' => $release['release_notes'],
         'is_beta'       => (bool)$release['is_beta'],
     ]

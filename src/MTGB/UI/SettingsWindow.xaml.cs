@@ -159,6 +159,8 @@ public partial class SettingsWindow : Window
             s.Polling.IntervalSeconds.ToString();
         WebhookToggle.IsChecked = s.Webhook.Enabled;
         StartupToggle.IsChecked = s.Ui.StartWithWindows;
+        UpdateStableOnlyRadio.IsChecked = !s.Update.IncludeBeta;
+        UpdateIncludeBetaRadio.IsChecked = s.Update.IncludeBeta;
         UpdateWebhookPortPanel();
 
         // Language
@@ -795,6 +797,17 @@ public partial class SettingsWindow : Window
         var enabled = StartupToggle.IsChecked == true;
         _settings.Value.Ui.StartWithWindows = enabled;
         SetWindowsStartup(enabled);
+        MarkDirty();
+    }
+
+    private void OnUpdateChannelChanged(
+        object sender, RoutedEventArgs e)
+    {
+        if (_isLoading) return;
+
+        _settings.Value.Update.IncludeBeta =
+            UpdateIncludeBetaRadio.IsChecked == true;
+        _settings.Value.Update.LastNotifiedVersion = null;
         MarkDirty();
     }
 
