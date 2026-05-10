@@ -19,7 +19,7 @@ public partial class UpdateWindow : Window
     private readonly ILogger<UpdateWindow> _logger;
     private readonly ReleaseInfo _release;
 
-    private string? _downloadedMsixPath;
+    private string? _downloadedSetupPath;
     private double _progressBarMaxWidth;
 
     public UpdateWindow(
@@ -51,7 +51,7 @@ public partial class UpdateWindow : Window
             .GetName().Version?.ToString(3) ?? "0.0.0";
 
         VersionHeader.Text =
-            $"Version {_release.Version} is available";
+            $"Version {_release.DisplayVersion} is available";
         CurrentVersionText.Text =
             $"You are running v{current}";
         ReleaseNotesText.Text = _release.ReleaseNotes;
@@ -100,11 +100,11 @@ public partial class UpdateWindow : Window
         using var cts = new CancellationTokenSource(
             TimeSpan.FromMinutes(10));
 
-        _downloadedMsixPath = await _updateService
+        _downloadedSetupPath = await _updateService
             .DownloadUpdateAsync(_release, progress, cts.Token);
 
-        if (_downloadedMsixPath is null ||
-            !File.Exists(_downloadedMsixPath))
+        if (_downloadedSetupPath is null ||
+            !File.Exists(_downloadedSetupPath))
         {
             Dispatcher.Invoke(() =>
             {
@@ -134,14 +134,14 @@ public partial class UpdateWindow : Window
     private void OnInstallClick(
         object sender, RoutedEventArgs e)
     {
-        if (_downloadedMsixPath is null) return;
+        if (_downloadedSetupPath is null) return;
 
         _logger.LogInformation(
             "User confirmed update to v{Version}. " +
             "The Ministry is applying the update.",
-            _release.Version);
+            _release.DisplayVersion);
 
-        _updateService.InstallUpdate(_downloadedMsixPath);
+        _updateService.InstallUpdate(_downloadedSetupPath);
     }
 
     private void OnCancelClick(
@@ -150,7 +150,7 @@ public partial class UpdateWindow : Window
         _logger.LogInformation(
             "User deferred update to v{Version}. " +
             "The Ministry notes this without judgement.",
-            _release.Version);
+            _release.DisplayVersion);
 
         Close();
     }

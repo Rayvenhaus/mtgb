@@ -167,12 +167,13 @@ CREATE TABLE IF NOT EXISTS `release_info` (
     `id`            bigint        NOT NULL AUTO_INCREMENT,
     `version`       varchar(20)   COLLATE utf8mb4_unicode_ci NOT NULL,
     `release_date`  datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `msix_url`      varchar(500)  COLLATE utf8mb4_unicode_ci NOT NULL,
-    `zip_url`       varchar(500)  COLLATE utf8mb4_unicode_ci NOT NULL,
+    `setup_url`     varchar(500)  COLLATE utf8mb4_unicode_ci NOT NULL,
     `release_notes` text          COLLATE utf8mb4_unicode_ci NOT NULL,
+    `is_beta`       tinyint(1)    NOT NULL DEFAULT 0,
     `is_current`    tinyint(1)    NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     KEY `idx_version`   (`version`),
+    KEY `idx_is_beta`   (`is_beta`),
     KEY `idx_is_current`(`is_current`)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4

@@ -15,7 +15,7 @@
 // every 72 hours during non-quiet hours.
 // [USAGE] GET /mtgb/v1/release/latest
 // [RETURNS] JSON — { status, message, data: { version, release_date,
-//           msix_url, zip_url, release_notes } }
+//           setup_url, release_notes, is_beta } }
 // ============================================================
 
 require_once __DIR__ . '/config.php';
@@ -31,9 +31,9 @@ $stmt = $db->prepare('
     SELECT
         version,
         release_date,
-        msix_url,
-        zip_url,
-        release_notes
+        setup_url,
+        release_notes,
+        is_beta
     FROM release_info
     WHERE is_current = 1
     ORDER BY release_date DESC
@@ -57,8 +57,8 @@ send_success(
     [
         'version'       => $release['version'],
         'release_date'  => $release['release_date'],
-        'msix_url'      => $release['msix_url'],
-        'zip_url'       => $release['zip_url'],
+        'setup_url'     => $release['setup_url'],
         'release_notes' => $release['release_notes'],
+        'is_beta'       => (bool)$release['is_beta'],
     ]
 );

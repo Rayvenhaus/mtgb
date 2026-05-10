@@ -45,7 +45,8 @@ That's what it does. The Ministry handles the rest.
 
 - Windows 10 (1809 or later) or Windows 11
 - SimplyPrint account with API access
-- No .NET runtime required — self-contained installer
+- x64 processor
+- .NET 8 Windows Desktop Runtime, installed automatically by setup if missing
 
 ---
 
@@ -57,8 +58,7 @@ Download the latest release from the
 > **⚠️ Beta notice — unsigned installer**
 > MTGB is currently in beta and the installer is not yet code-signed.
 > Windows will show a SmartScreen warning. See [INSTALL.md](INSTALL.md)
-> for full instructions including how to proceed and how to use the
-> portable ZIP as an alternative.
+> for full instructions.
 
 Full installation instructions, troubleshooting, and uninstall
 guidance: **[INSTALL.md](INSTALL.md)**
@@ -69,7 +69,9 @@ guidance: **[INSTALL.md](INSTALL.md)**
 
 | Document | Contents |
 |---|---|
-| [INSTALL.md](INSTALL.md) | Installation, SmartScreen, portable ZIP, troubleshooting |
+| [INSTALL.md](INSTALL.md) | Installation, SmartScreen, first-run setup, troubleshooting |
+| [docs/BUILDING.md](docs/BUILDING.md) | Local publish, MSI, and Burn build instructions |
+| [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) | Release scope, VM validation, uninstall and upgrade checks |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, code style, voice and tone |
 | [TELEMETRY.md](TELEMETRY.md) | Full privacy and telemetry disclosure |
 | [SECURITY.md](SECURITY.md) | Vulnerability reporting policy |
@@ -83,14 +85,14 @@ guidance: **[INSTALL.md](INSTALL.md)**
 
 ```powershell
 git clone https://github.com/Rayvenhaus/mtgb.git
-cd mtgb\src\MTGB
-dotnet build -c Release
+cd mtgb
+.\build-installer.ps1 -Version "0.6.2-beta" -Clean
 ```
 
-To produce a distributable MSIX and portable ZIP:
+To build only the application:
 
 ```powershell
-.\package.ps1 -Version "0.5.3.0"
+dotnet build src\MTGB\MTGB.csproj -c Release -p:Platform=x64
 ```
 
 To regenerate icons and tile assets:

@@ -10,15 +10,17 @@
     <ProductCode>auto</ProductCode>
     <UpgradeCode>a8d5e2f1-9b3c-4d7e-8a6f-5c4b3a2d1e0f</UpgradeCode>
     <Manufacturer>Myndworx Asylum</Manufacturer>
-    <Version>0.6.0</Version>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.6.0</ProductVersion>
+    <Version>$(ProductVersion)</Version>
 
     <!-- Output configuration -->
-    <OutputName>MTGB-0.6.0-beta-setup</OutputName>
+    <OutputName>MTGB-$(ProductVersion)-setup</OutputName>
     <OutputType>Package</OutputType>
     <InstallerPlatform>x64</InstallerPlatform>
 
     <!-- Suppress ICE validation warnings for development -->
     <SuppressSpecificWarnings>1079;1083</SuppressSpecificWarnings>
+    <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

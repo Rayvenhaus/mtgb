@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGB", "src\MTGB\MTGB.cspro
 EndProject
 Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "mtgbInstaller", "src\mtgbInstaller\mtgbInstaller.wixproj", "{49CA0C59-FF1B-404F-BC2E-CA9DA6688D31}"
 EndProject
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "mtgbBootstrapper", "src\mtgbBootstrapper\mtgbBootstrapper.wixproj", "{E0F2233D-DC96-4068-DFF5-0BA42B21799A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -40,6 +42,18 @@ Global
 		{49CA0C59-FF1B-404F-BC2E-CA9DA6688D31}.Release|x64.Build.0 = Release|x64
 		{49CA0C59-FF1B-404F-BC2E-CA9DA6688D31}.Release|x86.ActiveCfg = Release|x86
 		{49CA0C59-FF1B-404F-BC2E-CA9DA6688D31}.Release|x86.Build.0 = Release|x86
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|ARM64.Build.0 = Debug|ARM64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|x64.ActiveCfg = Debug|x64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|x64.Build.0 = Debug|x64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|x86.ActiveCfg = Debug|x86
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Debug|x86.Build.0 = Debug|x86
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|ARM64.ActiveCfg = Release|ARM64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|ARM64.Build.0 = Release|ARM64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|x64.ActiveCfg = Release|x64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|x64.Build.0 = Release|x64
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|x86.ActiveCfg = Release|x86
+		{E0F2233D-DC96-4068-DFF5-0BA42B21799A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

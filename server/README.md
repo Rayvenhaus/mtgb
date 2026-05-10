@@ -40,6 +40,7 @@ server/
         ├── config.local.example   ← template for config.local
         ├── response.php           ← shared JSON response helpers
         ├── ingest.php             ← POST /mtgb/v1/telemetry
+        ├── installations.php      ← DELETE /mtgb/v1/installations
         ├── latest.php             ← GET  /mtgb/v1/release/latest
         ├── publish.php            ← POST /mtgb/v1/release/publish
         ├── register.php           ← POST/DELETE /mtgb/v1/map/register
@@ -54,6 +55,7 @@ server/
 | Method          | Endpoint                              | Auth             | Called by               |
 |-----------------|---------------------------------------|------------------|-------------------------|
 | `POST`          | `/mtgb/v1/telemetry`                  | User-Agent       | MTGB client             |
+| `DELETE`        | `/mtgb/v1/installations`              | User-Agent       | MTGB uninstaller        |
 | `GET`           | `/mtgb/v1/release/latest`             | User-Agent       | MTGB client             |
 | `POST`          | `/mtgb/v1/release/publish`            | X-Publish-Key    | GitHub Actions pipeline |
 | `POST`          | `/mtgb/v1/map/register`               | User-Agent       | MTGB client             |
@@ -146,6 +148,9 @@ RewriteEngine On
 
 # Route /mtgb/v1/map/status/{installId} to status.php
 RewriteRule ^mtgb/v1/map/status/([a-f0-9\-]{36})$ /mtgb/v1/status.php?install_id=$1 [QSA,L]
+
+# Route /mtgb/v1/installations to installations.php
+RewriteRule ^mtgb/v1/installations$ /mtgb/v1/installations.php [QSA,L]
 ```
 
 Ensure `AllowOverride All` is set for your document root,

@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MTGB.Config;
 using MTGB.Services;
-using MTGB.UI;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.IO;
 
 namespace MTGB.UI;
 
@@ -39,14 +39,12 @@ public class TrayIcon : IDisposable
     private string _currentTooltipFlavour = string.Empty;
     private string _lastTooltipState = string.Empty;
 
-    private static readonly string IconIdle = "Assets/mtgb.ico";
-    private static readonly string IconPrinting = "Assets/mtgb.ico";
-    private static readonly string IconAlert = "Assets/mtgb.ico";
+    private static readonly string IconIdle = "MTGB";
+    private static readonly string IconPrinting = "MTGB";
+    private static readonly string IconAlert = "MTGB";
 
     private readonly Dictionary<int, (string state, string text)>
         _flavourCache = new();
-
-    // ── Flavour text pools ────────────────────────────────────────
 
     private static readonly string[] IdleFlavour =
     {
@@ -56,7 +54,14 @@ public class TrayIcon : IDisposable
         "Ready and waiting. Unlike the bus.",
         "Standing by. Stoically. Without complaint.",
         "All printers present and accounted for. Mostly.",
-        "Peaceful. Don't jinx it."
+        "Peaceful. Don't jinx it.",
+        "No alarms. No bells. No paperwork currently on fire.",
+        "Stillness reigns. The Ministry distrusts stillness.",
+        "The printers are quiet. Someone should check the biscuits.",
+        "Ready for duty. Probably.",
+        "Nothing to report, which is itself worth reporting.",
+        "Operational serenity has been declared. Provisionally.",
+        "The machines are behaving. This will be documented."
     };
 
     private static readonly string[] PrintingFlavour =
@@ -67,7 +72,14 @@ public class TrayIcon : IDisposable
         "The machines are doing their thing. Stand back.",
         "Progress is being made. The Ministry is cautiously hopeful.",
         "Printing. Try not to watch. It makes it nervous.",
-        "Layer by layer. Like bureaucracy, but faster."
+        "Layer by layer. Like bureaucracy, but faster.",
+        "Material is becoming object. The forms are impressed.",
+        "A small miracle is being extruded under supervision.",
+        "The printer is busy pretending this was easy.",
+        "The object emerges, one tiny decision at a time.",
+        "Heat, motion, optimism. A dangerous combination.",
+        "The machine hums. The Ministry listens.",
+        "Creation is underway. Please refrain from dramatic breathing."
     };
 
     private static readonly string[] PausedFlavour =
@@ -77,7 +89,13 @@ public class TrayIcon : IDisposable
         "On hold. Like your tax return.",
         "Resting. It has earned this.",
         "Temporarily suspended. By order of the Ministry.",
-        "Paused mid-layer. The suspense is considerable."
+        "Paused mid-layer. The suspense is considerable.",
+        "Motion has ceased. Speculation has not.",
+        "The print is contemplating its choices.",
+        "Suspended animation, but with more plastic.",
+        "The machine has stopped to consider the paperwork.",
+        "A pause has been declared. Tea may be involved.",
+        "Progress delayed. Anxiety continues on schedule."
     };
 
     private static readonly string[] FailedFlavour =
@@ -88,7 +106,14 @@ public class TrayIcon : IDisposable
         "The Ministry has filed a strongly worded report.",
         "Run away! Run away!",
         "We apologise for the inconvenience.",
-        "Strange things have occurred. Investigation ongoing."
+        "Strange things have occurred. Investigation ongoing.",
+        "A regrettable plastic incident has been detected.",
+        "The machine has entered a state of interpretive distress.",
+        "Failure has arrived wearing sensible shoes.",
+        "The print has made alternative career choices.",
+        "Something has gone wrong. The llamas remain calm.",
+        "The Ministry has lowered its eyebrows.",
+        "Reality has rejected this particular object."
     };
 
     private static readonly string[] OfflineFlavour =
@@ -97,10 +122,16 @@ public class TrayIcon : IDisposable
         "Gone. Reduced to atoms. Or just unplugged.",
         "The printer appears to have made a break for it.",
         "No one is home. We checked. Twice. In triplicate.",
-        "Absent without leave. The Ministry is displeased."
+        "Absent without leave. The Ministry is displeased.",
+        "Signal lost. Morale uncertain.",
+        "The printer has become theoretical.",
+        "Offline. Presumed sulking until proven otherwise.",
+        "The machine is unreachable. Send biscuits.",
+        "Communication has ceased. The paperwork has not."
     };
 
     private static readonly Random _random = new();
+
     private static string Pick(string[] pool) =>
         pool[_random.Next(pool.Length)];
 
@@ -122,8 +153,6 @@ public class TrayIcon : IDisposable
         _logger = logger;
     }
 
-    // ── Initialisation ────────────────────────────────────────────
-
     public void Initialise()
     {
         _taskbarIcon = new TaskbarIcon
@@ -135,7 +164,6 @@ public class TrayIcon : IDisposable
 
         _taskbarIcon.TrayLeftMouseDown += OnLeftClick;
 
-        // Context menu from TrayContextMenu.xaml resource dictionary
         if (Application.Current.Resources["TrayMenu"]
             is ContextMenu menu)
         {
@@ -177,8 +205,6 @@ public class TrayIcon : IDisposable
             }
         }
     }
-
-    // ── Icon state loop ───────────────────────────────────────────
 
     private async Task StartIconStateLoopAsync()
     {
@@ -267,30 +293,36 @@ public class TrayIcon : IDisposable
             "printing" => Pick(PrintingFlavour),
             _ => Pick(IdleFlavour)
         };
+
         return _currentTooltipFlavour;
     }
 
     private void SetIcon(string iconPath, string tooltip)
     {
         if (_taskbarIcon is null) return;
+
         _taskbarIcon.IconSource = LoadIcon(iconPath);
         _taskbarIcon.ToolTipText = tooltip;
     }
 
-    private static BitmapImage LoadIcon(string relativePath)
+    private static ImageSource LoadIcon(string _)
     {
-        var fullPath = Path.Combine(
-            AppContext.BaseDirectory, relativePath);
+        var exePath = Environment.ProcessPath
+            ?? Path.Combine(AppContext.BaseDirectory, "MTGB.exe");
 
-        var image = new BitmapImage();
-        image.BeginInit();
-        image.UriSource = new Uri(fullPath, UriKind.Absolute);
-        image.CacheOption = BitmapCacheOption.OnLoad;
-        image.EndInit();
-        return image;
+        using var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath)
+            ?? throw new FileNotFoundException(
+                "Could not load the embedded MTGB application icon.",
+                exePath);
+
+        var source = Imaging.CreateBitmapSourceFromHIcon(
+            icon.Handle,
+            Int32Rect.Empty,
+            BitmapSizeOptions.FromWidthAndHeight(16, 16));
+
+        source.Freeze();
+        return source;
     }
-
-    // ── Left click — flyout ───────────────────────────────────────
 
     private void OnLeftClick(object sender, RoutedEventArgs e)
     {
@@ -314,8 +346,6 @@ public class TrayIcon : IDisposable
         _flyout.SlideUp();
     }
 
-    // ── Menu actions ──────────────────────────────────────────────
-
     private void OpenSimplyPrintDashboard()
     {
         var orgId = _settings.Value.OrganisationId;
@@ -334,6 +364,7 @@ public class TrayIcon : IDisposable
     private void OpenHistory()
     {
         var history = _services.GetRequiredService<HistoryWindow>();
+        history.WindowState = System.Windows.WindowState.Normal;
         history.Show();
         history.Activate();
     }
@@ -341,6 +372,7 @@ public class TrayIcon : IDisposable
     private void OpenSettings()
     {
         var settings = _services.GetRequiredService<SettingsWindow>();
+        settings.WindowState = System.Windows.WindowState.Normal;
         settings.Show();
         settings.Activate();
     }
@@ -374,7 +406,7 @@ public class TrayIcon : IDisposable
                     WriteIndented = true
                 });
 
-            System.IO.File.WriteAllText(DataPaths.SettingsFile, json);
+            File.WriteAllText(DataPaths.SettingsFile, json);
             _logger.LogDebug("Settings persisted after mute toggle.");
         }
         catch (Exception ex)
@@ -395,8 +427,6 @@ public class TrayIcon : IDisposable
         _taskbarIcon?.Dispose();
         Application.Current.Shutdown();
     }
-
-    // ── Toast action handler ──────────────────────────────────────
 
     private void OnToastActionRequested(
         object? sender,
@@ -432,8 +462,6 @@ public class TrayIcon : IDisposable
         }
     }
 
-    // ── Update action ─────────────────────────────────────────────
-
     private async Task<bool> HandleUpdateActionAsync()
     {
         var release = _updateService.GetCachedRelease();
@@ -459,8 +487,6 @@ public class TrayIcon : IDisposable
 
         return true;
     }
-
-    // ── Flavour text for printer cards ────────────────────────────
 
     public string GetFlavourText(PrinterSnapshot snapshot)
     {
@@ -503,11 +529,10 @@ public class TrayIcon : IDisposable
         };
     }
 
-    // ── Disposal ──────────────────────────────────────────────────
-
     public void Dispose()
     {
         if (_disposed) return;
+
         _disposed = true;
 
         _taskbarIcon?.Dispose();

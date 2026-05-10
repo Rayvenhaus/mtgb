@@ -9,7 +9,7 @@
 		<UI>
 
 			<!-- Welcome dialog: bitmap only, no overlaid text -->
-			<Dialog Id="WelcomeDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
+			<Dialog Id="mtgbWelcomeDlg" Width="370" Height="270" Title="Welcome to [ProductName] Setup">
 
 				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="yes"
 						 Text="!(loc.WelcomeDlgBitmap)" />
@@ -32,7 +32,7 @@
 			</Dialog>
 
 			<!-- Exit dialog: bitmap only, no overlaid text, with launch checkbox -->
-			<Dialog Id="ExitDlg" Width="370" Height="270" Title="!(loc.ExitDlg_Title)">
+			<Dialog Id="mtgbExitDlg" Width="370" Height="270" Title="[ProductName] Setup Complete">
 
 				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="yes"
 						 Text="!(loc.WelcomeDlgBitmap)" />
@@ -43,7 +43,7 @@
 				<Control Id="OptionalCheckBox" Type="CheckBox" X="10" Y="237" Width="200" Height="12"
 						 Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX"
 						 CheckBoxValue="1"
-						 Text="!(loc.WixUIOptionalCheckBox)" />
+						 Text="Launch MTGB now" />
 
 				<Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17"
 						 Disabled="yes" Text="!(loc.WixUIBack)" />

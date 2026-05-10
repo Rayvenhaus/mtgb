@@ -95,17 +95,23 @@ public partial class InductionWindow : Window
 
     private void UpdateTestConnectionButton()
     {
+        _connectionVerified = false;
+        UpdateContinueButtonState();
+
         var orgIdFilled = !string.IsNullOrWhiteSpace(OrgIdInput.Text);
         var apiKeyFilled = ApiKeyInput.SecurePassword.Length > 0;
         var bothFilled = orgIdFilled && apiKeyFilled;
 
         TestConnectionButton.IsEnabled = bothFilled;
+        TestConnectionButton.Content = "Test Connection";
 
         TestConnectionButton.Foreground = new SolidColorBrush(
             bothFilled ? AccentBlue : TextDim);
 
         TestConnectionButton.BorderBrush = new SolidColorBrush(
             bothFilled ? AccentBlue : Color.FromRgb(0x2c, 0x4d, 0xba));
+
+        ConnectionStatusPanel.Visibility = Visibility.Collapsed;
     }
 
     // ── Navigation ────────────────────────────────────────────────
@@ -200,7 +206,8 @@ public partial class InductionWindow : Window
             "The Ministry has filed the abandonment form. " +
             "In triplicate.");
 
-        Application.Current.Shutdown();
+        DialogResult = false;
+        Close();
     }
 
     // ── Screen management ─────────────────────────────────────────
@@ -227,14 +234,19 @@ public partial class InductionWindow : Window
         BackButton.Visibility = _currentScreen > 1
             ? Visibility.Visible : Visibility.Collapsed;
 
-        ContinueButton.Content = _currentScreen == TotalScreens
+        ContinueButtonText.Text = _currentScreen == TotalScreens
             ? "Done ✓" : "Continue →";
 
-        ContinueButton.IsEnabled =
-            _currentScreen != 2 || _connectionVerified;
+        UpdateContinueButtonState();
 
         ScreenIndicatorText.Text =
             $"{_currentScreen} of {TotalScreens}";
+    }
+
+    private void UpdateContinueButtonState()
+    {
+        ContinueButton.IsEnabled =
+            _currentScreen != 2 || _connectionVerified;
     }
 
     private void UpdateDots()
@@ -262,7 +274,9 @@ public partial class InductionWindow : Window
         var s = _settings.Value;
 
         SummaryOrgId.Text = s.OrganisationId.ToString();
-        SummaryAuthMode.Text = s.AuthMode.ToString();
+        SummaryAuthMode.Text = s.AuthMode == AuthMode.ApiKey
+            ? "API key entered, verified, and secured"
+            : "OAuth2 connected and secured";
 
         SummaryStartWithWindows.Text = s.Ui.StartWithWindows
             ? "Enabled" : "Disabled";
@@ -289,11 +303,13 @@ public partial class InductionWindow : Window
         object sender, RoutedEventArgs e)
     {
         _connectionVerified = false;
-        ContinueButton.IsEnabled = false;
+        UpdateContinueButtonState();
         TestConnectionButton.IsEnabled = false;
 
         SetConnectionStatus("Contacting the Ministry...",
             isPending: true);
+
+        TestConnectionButton.Content = "Testing...";
 
         try
         {
@@ -324,11 +340,12 @@ public partial class InductionWindow : Window
             {
                 _settings.Value.OrganisationId = orgId;
                 _connectionVerified = true;
-                ContinueButton.IsEnabled = true;
+                UpdateContinueButtonState();
 
                 SetConnectionStatus(
                     "Connected. The Ministry approves.",
                     isSuccess: true);
+                TestConnectionButton.Content = "Test Passed";
 
                 _logger.LogInformation(
                     "Induction connection verified " +
@@ -341,6 +358,7 @@ public partial class InductionWindow : Window
                     "Connection failed. " +
                     "Check your credentials and try again.",
                     isError: true);
+                TestConnectionButton.Content = "Test Failed";
             }
         }
         catch (Exception ex)
@@ -350,6 +368,7 @@ public partial class InductionWindow : Window
             SetConnectionStatus(
                 "Connection failed — check logs for details.",
                 isError: true);
+            TestConnectionButton.Content = "Test Failed";
         }
         finally
         {

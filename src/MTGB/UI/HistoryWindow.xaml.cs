@@ -623,6 +623,29 @@ public partial class HistoryWindow : Window
     private void OnCloseClick(
         object sender, RoutedEventArgs e) => Hide();
 
+    private void OnTitleBarDrag(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            WindowState = WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized;
+            return;
+        }
+
+        if (e.LeftButton ==
+            System.Windows.Input.MouseButtonState.Pressed)
+            DragMove();
+    }
+
+    private void OnMinimizeClick(
+        object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
     // ── Dark title bar ────────────────────────────────────────────
 
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]

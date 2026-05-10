@@ -113,13 +113,13 @@ public class UpdateWorker : BackgroundService
                 PrinterId = 0,
                 PrinterName = "MTGB",
                 IsCritical = false,
-                JobFilename = release.Version,
+                JobFilename = release.DisplayVersion,
                 DetectedAt = DateTimeOffset.Now
             }, ct);
 
         // Record that we notified for this version
         _settings.Value.Update.LastNotifiedVersion =
-            release.Version;
+            release.DisplayVersion;
     }
 
     private bool IsQuietHours()

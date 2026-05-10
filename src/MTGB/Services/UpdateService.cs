@@ -18,14 +18,20 @@ public record ReleaseInfo
     [JsonPropertyName("release_date")]
     public string ReleaseDate { get; init; } = string.Empty;
 
-    [JsonPropertyName("msix_url")]
-    public string MsixUrl { get; init; } = string.Empty;
+    [JsonPropertyName("setup_url")]
+    public string SetupUrl { get; init; } = string.Empty;
 
-    [JsonPropertyName("zip_url")]
-    public string ZipUrl { get; init; } = string.Empty;
+    [JsonPropertyName("msix_url")]
+    public string LegacyMsixUrl { get; init; } = string.Empty;
 
     [JsonPropertyName("release_notes")]
     public string ReleaseNotes { get; init; } = string.Empty;
+
+    [JsonPropertyName("is_beta")]
+    public bool IsBeta { get; init; }
+
+    public string DisplayVersion =>
+        IsBeta ? $"{Version}-beta" : Version;
 }
 
 // ── Interface ─────────────────────────────────────────────────
@@ -41,7 +47,7 @@ public interface IUpdateService
         CancellationToken ct = default);
 
     /// <summary>
-    /// Download the MSIX to a temp file and return the path.
+    /// Download the setup installer to a temp file and return the path.
     /// Reports progress via the provided callback.
     /// </summary>
     Task<string?> DownloadUpdateAsync(
@@ -50,9 +56,9 @@ public interface IUpdateService
         CancellationToken ct = default);
 
     /// <summary>
-    /// Launch the downloaded MSIX installer and exit MTGB.
+    /// Launch the downloaded setup installer and exit MTGB.
     /// </summary>
-    void InstallUpdate(string msixPath);
+    void InstallUpdate(string setupPath);
 
     /// <summary>
     /// Returns the last release info found by CheckForUpdateAsync.
@@ -131,6 +137,14 @@ public class UpdateService : IUpdateService
                     JsonOptions);
 
             if (release is null) return null;
+            if (string.IsNullOrWhiteSpace(
+                    GetDownloadUrl(release)))
+            {
+                _logger.LogDebug(
+                    "Update payload for v{Version} had no setup URL.",
+                    release.DisplayVersion);
+                return null;
+            }
 
             // Compare versions
             var current = GetCurrentVersion();
@@ -147,17 +161,17 @@ public class UpdateService : IUpdateService
 
             // Don't notify twice for the same version
             if (_settings.Value.Update.LastNotifiedVersion
-                == release.Version)
+                == release.DisplayVersion)
             {
                 _logger.LogDebug(
                     "Already notified for v{Version} — skipping.",
-                    release.Version);
+                    release.DisplayVersion);
                 return null;
             }
 
             _logger.LogInformation(
                 "Update available — v{Version}.",
-                release.Version);
+                release.DisplayVersion);
 
             // Cache the release for the toast action handler
             _cachedRelease = release;
@@ -188,15 +202,19 @@ public class UpdateService : IUpdateService
         {
             var tempPath = Path.Combine(
                 Path.GetTempPath(),
-                $"MTGB-{release.Version}-x64.msix");
+                $"MTGB-v{release.DisplayVersion}-x64-Setup.exe");
 
             _logger.LogInformation(
                 "Downloading MTGB v{Version} to {Path}.",
-                release.Version, tempPath);
+                release.DisplayVersion, tempPath);
+
+            var downloadUrl = GetDownloadUrl(release);
+            if (string.IsNullOrWhiteSpace(downloadUrl))
+                return null;
 
             using var response = await _httpClient
                 .GetAsync(
-                    release.MsixUrl,
+                    downloadUrl,
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
 
@@ -246,24 +264,24 @@ public class UpdateService : IUpdateService
         {
             _logger.LogError(ex,
                 "Download failed for v{Version}.",
-                release.Version);
+                release.DisplayVersion);
             return null;
         }
     }
 
     // ── Install ───────────────────────────────────────────────
 
-    public void InstallUpdate(string msixPath)
+    public void InstallUpdate(string setupPath)
     {
         _logger.LogInformation(
-            "Launching MSIX installer — {Path}. " +
+            "Launching setup installer — {Path}. " +
             "MTGB is exiting. Goodbye.",
-            msixPath);
+            setupPath);
 
         System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo
             {
-                FileName = msixPath,
+                FileName = setupPath,
                 UseShellExecute = true
             });
 
@@ -286,6 +304,11 @@ public class UpdateService : IUpdateService
         var clean = version.TrimStart('v');
         return Version.TryParse(clean, out var v) ? v : null;
     }
+
+    private static string GetDownloadUrl(ReleaseInfo release) =>
+        !string.IsNullOrWhiteSpace(release.SetupUrl)
+            ? release.SetupUrl
+            : release.LegacyMsixUrl;
 
     // ── API envelope ──────────────────────────────────────────
 

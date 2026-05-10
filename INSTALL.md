@@ -1,248 +1,170 @@
 # Installing MTGB
 
-> *The Ministry welcomes you.*
-> *We have prepared the forms.*
-> *There are only a few of them.*
+MTGB is distributed as a Windows setup executable:
 
----
+```text
+MTGB-v0.6.2-beta-x64-Setup.exe
+```
+
+The setup program is a WiX Burn bootstrapper. It installs the .NET 8 Windows Desktop Runtime if needed, then installs MTGB through the bundled MSI.
 
 ## Requirements
 
-- Windows 10 (version 1809 or later) or Windows 11
-- x64 processor
-- No .NET runtime required — MTGB is self-contained
-- A SimplyPrint account with API access
+- Windows 10 version 1809 or later, or Windows 11.
+- x64 processor.
+- A SimplyPrint account with API access.
 
----
+The installer handles the required .NET Desktop Runtime.
 
-## Two ways to install
+## Install
 
-MTGB ships as two packages with every release:
+1. Download the latest `MTGB-v*-x64-Setup.exe` from the GitHub release.
+2. Run the setup executable.
+3. Follow the installer prompts.
+4. Launch MTGB from the Start Menu.
+5. Complete the first-run Induction wizard.
 
-| Package        | File                       | Best for                                                        |
-|----------------|----------------------------|-----------------------------------------------------------------|
-| MSIX installer | `MTGB-v*-x64.msix`         | Most users — installs cleanly, appears in Add/Remove Programs   |
-| Portable ZIP   | `MTGB-v*-x64-portable.zip` | Users who prefer no installation, or who hit SmartScreen issues |
+MTGB installs by default to:
 
-Both are unsigned during the beta period. This is documented
-and expected. Code signing is in progress.
-
----
-
-## MSIX installer
-
-### Step 1 — Download
-
-Download `MTGB-v*-x64.msix` from the
-[latest release](https://github.com/Rayvenhaus/mtgb/releases).
-
-### Step 2 — Windows 10 only: enable sideloading
-
-Windows 11 supports unsigned MSIX packages by default.
-Windows 10 requires sideloading to be enabled first.
-
-**Windows 10:**
-Settings → Update & Security → For developers →
-select **Sideload apps** → confirm when prompted.
-
-You only need to do this once.
-
-### Step 3 — Install
-
-Double-click `MTGB-v*-x64.msix`.
-
-### Step 4 — SmartScreen warning
-
-Because MTGB is not yet code-signed, Windows will show
-a SmartScreen warning:
-
-> *"Windows protected your PC"*
-
-This is expected during the beta period. To proceed:
-
-1. Click **More info**
-2. Click **Run anyway**
-
-MTGB will then install normally.
-
-> **Why does this happen?**
-> Windows SmartScreen warns on software that has not been
-> signed by a trusted certificate authority. MTGB is in the
-> process of obtaining a code signing certificate.
-> Once signed, this warning will not appear.
-> The source code is fully open and auditable at
-> https://github.com/Rayvenhaus/mtgb
-
-### Step 5 — Launch
-
-MTGB will appear in your Start menu.
-On first launch it will run the Induction — a short setup
-wizard that connects MTGB to your SimplyPrint account.
-
----
-
-## Portable ZIP
-
-No installation required. No SmartScreen warning.
-
-### Step 1 — Download
-
-Download `MTGB-v*-x64-portable.zip` from the
-[latest release](https://github.com/Rayvenhaus/mtgb/releases).
-
-### Step 2 — Extract
-
-Extract the ZIP to any folder. A permanent location is
-recommended — MTGB will run from wherever you put it.
-
-Suggested locations:
-- `C:\Program Files\MTGB\`
-- `C:\Users\YourName\Apps\MTGB\`
-
-### Step 3 — Launch
-
-Run `MTGB.exe`.
-
-On first launch it will run the Induction wizard.
-
-### Step 4 — Optional: start with Windows
-
-The portable version can still start with Windows.
-During the Induction, enable **Start with Windows** on
-the Standing Orders screen. MTGB will add itself to the
-Windows startup registry automatically.
-
----
-
-## Settings and data
-
-MTGB stores all settings and history in:
-
-```
-%APPDATA%\MTGB\
+```text
+C:\Program Files\MTGB
 ```
 
-Which resolves to something like:
+The installer allows a different install folder.
 
-```
-C:\Users\YourName\AppData\Roaming\MTGB\
-```
+## Beta SmartScreen Notice
 
-This directory contains:
+MTGB beta builds are not yet code-signed.
 
-| File               | Contents                                    |
-|--------------------|---------------------------------------------|
-| `appsettings.json` | All settings including your Organisation ID |
-| `history.json`     | Notification history log                    |
-| `logs\`            | Application logs, rotated daily             |
+Windows may show:
 
-Your API key is **not** stored here — it is stored securely
-in the Windows Credential Manager and never written to disk
-in plain text.
-
----
-
-## Uninstalling
-
-### MSIX
-
-Settings → Apps → MTGB → Uninstall.
-
-Note: the `%APPDATA%\MTGB\` directory is not removed
-automatically. Delete it manually if you want a clean removal.
-This will be fixed in a future release.
-
-### Portable
-
-**Important — do this before deleting the app:**
-
-If you enabled Start with Windows, disable it first:
-- Open MTGB → Settings → Advanced → turn off **Start with Windows**
-
-This removes the registry entry automatically. If you skip this step
-and delete the app folder first, Windows will have a startup entry
-pointing to a path that no longer exists. The next portable install
-will also inherit your old settings and skip the Induction wizard
-entirely, as if it were already configured.
-
-**Then:**
-
-1. Delete the folder you extracted MTGB into
-2. Delete `%APPDATA%\MTGB\` — this removes all settings, history and logs
-
-**If you already deleted the app without disabling startup first:**
-
-Remove the registry entry manually via PowerShell:
-
-```powershell
-Remove-ItemProperty `
-    -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" `
-    -Name "MTGB" `
-    -ErrorAction SilentlyContinue
+```text
+Windows protected your PC
 ```
 
-**If the next portable install skipped the Induction wizard:**
+To continue:
 
-Delete `%APPDATA%\MTGB\` and relaunch. MTGB will run the
-Induction again and configure itself correctly for the new location.
+1. Click `More info`.
+2. Click `Run anyway`.
 
----
+This warning is expected until code signing is added.
 
-## Updating
+## Installed Layout
 
-MTGB checks for updates automatically on startup and every
-72 hours during non-quiet hours. When a new version is
-available a toast notification will appear. Click it to
-open the update window, download the new version, and install.
+The intended install layout is:
 
-You can also check manually via the tray icon right-click menu.
+```text
+[INSTALLFOLDER]\
+    MTGB.exe
+    data\
+        assets\
+            countries.json
+            mtgbNotification.wav
+    logs\
+```
 
----
+MTGB intentionally keeps its controlled runtime files under the selected install folder.
 
-## Known issues — beta
+## First Run
 
-| Issue                                                                                            | Workaround                                                                |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| SmartScreen warning on MSIX install                                                              | Click More info → Run anyway, or use the portable ZIP                     |
-| Windows 10 requires sideloading enabled                                                          | Settings → Update & Security → For developers → Sideload apps             |
-| Uninstaller does not remove `%APPDATA%\MTGB\`                                                    | Delete manually after uninstalling                                        |
-| OAuth2 login not yet available                                                                   | Use API key authentication                                                |
-| Portable — startup registry entry not removed if app deleted before disabling Start with Windows | Disable Start with Windows in Settings → Advanced before deleting the app |
-| Portable reinstall — Induction skipped if `%APPDATA%\MTGB\` not deleted first                    | Delete `%APPDATA%\MTGB\` before installing a new portable version         |
+On first launch, MTGB opens the Induction wizard.
 
----
+Induction collects:
+
+- SimplyPrint Organisation ID.
+- SimplyPrint API key.
+- Start with Windows preference.
+- Optional anonymous telemetry preference.
+- Optional community map registration.
+
+The API key is stored in Windows Credential Manager.
+
+Settings are written to:
+
+```text
+[INSTALLFOLDER]\data\appsettings.json
+```
+
+Logs are written to:
+
+```text
+[INSTALLFOLDER]\logs
+```
+
+Runtime assets are loaded from:
+
+```text
+[INSTALLFOLDER]\data\assets
+```
+
+## Uninstall
+
+Uninstall MTGB from Windows Apps or Control Panel.
+
+Target uninstall behavior is complete removal of MTGB-controlled traces:
+
+- `MTGB.exe`
+- `data`
+- `logs`
+- `data\assets`
+- Start Menu shortcut
+- MTGB installer registry keys
+- MTGB startup registry entry
+- MTGB Credential Manager entries
+- MTGB community map or telemetry records through the community installation removal endpoint
+
+Windows-owned traces such as Event Viewer records, Prefetch, Windows Installer cache metadata, Defender history, and WER reports are not MTGB-controlled and are not removed.
 
 ## Troubleshooting
 
-**MTGB won't start after install**
-Check `%APPDATA%\MTGB\logs\` for error details.
-The log file is named by date — open the most recent one.
+### MTGB will not start
 
-**Toast notifications not appearing**
-Check Windows notification settings:
-Settings → System → Notifications → ensure MTGB is allowed.
+Check the newest log file in:
 
-**Connection test fails during Induction**
-- Verify your Organisation ID — it appears in your SimplyPrint
-  URL: `simplyprint.io/panel/[your-id-here]/dashboard`
-- Verify your API key — regenerate it in SimplyPrint →
-  Settings → API if needed
-- Check your firewall is not blocking outbound HTTPS
+```text
+[INSTALLFOLDER]\logs
+```
 
-**SmartScreen won't let me proceed**
-Use the portable ZIP instead — it has no SmartScreen warning.
+If no log file exists, confirm that the installer created `data` and `logs` and that the current user can write to them.
 
----
+### Country picker is empty
 
-## Getting help
+Confirm this file exists:
 
-Open a GitHub issue:
+```text
+[INSTALLFOLDER]\data\assets\countries.json
+```
+
+### Notification sound does not play
+
+Confirm this file exists:
+
+```text
+[INSTALLFOLDER]\data\assets\mtgbNotification.wav
+```
+
+### Connection test fails during Induction
+
+- Confirm the Organisation ID from the SimplyPrint URL:
+
+```text
+simplyprint.io/panel/[organisation-id]/dashboard
+```
+
+- Regenerate or re-copy the API key from SimplyPrint settings.
+- Confirm outbound HTTPS is not blocked by firewall or proxy.
+
+## Getting Help
+
+Open an issue:
+
+```text
 https://github.com/Rayvenhaus/mtgb/issues
+```
 
-Or find the community on the SimplyPrint Discord.
+Include:
 
----
-
-*MTGB — The Monitor That Goes Bing*
-*Never leave a print behind.*
-*No llamas were harmed in the installation of this software.*
+- MTGB version.
+- Windows version.
+- Whether this was a fresh install, upgrade, or uninstall.
+- The newest log file from `[INSTALLFOLDER]\logs`, if available.

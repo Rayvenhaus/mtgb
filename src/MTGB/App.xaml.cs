@@ -13,6 +13,7 @@ namespace MTGB;
 public partial class App : Application
 {
     private ILogger<App>? _logger;
+    private IHost? _host;
     private IServiceProvider? _services;
     private IOptions<AppSettings>? _settings;
     private ICredentialManager? _credentials;
@@ -21,8 +22,11 @@ public partial class App : Application
     private TrayIcon? _trayIcon;
 
     // Called by Program.cs after the host is built
-    public void SetServiceProvider(IServiceProvider services)
+    public void SetHost(IHost host)
     {
+        _host = host;
+        var services = host.Services;
+
         _services = services;
         _logger = services.GetRequiredService<ILogger<App>>();
         _settings = services.GetRequiredService<IOptions<AppSettings>>();
@@ -51,11 +55,22 @@ public partial class App : Application
             _logger?.LogInformation(
                 "First run detected — launching Induction " +
                 "(Form MwA 621d/7 22). The Ministry awaits.");
-            ShowFirstRunSetup();
+            var inductionCompleted = ShowFirstRunSetup();
+
+            if (!inductionCompleted)
+            {
+                _logger?.LogInformation(
+                    "Induction did not complete — shutting down " +
+                    "without starting the tray icon.");
+                Shutdown();
+                return;
+            }
         }
 
         _trayIcon = _services!.GetRequiredService<TrayIcon>();
         _trayIcon.Initialise();
+
+        _ = Task.Run(StartHostAsync);
 
         _logger?.LogInformation(
             "MTGB ready. Watching your prints.");
@@ -72,14 +87,41 @@ public partial class App : Application
     private bool IsFirstRun() =>
         !_settings!.Value.Inducted;
 
-    private void ShowFirstRunSetup()
+    private async Task StartHostAsync()
     {
+        try
+        {
+            await _host!.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogCritical(ex,
+                "Failed to start MTGB background services.");
+
+            Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show(
+                    "MTGB started, but its background services did not.\n\n" +
+                    ex.Message,
+                    "MTGB — It does not go Bing",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            });
+        }
+    }
+
+    private bool ShowFirstRunSetup()
+    {
+        bool? result = null;
+
         Dispatcher.Invoke(() =>
         {
             var induction = _services!
                 .GetRequiredService<InductionWindow>();
-            induction.ShowDialog();
+            result = induction.ShowDialog();
         });
+
+        return result == true && !IsFirstRun();
     }
 
     private static void RegisterAppUserModelId()
@@ -103,9 +145,8 @@ public partial class App : Application
         key.SetValue("DisplayName",
             "The Monitor That Goes Bing");
         key.SetValue("IconUri",
-            Path.Combine(
-                AppContext.BaseDirectory,
-                "Assets", "mtgb.ico"));
+            Environment.ProcessPath
+            ?? Path.Combine(AppContext.BaseDirectory, "MTGB.exe"));
     }
 
     [System.Runtime.InteropServices.DllImport(
@@ -126,7 +167,7 @@ public partial class App : Application
                 "Unhandled UI thread exception.");
             MessageBox.Show(
                 $"Something went wrong.\n\n{e.Exception.Message}\n\n" +
-                $"Check logs in %APPDATA%\\MTGB\\logs\\ for details.",
+                $"Check logs in {DataPaths.LogsPath} for details.",
                 "MTGB — Unexpected Bing",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

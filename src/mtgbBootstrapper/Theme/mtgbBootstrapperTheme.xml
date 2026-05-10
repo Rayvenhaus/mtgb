@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme
+    xmlns="http://wixtoolset.org/schemas/thmutil/2010"
+    Width="500"
+    Height="390"
+    HexStyle="yes"
+    FontId="0">
+
+	<Font Id="0" Height="-12" Weight="500" Foreground="#f5f5f5" Background="#0f1f4a" FaceName="Segoe UI" />
+	<Font Id="1" Height="-20" Weight="700" Foreground="#fbbd23" Background="#0f1f4a" FaceName="Segoe UI" />
+	<Font Id="2" Height="-12" Weight="500" Foreground="#d1d5db" Background="#0f1f4a" FaceName="Segoe UI" />
+	<Font Id="3" Height="-12" Weight="700" Foreground="#0f1f4a" Background="#fbbd23" FaceName="Segoe UI" />
+
+	<Window Width="500" Height="390" HexStyle="100a0000" FontId="0" Caption="MTGB Setup" />
+
+	<Page Name="Install">
+		<Text X="24" Y="24" Width="452" Height="32" FontId="1">MTGB Setup</Text>
+		<Text X="24" Y="64" Width="452" Height="70" FontId="2">
+			The Ministry will install The Monitor That Goes Bing.
+		</Text>
+
+		<Button Name="InstallButton" X="276" Y="330" Width="96" Height="34" FontId="3">Install</Button>
+		<Button Name="CloseButton" X="380" Y="330" Width="96" Height="34" FontId="0">Cancel</Button>
+	</Page>
+
+	<Page Name="Progress">
+		<Text X="24" Y="24" Width="452" Height="32" FontId="1">Installing MTGB</Text>
+		<Text X="24" Y="64" Width="452" Height="44" FontId="2">
+			The Ministry is filing the necessary forms.
+		</Text>
+		<Progressbar Name="Progressbar" X="24" Y="125" Width="452" Height="16" />
+		<Text Name="ExecuteProgressPackageText" X="24" Y="154" Width="452" Height="28" FontId="2" />
+		<Button Name="CloseButton" X="380" Y="330" Width="96" Height="34" FontId="0">Cancel</Button>
+	</Page>
+
+	<Page Name="Success">
+		<Text X="24" Y="24" Width="452" Height="32" FontId="1">MTGB is installed</Text>
+		<Text X="24" Y="64" Width="452" Height="80" FontId="2">
+			Exit setup, then run MTGB to begin configuration.
+		</Text>
+		<Button Name="LaunchButton" X="260" Y="330" Width="112" Height="34" FontId="3">Launch MTGB</Button>
+		<Button Name="CloseButton" X="380" Y="330" Width="96" Height="34" FontId="0">Exit</Button>
+	</Page>
+
+	<Page Name="Failure">
+		<Text X="24" Y="24" Width="452" Height="32" FontId="1">Setup could not continue</Text>
+		<Text Name="FailureLogFileLink" X="24" Y="64" Width="452" Height="80" FontId="2" />
+		<Button Name="CloseButton" X="380" Y="330" Width="96" Height="34" FontId="0">Exit</Button>
+	</Page>
+</Theme>

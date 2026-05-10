@@ -1,6 +1,7 @@
 <Window x:Class="MTGB.UI.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="MTGB — Settings"
         Width="740" Height="680"
         MinWidth="740" MinHeight="680"
@@ -9,10 +10,16 @@
         Foreground="{StaticResource TextPrimaryBrush}"
         BorderBrush="{StaticResource AccentBlueBrush}"
         BorderThickness="2"
-        WindowStyle="SingleBorderWindow"
+        WindowStyle="None"
         ResizeMode="CanResize"
-        Icon="/Assets/MTGB_32.png"
-        Topmost="True" ShowInTaskbar="False">
+        ShowInTaskbar="True">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0"
+                            ResizeBorderThickness="6"
+                            GlassFrameThickness="0"
+                            CornerRadius="0"/>
+    </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
         <ResourceDictionary>
@@ -136,10 +143,12 @@
                 Background="{StaticResource BgDeepestBrush}"
                 BorderBrush="{StaticResource BorderBlueBrush}"
                 BorderThickness="0,0,0,1"
-                Padding="20,14">
+                Padding="20,14"
+                MouseLeftButtonDown="OnTitleBarDrag">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -165,6 +174,14 @@
                 </StackPanel>
 
                 <Button Grid.Column="1"
+                        Content="–"
+                        Style="{StaticResource GhostButton}"
+                        Width="32" Height="32"
+                        Padding="0" FontSize="16"
+                        Margin="0,0,8,0"
+                        Click="OnMinimizeClick"/>
+
+                <Button Grid.Column="2"
                         Content="✕"
                         Style="{StaticResource GhostButton}"
                         Width="32" Height="32"
@@ -1411,6 +1428,7 @@
                             VerticalAlignment="Center">
                     <Button Content="Save"
                             Style="{StaticResource PrimaryButton}"
+                            Foreground="{StaticResource BgDeepestBrush}"
                             Margin="0,0,8,0"
                             Click="OnSaveClick"/>
                     <Button x:Name="CancelButton"

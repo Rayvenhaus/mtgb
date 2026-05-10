@@ -6,8 +6,8 @@
     <AssemblyName>MTGB</AssemblyName>
     <RootNamespace>MTGB</RootNamespace>
     <ApplicationIcon>Assets\mtgb.ico</ApplicationIcon>
-    <Version>0.6.0</Version>
-      <VersionSuffix>beta</VersionSuffix>
+    <Version>0.6.2</Version>
+    <VersionSuffix>beta</VersionSuffix>
     <Authors>Steven Sheeley</Authors>
     <Description>The Monitor That Goes Bing - Never leave a print behind.</Description>
     <Copyright>Copyright © 2026 Myndworx Asylum</Copyright>
@@ -63,22 +63,14 @@
 	<Resource Include="Assets\MTGB_310x310.png" />
 	<Resource Include="Assets\MTGB_620x300.png" />
 	<Resource Include="Assets\MTGB_1024.png" />
-    <Content Include="Assets\countries.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\mtgb.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="Assets\countries.json" />
+	<None Include="Assets\mtgb.ico" />
   </ItemGroup>
 
   <!-- ── Copy to output ─────────────────────────────────────── -->
   <ItemGroup>
-    <Content Include="Assets\mtgbNotification.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+	<None Include="Assets\mtgbNotification.wav" />
+	<None Include="appsettings.json" />
   </ItemGroup>
 
   <!-- ── WPF entry point ────────────────────────────────────── -->
@@ -86,21 +78,7 @@
     <Page Include="App.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="UI\Themes\" />
-  </ItemGroup>
-
-  <!-- ── MSIX packaging ──────────────────────────────────────── -->
-  <PropertyGroup>
-	<AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
-	<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
-	<DefaultLanguage>en-au</DefaultLanguage>
-  </PropertyGroup>
-
-  <ItemGroup>
-	<AppxManifest Include="Package.appxmanifest">
-	  <SubType>Designer</SubType>
-	</AppxManifest>
   </ItemGroup>
 
 </Project>

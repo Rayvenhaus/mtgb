@@ -1,0 +1,37 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+
+    <?define ProductName = "MTGB" ?>
+    <?define ProductVersion = "$(var.ProductVersion)" ?>
+    <?define Manufacturer = "Myndworx Asylum" ?>
+    <?define UpgradeCode = "B7E6F4A1-8C22-4D13-9A8F-3E4C91F0D2A6" ?>
+
+    <Bundle Name="$(var.ProductName)"
+            Version="$(var.ProductVersion)"
+            Manufacturer="$(var.Manufacturer)"
+            UpgradeCode="$(var.UpgradeCode)">
+
+        <BootstrapperApplication>
+            <bal:WixStandardBootstrapperApplication
+                Theme="hyperlinkLicense"
+                LicenseUrl="" />
+        </BootstrapperApplication>
+
+        <Chain>
+            <ExePackage Id="DotNetDesktopRuntime8"
+                        SourceFile="redist\windowsdesktop-runtime-8.0.26-win-x64.exe"
+                        DisplayName=".NET 8 Windows Desktop Runtime"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        Vital="yes"
+                        DetectCondition="Netfx80DesktopRuntimeInstalled"
+                        InstallArguments="/install /quiet /norestart"
+                        RepairArguments="/repair /quiet /norestart"
+                        UninstallArguments="/uninstall /quiet /norestart" />
+
+            <MsiPackage SourceFile="$(var.mtgbInstaller.TargetPath)" />
+        </Chain>
+
+    </Bundle>
+
+</Wix>

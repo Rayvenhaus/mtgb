@@ -15,7 +15,7 @@
 // previous records as not current.
 // Protected by API key — never called by MTGB clients directly.
 // [USAGE] POST /mtgb/v1/release/publish
-// [RETURNS] JSON — { status, message, data: { id, version } }
+// [RETURNS] JSON — { status, message, data: { id, version, is_beta } }
 // ============================================================
 
 require_once __DIR__ . '/config.php';
@@ -45,16 +45,10 @@ if (empty($version) || !validate_version($version)) {
     send_error('Invalid or missing version.', 400);
 }
 
-$msixUrl = trim($body['msix_url'] ?? '');
-if (empty($msixUrl) || !filter_var(
-    $msixUrl, FILTER_VALIDATE_URL)) {
-    send_error('Invalid or missing msix_url.', 400);
-}
-
-$zipUrl = trim($body['zip_url'] ?? '');
-if (empty($zipUrl) || !filter_var(
-    $zipUrl, FILTER_VALIDATE_URL)) {
-    send_error('Invalid or missing zip_url.', 400);
+$setupUrl = trim($body['setup_url'] ?? '');
+if (empty($setupUrl) || !filter_var(
+    $setupUrl, FILTER_VALIDATE_URL)) {
+    send_error('Invalid or missing setup_url.', 400);
 }
 
 $releaseNotes = trim($body['release_notes'] ?? '');
@@ -67,6 +61,10 @@ if (empty($releaseDate)) {
     $releaseDate = date('Y-m-d H:i:s');
 }
 
+$isBeta = filter_var(
+    $body['is_beta'] ?? false,
+    FILTER_VALIDATE_BOOLEAN);
+
 $db = get_db();
 $db->beginTransaction();
 
@@ -77,20 +75,20 @@ try {
     // Insert new release
     $stmt = $db->prepare('
         INSERT INTO release_info
-            (version, release_date, msix_url,
-             zip_url, release_notes, is_current)
+            (version, release_date, setup_url,
+             release_notes, is_beta, is_current)
         VALUES
-            (:version, :release_date, :msix_url,
-             :zip_url, :release_notes, 1)
+            (:version, :release_date, :setup_url,
+             :release_notes, :is_beta, 1)
     ');
 
     $stmt->execute([
         ':version'       => sanitise_string(
                                 $version, MAX_VERSION_LENGTH),
         ':release_date'  => $releaseDate,
-        ':msix_url'      => $msixUrl,
-        ':zip_url'       => $zipUrl,
+        ':setup_url'     => $setupUrl,
         ':release_notes' => $releaseNotes,
+        ':is_beta'       => $isBeta ? 1 : 0,
     ]);
 
     $id = (int)$db->lastInsertId();
@@ -102,6 +100,7 @@ try {
         [
             'id'      => $id,
             'version' => $version,
+            'is_beta' => $isBeta,
         ]
     );
 

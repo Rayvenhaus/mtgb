@@ -7,6 +7,226 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ---
 
 ## [Unreleased]
+### The one where the Ministry sharpens a pencil ominously
+
+---
+
+## [0.6.2-beta] — 2026-05-10
+### The one where the Ministry stopped stamping the same form twice
+
+### Changed
+
+#### Versioning
+- Bumped MTGB to `0.6.2-beta` for the next patch build.
+- About now displays the Ministry patch format as
+  `v0.6.002 - Beta` instead of the raw assembly version.
+- Updated the deprecated `package.ps1` compatibility wrapper and release
+  docs to default/reference `0.6.2-beta`, so wrapper builds no longer
+  quietly reach back for old `0.6.0-beta` paperwork.
+- Polished the GitHub release workflow so tag and manual release runs
+  share the same normalized version handling, draft prerelease naming,
+  and beta-aware release metadata.
+
+#### Flyout
+- Renamed the flyout `Settings` action to `System Info`.
+- Removed the flyout `Exit` button so users do not mistake it for
+  closing the flyout instead of exiting MTGB.
+- Added explicit completion percentage text below printer progress bars
+  when SimplyPrint provides job progress data.
+
+#### Logging
+- Fixed the daily log filename pattern so the session header and file
+  logger write to the same `mtgb-{yyyyMMdd}.log` file instead of
+  splitting header and dry entries across two similarly named files.
+
+### Fixed
+
+#### Runtime
+- Added a single-instance guard so MTGB refuses to start a second copy
+  for the same Windows session.
+
+#### Induction
+- Summary now describes API key authentication as
+  `API key entered, verified, and secured` instead of showing the raw
+  `ApiKey` enum value.
+
+#### Settings
+- Save button now explicitly uses dark text on the gold primary button
+  so it remains readable.
+
+---
+
+## [0.6.1-beta] — 2026-05-10
+### The one where the Ministry stopped wandering and found the exit
+
+### Added
+
+#### WiX/Burn release lane
+- Added `build-installer.ps1` as the canonical local release build
+  script. It performs the required sequence in one command:
+  publish MTGB single-file, build the WiX MSI, build the Burn
+  bootstrapper, then stage release artifacts in `dist\`.
+- Release artifacts are now staged as:
+  `MTGB-v{version}-x64-Setup.exe` and
+  `MTGB-v{version}-x64.msi`.
+- Added explicit build failure handling to the installer script so
+  failed `dotnet` commands stop the build immediately instead of
+  allowing the Ministry to stroll confidently into a ditch.
+
+#### Release documentation
+- Added `docs/BUILDING.md` covering prerequisites, the one-command
+  installer build, manual build order, and expected outputs.
+- Added `docs/RELEASE_CHECKLIST.md` covering release scope, version
+  policy, fresh-install VM testing, uninstall testing, upgrade
+  testing, release tagging, and the community endpoint migration.
+- Rewrote `INSTALL.md` for the WiX/Burn setup model, first-run
+  Induction, install layout, uninstall target, and troubleshooting.
+- Updated `README.md` so new contributors see the setup EXE path
+  instead of the old MSIX/portable instructions.
+
+#### Server migration
+- Added `server/mtgb/v1/migrations/2026-05-10-release-info-setup-url.sql`
+  to migrate existing `release_info` rows from `msix_url`/`zip_url`
+  to the new `setup_url` field used by setup-based releases.
+- Added `server/mtgb/v1/migrations/2026-05-10-release-info-is-beta.sql`
+  to add an explicit `is_beta` release flag while keeping release
+  versions numeric for client-side comparison.
+- Added `server/mtgb/v1/migrations/2026-05-10-reset-release-info.sql`
+  to reseed a damaged `release_info` table with historical releases
+  and a single current WiX/Burn setup release row.
+
+#### Uninstall cleanup
+- Added a quiet `MTGB.exe --cleanup-uninstall` mode for MSI-driven
+  cleanup of current-user traces before application files are removed.
+- Added `server/mtgb/v1/installations.php` so uninstall can request
+  server-side deletion of an installation record and all cascaded
+  telemetry/community map data.
+
+### Changed
+
+#### Release pipeline
+- Replaced the GitHub Actions release workflow so tag builds now
+  produce a draft prerelease containing the WiX/Burn setup EXE and
+  MSI, rather than the previous MSIX and portable ZIP artifacts.
+- Changed GitHub release creation to draft/prerelease by default so
+  setup artifacts can be downloaded and smoke-tested before public
+  release.
+- Changed `package.ps1` into a compatibility wrapper around
+  `build-installer.ps1`. The old MSIX packaging machinery has been
+  formally shown to the door.
+- Updated `.gitignore` to keep generated setup EXEs out of source
+  control while allowing the new `win-x64-singlefile.pubxml` publish
+  profile to be tracked.
+
+#### Installer versioning
+- Parameterised WiX MSI and Burn bundle product versions so patch
+  releases such as `0.6.1-beta` can build numeric Windows Installer
+  versions such as `0.6.1` without hand-editing project files.
+- MSI output names now follow the numeric installer version:
+  `MTGB-{ProductVersion}-setup.msi`.
+
+#### Auto-update contract
+- Migrated the client update model from `msix_url`/`zip_url` to
+  `setup_url`.
+- Added explicit beta-release metadata to the update contract. The
+  server now returns `is_beta`, the publisher accepts it, and the client
+  displays/notifies using `0.6.1-beta` while comparing the numeric
+  `0.6.1` version safely.
+- Updated `UpdateService` to download and launch the setup EXE
+  instead of an MSIX package.
+- Kept a legacy `msix_url` fallback in `UpdateService` so an old
+  server response does not cause dramatic fainting in the lobby.
+- Updated `server/mtgb/v1/latest.php`, `publish.php`, and
+  `schema.sql` to use `setup_url` for future releases.
+
+#### Uninstall behaviour
+- MSI now calls `MTGB.exe --cleanup-uninstall` only for real uninstall
+  (`REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE`) so upgrades do not
+  delete user settings or credentials.
+- Uninstall cleanup removes the current user's MTGB startup entry,
+  toast AppUserModelID registration, and all MTGB Credential Manager
+  entries on a best-effort basis.
+- Uninstall cleanup now removes generated runtime data before MSI file
+  removal, including logs and non-installed data files, so
+  `C:\Program Files\MTGB` can disappear properly after uninstall.
+- Server-side uninstall cleanup now explicitly removes telemetry,
+  printer summary, enabled-event, and community map rows before deleting
+  the installation record, instead of depending solely on live database
+  cascade constraints.
+- Uninstall deregistration now retries against both the friendly
+  `/mtgb/v1/installations` route and the direct
+  `/mtgb/v1/installations.php` endpoint so server routing cannot quietly
+  strand an active install record.
+
+#### Window behaviour
+- Settings and History now use MTGB's own themed title chrome instead
+  of showing the native black Windows title bar above the custom header.
+- Settings is no longer topmost and now appears in the taskbar, so
+  opening the GitHub or origin-story links lets the browser come to the
+  foreground like it has a signed permission slip.
+- Settings and History now include themed minimise buttons and restore
+  correctly when reopened from the tray.
+
+#### Logging
+- Log files now start each application session with a readable MTGB
+  header containing session start time, version, process ID, install
+  path, and log file path.
+- The log header now includes the Ministry form designator
+  `MRFWVP Form 3201/4d`, the Ministry of Reduction of Filament Waste
+  and Void Prevention, and an appropriately official preamble before
+  the dry machinery begins.
+- Removed the trailing Serilog event/message-template identifier from
+  file log lines so entries end at the message instead of carrying a
+  mysterious little hexadecimal passport stamp.
+
+### Fixed
+
+#### Induction polish
+- Fixed the Induction Continue button so the dark `TextBlock` is
+  actually inside the primary button instead of standing nearby
+  looking decorative and unhelpful.
+- Fixed first Induction page navigation. The connection-test reset
+  logic now only gates page 2 instead of disabling Continue on page 1.
+- Fixed first-run startup sequencing. MTGB no longer starts the
+  background host during Induction, so Polling, Webhook, Telemetry,
+  and Update workers stay quiet until setup has actually completed.
+- Fixed Induction exit during first run. If the user exits the wizard,
+  Induction now returns an explicit cancelled result so `App` owns the
+  shutdown path and the tray icon never starts after abandoned setup.
+- Test Connection now uses the intended state text:
+  `Testing...`, `Test Passed`, `Test Failed`, and resets to
+  `Test Connection` when credentials are edited.
+- Summary wording now says the API key was entered, verified, and
+  secured.
+- Replaced stale `%APPDATA%\MTGB\appsettings.json` wording in the
+  Induction summary with the current `data\appsettings.json`
+  install-folder model.
+
+#### Installer identity
+- Fixed Windows installed-app registration showing the Burn bundle as
+  `MTGB Setup`. The installed product now registers as `MTGB`, matching
+  the Start Menu shortcut and sparing everyone a needless naming debate.
+
+#### About links
+- Fixed Settings -> About GitHub buttons that still pointed at
+  `https://github.com/YOUR_USERNAME/mtgb`.
+- The GitHub button now opens `https://github.com/Rayvenhaus/mtgb`.
+- The origin story button now opens
+  `https://github.com/Rayvenhaus/mtgb/blob/main/THE_TRUTH.md`.
+
+### Technical notes
+- Verified `dotnet build src\MTGB\MTGB.csproj -c Release -p:Platform=x64 --nologo`
+  completes with zero warnings and zero errors after the updater,
+  uninstall cleanup, and About-link changes.
+- Verified `.\build-installer.ps1 -Version "0.6.1-beta"` completes
+  with zero warnings and zero errors, producing the setup EXE and MSI
+  in `dist\`.
+- Verified `package.ps1 -Version "0.6.1-beta"` still works as a
+  deprecated compatibility wrapper.
+- Community release endpoint publication is intentionally not run
+  automatically from the draft GitHub release workflow. The setup URL
+  should be published only after the GitHub release is public and the
+  staged installer has passed smoke testing.
 
 ---
 

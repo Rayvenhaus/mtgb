@@ -200,10 +200,13 @@ public partial class SettingsWindow : Window
     {
         var version = GetType().Assembly
             .GetName().Version;
+
+        var displayVersion = version is null
+            ? "v0.0.000 - Beta"
+            : $"v{version.Major}.{version.Minor}.{version.Build:000} - Beta";
+
         VersionText.Text =
-            $"The Monitor That Goes Bing · " +
-            $"v{version?.Major}.{version?.Minor}." +
-            $"{version?.Build}";
+            $"The Monitor That Goes Bing · {displayVersion}";
     }
 
     // ── Auth panel switching ──────────────────────────────────────
@@ -1090,12 +1093,12 @@ public partial class SettingsWindow : Window
 
     private void OnGitHubClick(
         object sender, RoutedEventArgs e) =>
-        OpenUrl("https://github.com/YOUR_USERNAME/mtgb");
+        OpenUrl("https://github.com/Rayvenhaus/mtgb");
 
     private void OnOriginStoryClick(
         object sender, RoutedEventArgs e) =>
         OpenUrl(
-            "https://github.com/YOUR_USERNAME/mtgb/blob/main/THE_TRUTH.md");
+            "https://github.com/Rayvenhaus/mtgb/blob/main/THE_TRUTH.md");
 
     private static void OpenUrl(string url)
     {
@@ -1104,6 +1107,29 @@ public partial class SettingsWindow : Window
             FileName = url,
             UseShellExecute = true
         });
+    }
+
+    private void OnTitleBarDrag(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            WindowState = WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized;
+            return;
+        }
+
+        if (e.LeftButton ==
+            System.Windows.Input.MouseButtonState.Pressed)
+            DragMove();
+    }
+
+    private void OnMinimizeClick(
+        object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
     }
 
     // ── Save / Close ──────────────────────────────────────────────
@@ -1271,7 +1297,7 @@ public partial class SettingsWindow : Window
 
         try
         {
-            var dumpDir = DataPaths.DumpsDirectory;
+            var dumpDir = Path.Combine(DataPaths.LogsPath, "diagnostics");
             Directory.CreateDirectory(dumpDir);
 
             var orgId = _settings.Value.OrganisationId;

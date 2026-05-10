@@ -89,8 +89,8 @@ public class CommunityMapService : ICommunityMapService
 
     private static readonly string CountriesFilePath =
         Path.Combine(
-            AppContext.BaseDirectory,
-            "Assets", "countries.json");
+            DataPaths.AssetsPath,
+            "countries.json");
 
     private static readonly JsonSerializerOptions JsonOptions =
         new()

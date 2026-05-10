@@ -261,8 +261,6 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="6"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="6"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0"
@@ -271,7 +269,7 @@
                         Click="OnHistoryClick"/>
 
                 <Button Grid.Column="2"
-                        Content="Settings"
+                        Content="System Info"
                         Style="{StaticResource ActionButton}"
                         Foreground="{StaticResource AccentBlueBrush}"
                         Click="OnSettingsClick"/>
@@ -280,12 +278,6 @@
                         Content="Dashboard ↗"
                         Style="{StaticResource ActionButton}"
                         Click="OnDashboardClick"/>
-
-                <Button Grid.Column="6"
-                        Content="Exit"
-                        Style="{StaticResource ActionButton}"
-                        Foreground="{StaticResource SemanticErrorBrush}"
-                        Click="OnExitClick"/>
             </Grid>
 
             <!-- ── Footer ────────────────────────────────────── -->

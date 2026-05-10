@@ -178,7 +178,7 @@
                                  Style="{StaticResource MtgbInput}"
                                  Margin="0,0,0,20"/>
 
-                        <TextBlock Text="API KEY"
+                        <TextBlock Text="API KEY entered, verified and secured"
                                    FontFamily="Segoe UI Variable, Segoe UI"
                                    FontSize="10" FontWeight="SemiBold"
                                    Foreground="{StaticResource GoldPrimaryBrush}"
@@ -698,7 +698,7 @@
                                    Foreground="{StaticResource TextDimBrush}"
                                    TextWrapping="Wrap" Margin="0,0,0,8">
                             This is your anonymous identifier. The Ministry knows only this.
-                            Nothing more. It lives in %APPDATA%\MTGB\appsettings.json.
+                            Nothing more. It lives in data\appsettings.json beside MTGB.
                         </TextBlock>
                     </StackPanel>
                 </ScrollViewer>
@@ -821,9 +821,14 @@
                             Visibility="Collapsed"
                             Click="OnBackClick"/>
                     <Button x:Name="ContinueButton"
-                            Grid.Column="4" Content="Continue →"
+                            Grid.Column="4"
                             Style="{StaticResource PrimaryButton}"
-                            Click="OnContinueClick"/>
+                            Click="OnContinueClick">
+                        <TextBlock x:Name="ContinueButtonText"
+                                   Text="Continue →"
+                                   Foreground="{StaticResource BgDeepestBrush}"
+                                   FontWeight="SemiBold"/>
+                    </Button>
                 </Grid>
             </Border>
 

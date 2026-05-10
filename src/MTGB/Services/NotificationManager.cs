@@ -107,7 +107,7 @@ public class NotificationManager : INotificationManager, IDisposable
     // Notification sound
     private static readonly string SoundFilePath = Path.Combine(
         AppContext.BaseDirectory,
-        "Assets", "mtgbNotification.wav");
+        "mtgbNotification.wav");
 
     public NotificationManager(
         IOptions<AppSettings> settings,
@@ -285,11 +285,6 @@ public class NotificationManager : INotificationManager, IDisposable
                 var body = BuildBody(evt);
 
                 var builder = new ToastContentBuilder()
-                    .AddAppLogoOverride(
-                        new Uri(
-                            Path.Combine(
-                                AppContext.BaseDirectory,
-                                "Assets", "mtgb.ico")))
                     .AddText(title)
                     .AddText(body)
                     .AddAttributionText("MTGB — It goes Bing");

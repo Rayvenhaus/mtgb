@@ -191,9 +191,13 @@ public partial class FlyoutWindow : Window
         stack.Children.Add(topRow);
 
         // ── Progress bar ──────────────────────────────────────────
-        if (snapshot.JobPercentage.HasValue &&
-            snapshot.JobPercentage > 0)
+        if (snapshot.JobPercentage.HasValue)
         {
+            var percentage = Math.Clamp(
+                snapshot.JobPercentage.Value,
+                0,
+                100);
+
             var progressBg = new Border
             {
                 Height = 5,
@@ -209,8 +213,7 @@ public partial class FlyoutWindow : Window
                 Background = new SolidColorBrush(statusColor),
                 CornerRadius = new CornerRadius(3),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Width = (snapshot.JobPercentage.Value / 100.0)
-                                      * (300 - 24)
+                Width = (percentage / 100.0) * (300 - 24)
             };
 
             var progressGrid = new Grid
@@ -220,6 +223,17 @@ public partial class FlyoutWindow : Window
             progressGrid.Children.Add(progressBg);
             progressGrid.Children.Add(progressFill);
             stack.Children.Add(progressGrid);
+
+            stack.Children.Add(new TextBlock
+            {
+                Text = $"{percentage:F0}% complete",
+                FontFamily = new FontFamily("Segoe UI Variable, Segoe UI"),
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(TextDim),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, -3, 0, 5)
+            });
         }
 
         // ── Meta row — filename + time ────────────────────────────

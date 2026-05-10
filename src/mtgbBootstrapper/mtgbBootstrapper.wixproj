@@ -1,0 +1,26 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <AcceptEula>wix7</AcceptEula>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <OutputName>MTGB-Setup</OutputName>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.6.0</ProductVersion>
+    <Version>$(ProductVersion)</Version>
+    <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
+    <Platform>x64</Platform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="theme\mtgbBootstrapperTheme.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" Version="7.0.0" />
+    <PackageReference Include="WixToolset.Netfx.wixext" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\mtgbInstaller\mtgbInstaller.wixproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Theme\" />
+  </ItemGroup>
+</Project>
