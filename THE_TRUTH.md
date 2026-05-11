@@ -1,7 +1,7 @@
 # THE TRUTH OF THE BEGINNING AS TOLD BY THE COMMITTEE FOR THE REDUCTION OF FILAMENT WASTE
 ## As Filed with the Redundant Department of Redundancy
-### Which was originally filed correctly, then filed again for safety.
-### Subsequently filed a third time because the first filing was placed in the folder for Incorrectly Correct Filings and something ate the second filing.
+##### Which was originally filed correctly, then filed again for safety.
+##### Subsequently filed a third time because the first filing was placed in the folder for Incorrectly Correct Filings and something ate the second filing.
 
 ---
 
